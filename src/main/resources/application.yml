@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: kc-demo
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/lab
+server:
+  port: 8081
