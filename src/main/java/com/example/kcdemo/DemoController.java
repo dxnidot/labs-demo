@@ -7,15 +7,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DemoController {
 
-	@GetMapping("/menu")
-	@PreAuthorize("hasRole('ver-menu')")
-	public String menu() {
-		return "menu visible";
-	}
+    @GetMapping("/menu")
+    @PreAuthorize("hasRole('ver-menu')")
+    public String menu() {
+        return "menu visible";
+    }
 
-	@GetMapping("/autorizar")
-	@PreAuthorize("hasRole('autorizar')")
-	public String autorizar() {
-		return "autorizado";
-	}
+    @GetMapping("/autorizar")
+    @PreAuthorize("hasRole('autorizar')")
+    public String autorizar() {
+        return "autorizado";
+    }
 }

@@ -18,47 +18,45 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-	@Bean
-	SecurityFilterChain securityFilterChain(
-			HttpSecurity http,
-			JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
-		http
-			.authorizeHttpRequests(authorize -> authorize
-				.anyRequest().authenticated()
-			)
-			.oauth2ResourceServer(oauth2 -> oauth2
-				.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
-			);
-		return http.build();
-	}
+    @Bean
+    SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
+        http
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+        return http.build();
+    }
 
-	@Bean
-	JwtAuthenticationConverter jwtAuthenticationConverter() {
-		JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-		converter.setJwtGrantedAuthoritiesConverter(this::clientRoleAuthorities);
-		return converter;
-	}
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(this::clientRoleAuthorities);
+        return converter;
+    }
 
-	private Collection<GrantedAuthority> clientRoleAuthorities(Jwt jwt) {
-		Object resourceAccess = jwt.getClaims().get("resource_access");
-		if (!(resourceAccess instanceof Map<?, ?> resources)) {
-			return List.of();
-		}
+    private Collection<GrantedAuthority> clientRoleAuthorities(Jwt jwt) {
+        Object resourceAccess = jwt.getClaims().get("resource_access");
+        if (!(resourceAccess instanceof Map<?, ?> resources)) {
+            return List.of();
+        }
 
-		Object chatApi = resources.get("chat-api");
-		if (!(chatApi instanceof Map<?, ?> client)) {
-			return List.of();
-		}
+        Object chatApi = resources.get("chat-api");
+        if (!(chatApi instanceof Map<?, ?> client)) {
+            return List.of();
+        }
 
-		Object roles = client.get("roles");
-		if (!(roles instanceof Collection<?> roleNames)) {
-			return List.of();
-		}
+        Object roles = client.get("roles");
+        if (!(roles instanceof Collection<?> roleNames)) {
+            return List.of();
+        }
 
-		return roleNames.stream()
-			.filter(String.class::isInstance)
-			.map(String.class::cast)
-			.map(role -> (GrantedAuthority) new SimpleGrantedAuthority("ROLE_" + role))
-			.toList();
-	}
+        return roleNames.stream()
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .map(role -> (GrantedAuthority) new SimpleGrantedAuthority("ROLE_" + role))
+                .toList();
+    }
 }
