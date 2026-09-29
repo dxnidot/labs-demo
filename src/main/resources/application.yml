@@ -8,3 +8,25 @@ spring:
           issuer-uri: http://localhost:8080/realms/lab
 server:
   port: 8081
+menu:
+  opciones:
+    - clave: aclaraciones
+      titulo: "Aclaraciones"
+      ruta: /aclaraciones
+      rol: ver-menu
+      acciones:
+        - clave: consultar
+          rol: ver-menu
+        - clave: aprobar
+          rol: autorizar
+    - clave: autorizaciones
+      titulo: "Bandeja de autorizaciones"
+      ruta: /autorizaciones
+      rol: autorizar
+      acciones:
+        - clave: aprobar
+          rol: autorizar
+    - clave: administracion
+      titulo: "Administración de seguridad"
+      ruta: /admin
+      rol: admin-seguridad
