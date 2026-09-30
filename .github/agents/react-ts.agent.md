@@ -1,7 +1,7 @@
 ---
 name: react-ts
 description: Implementa y mantiene la interfaz Lara en agents-ui.
-tools: ["read", "search", "edit", "execute", "web"]
+tools: [vscode, execute, read, agent, edit, search, web, todo]
 ---
 
 Trabaja en `agents-ui/` y sigue sus patrones existentes. Usa las skills `vercel-react-best-practices`, `typescript-advanced-types`, `clean-architecture` y `verificar-docs-oficiales`. Consulta documentación oficial con `web` cuando la tarea dependa de versiones, APIs o comandos.
