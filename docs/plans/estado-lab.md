@@ -11,8 +11,8 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ `.gitignore` con reglas `.env`, `!.env.example` y `docs/private/`
 - [x] ✅ Estructura `docs/` (backlog, bugs, decisions, plans, archive, private)
 - [ ] ⏳ Auditoría de secretos completa (`git ls-files` filtrado)
-- [ ] ⏳ DOC-01 · ADR de versiones en `docs/decisions/0001-versiones.md`
-- [ ] ⏳ DOC-01 · Plantillas: backlog, bug y ADR
+- [ ] 🔄 DOC-01 · ADR de versiones en `docs/decisions/0001-versiones.md`
+- [ ] 🔄 DOC-01 · Plantillas: backlog, bug y ADR
 
 ## keycloak (puerto 8080)
 
@@ -20,7 +20,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ Realm `lab`, usuarios `ana` / `beto`, client `chat-api` con roles
 - [x] ✅ Authorization Services (RPT)
 - [ ] ⏳ KC-01 · Subir Keycloak a 26.7.5 (parche)
-- [ ] ⏳ KC-02 · Client público `agents-ui`
+- [x] ✅ KC-02 · Client público `agents-ui`
 - [ ] ⏳ KC-03 · Realm como código (export/import)
 
 ## kc-demo (Spring Boot, puerto 8081)
@@ -41,13 +41,13 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 
 ## .github (Copilot)
 
-- [ ] ⏳ CP-01 · Instrucciones, agentes y skills por lenguaje
+- [x] ✅ CP-01 · Instrucciones, agentes y skills por lenguaje
 - [ ] ⏳ CP-02 · Probar `test-engineer`, `keycloak-security` y la skill `keycloak-lab`
 
 ## agents (ADK)
 
-- [ ] ⏳ AG-00 · Entorno: venv, `google-adk[a2a]`, `litellm>=1.84`
-- [ ] ⏳ AG-01 · Orquestador Python en `adk web` (8000)
+- [x] ✅ AG-00 · Entorno: venv, `google-adk[a2a]`, `litellm>=1.84`
+- [x] ✅ AG-01 · Orquestador Python en `adk web` (8000)
 - [ ] ⏳ AG-02 · Agente Java con agent card (8002)
 - [ ] ⏳ AG-03 · Agente TypeScript con agent card (8003)
 - [ ] ⏳ AG-04 · Delegación A2A
@@ -56,8 +56,8 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 
 ## agents-ui / Lara (React, puerto 5173)
 
-- [ ] ⏳ UI-01 · API server de ADK (8010)
-- [ ] ⏳ UI-02 · Chat con login de Keycloak y streaming
+- [x] ✅ UI-01 · API server de ADK (8010)
+- [ ] 🔄 UI-02 · Chat con login de Keycloak y streaming
 - [ ] ⏳ UI-04 · C.5: vistas de Lara
 
 ## Personal (a futuro)
