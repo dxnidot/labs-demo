@@ -24,6 +24,12 @@ Laboratorio personal en Windows (`D:\dev\labs`, PowerShell). Repo **público**. 
 - Código limpio para Sonar: sin código muerto, sin `if` anidados innecesarios, nombres claros.
 - Cambia solo lo que se pidió. No toques otras carpetas del monorepo.
 
+## Estado del backlog
+- Al aprobarse el plan de una historia: cambia su Estado a "En curso" en su archivo de docs/backlog/, en docs/backlog/README.md y en docs/plans/estado-lab.md (🔄).
+- Al terminar y validar: propone cambiarla a "Hecho" (✅), reemplazando cada "Pendiente" de sus Notas por un "Confirmado" que diga cómo se resolvió, más "Cerrado: <fecha>". Si solo se hizo una parte, déjala "En curso" y di qué falta.
+- Actualiza "Última actualización" en estado-lab.md.
+- Estos cambios de estado son la única excepción a "no tocar otras carpetas".
+
 ## Arquitectura
 
 - Convención del lab: **hexagonal ligera** (puertos y adaptadores): `domain/`, `application/ports`, `application/use-cases`, `infrastructure/adapters`, `ui/`.
