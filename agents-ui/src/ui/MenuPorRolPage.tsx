@@ -1,34 +1,21 @@
 import { useEffect, useState } from "react";
-import type { Aclaracion } from "../domain/Aclaracion";
 import type { MenuOpcion } from "../domain/MenuOpcion";
-import type { ResultadoAprobacion } from "../domain/ResultadoAprobacion";
-import type { Usuario } from "../domain/Usuario";
-import { Button } from "./components/Button";
 import { Pill } from "./components/Pill";
 
 interface MenuPorRolPageProps {
-  aprobarAclaracion: (id: number) => Promise<ResultadoAprobacion>;
-  obtenerAclaraciones: () => Promise<Aclaracion[]>;
   obtenerMenu: () => Promise<MenuOpcion[]>;
-  usuario: Usuario;
 }
 
 /**
  * Presenta las opciones y acciones que el backend habilitó para el usuario.
  * @author Daniel
  * @since 2026-09-30
+ * @modified Daniel 2026-09-30 muestra solo menú y acciones de lectura.
  */
-export function MenuPorRolPage({
-  aprobarAclaracion,
-  obtenerAclaraciones,
-  obtenerMenu,
-  usuario,
-}: MenuPorRolPageProps) {
+export function MenuPorRolPage({ obtenerMenu }: MenuPorRolPageProps) {
   const [menu, setMenu] = useState<MenuOpcion[]>([]);
-  const [aclaraciones, setAclaraciones] = useState<Aclaracion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [approvingId, setApprovingId] = useState<number | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -37,13 +24,8 @@ export function MenuPorRolPage({
       setError(null);
       try {
         const opciones = await obtenerMenu();
-        const puedeConsultar = opciones.some(
-          (opcion) => opcion.clave === "aclaraciones" && opcion.acciones.includes("consultar"),
-        );
-        const registros = puedeConsultar ? await obtenerAclaraciones() : [];
         if (active) {
           setMenu(opciones);
-          setAclaraciones(registros);
         }
       } catch (reason: unknown) {
         if (active) {
@@ -59,26 +41,7 @@ export function MenuPorRolPage({
     return () => {
       active = false;
     };
-  }, [obtenerAclaraciones, obtenerMenu]);
-
-  async function aprobar(id: number) {
-    setApprovingId(id);
-    setError(null);
-    try {
-      const resultado = await aprobarAclaracion(id);
-      setAclaraciones((actuales) =>
-        actuales.map((aclaracion) =>
-          aclaracion.id === resultado.id
-            ? { ...aclaracion, estatus: resultado.estatus }
-            : aclaracion,
-        ),
-      );
-    } catch (reason: unknown) {
-      setError(reason instanceof Error ? reason.message : "No se pudo aprobar la aclaración.");
-    } finally {
-      setApprovingId(null);
-    }
-  }
+  }, [obtenerMenu]);
 
   if (loading) {
     return <p className="p-8 text-sm text-muted">Cargando menú por rol…</p>;
@@ -93,17 +56,8 @@ export function MenuPorRolPage({
           </p>
           <h1 className="mt-2 text-2xl font-semibold">Menú por rol</h1>
           <p className="mt-2 text-sm text-muted">
-            Opciones para {usuario.username} según los permisos que validó el backend.
+            Opciones y acciones según los permisos que validó el backend.
           </p>
-          <div aria-label="Roles del usuario" className="mt-4 flex flex-wrap gap-2">
-            {usuario.chatApiRoles.length > 0 ? (
-              usuario.chatApiRoles.map((rol) => (
-                <Pill key={rol} tone="lavender">{rol}</Pill>
-              ))
-            ) : (
-              <Pill tone="butter">Sin roles de chat-api</Pill>
-            )}
-          </div>
         </header>
 
         {error && (
@@ -121,67 +75,24 @@ export function MenuPorRolPage({
           </p>
         ) : (
           <div className="grid gap-4">
-            {menu.map((opcion) => {
-              const puedeAprobar =
-                opcion.acciones.includes("aprobar") &&
-                usuario.chatApiRoles.includes("autorizar");
-              const muestraAclaraciones =
-                opcion.clave === "aclaraciones" && opcion.acciones.includes("consultar");
-
-              return (
-                <article
-                  className="rounded-card border border-border bg-surface p-5"
-                  key={opcion.clave}
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-lg font-semibold">{opcion.titulo}</h2>
-                      <p className="mt-1 font-mono text-xs text-muted">{opcion.ruta}</p>
-                    </div>
-                    <div aria-label={`Acciones de ${opcion.titulo}`} className="flex flex-wrap gap-2">
-                      {opcion.acciones.map((accion) => (
-                        <Pill key={accion} tone={accion === "aprobar" ? "mint" : "accent"}>
-                          {accion}
-                        </Pill>
-                      ))}
-                    </div>
+            {menu.map((opcion) => (
+              <article
+                className="rounded-card border border-border bg-surface p-5"
+                key={opcion.clave}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <h2 className="text-lg font-semibold">{opcion.titulo}</h2>
+                    <p className="mt-1 font-mono text-xs text-muted">{opcion.ruta}</p>
                   </div>
-
-                  {muestraAclaraciones && aclaraciones.length === 0 && (
-                    <p className="mt-5 border-t border-divider pt-4 text-sm text-muted">
-                      No hay aclaraciones pendientes.
-                    </p>
-                  )}
-
-                  {muestraAclaraciones && aclaraciones.length > 0 && (
-                    <ul className="mt-5 divide-y divide-divider border-t border-divider">
-                      {aclaraciones.map((aclaracion) => (
-                        <li
-                          className="flex flex-wrap items-center justify-between gap-3 py-4"
-                          key={aclaracion.id}
-                        >
-                          <div>
-                            <p className="text-sm font-medium">{aclaracion.descripcion}</p>
-                            <p className="mt-1 font-mono text-xs text-muted">
-                              #{aclaracion.id} · {aclaracion.estatus}
-                            </p>
-                          </div>
-                          {puedeAprobar && aclaracion.estatus !== "aprobada" && (
-                            <Button
-                              disabled={approvingId !== null}
-                              onClick={() => void aprobar(aclaracion.id)}
-                              variant="primary"
-                            >
-                              {approvingId === aclaracion.id ? "Aprobando…" : "Aprobar"}
-                            </Button>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </article>
-              );
-            })}
+                  <div aria-label={`Acciones de ${opcion.titulo}`} className="flex flex-wrap gap-2">
+                    {opcion.acciones.map((accion) => (
+                      <Pill key={accion}>{accion}</Pill>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         )}
       </div>

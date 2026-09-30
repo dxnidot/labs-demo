@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router";
 import type { Usuario } from "../domain/Usuario";
-import { AprobarAclaracion } from "../application/use-cases/AprobarAclaracion";
-import { ObtenerAclaraciones } from "../application/use-cases/ObtenerAclaraciones";
 import { ObtenerMenu } from "../application/use-cases/ObtenerMenu";
 import { IniciarSesion } from "../application/use-cases/IniciarSesion";
 import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
-import { HttpAclaracionesAdapter } from "../infrastructure/adapters/HttpAclaracionesAdapter";
 import { HttpMenuAdapter } from "../infrastructure/adapters/HttpMenuAdapter";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { Button } from "./components/Button";
@@ -20,18 +17,14 @@ import { ChatSessionsProvider, useChatSessions } from "./useChatSessions";
 const iniciarSesion = new IniciarSesion(keycloakAuthAdapter);
 const apiHttpClient = new ApiHttpClient(keycloakAuthAdapter);
 const menuPort = new HttpMenuAdapter(apiHttpClient);
-const aclaracionesPort = new HttpAclaracionesAdapter(apiHttpClient);
 const obtenerMenu = new ObtenerMenu(menuPort);
-const obtenerAclaraciones = new ObtenerAclaraciones(aclaracionesPort);
-const aprobarAclaracion = new AprobarAclaracion(aclaracionesPort);
 const cargarMenu = () => obtenerMenu.ejecutar();
-const cargarAclaraciones = () => obtenerAclaraciones.ejecutar();
-const aprobarAclaracionPorId = (id: number) => aprobarAclaracion.ejecutar(id);
 
 /**
  * Autentica al usuario y compone el shell persistente con sus vistas.
  * @author Daniel
  * @since 2026-09-30
+ * @modified Daniel 2026-09-30 elimina integraciones de aclaraciones.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -191,17 +184,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
         <Routes>
           <Route path="/" element={<Navigate replace to="/chat" />} />
           <Route path="/chat" element={<ChatPage usuario={usuario} />} />
-          <Route
-            path="/menu"
-            element={
-              <MenuPorRolPage
-                aprobarAclaracion={aprobarAclaracionPorId}
-                obtenerAclaraciones={cargarAclaraciones}
-                obtenerMenu={cargarMenu}
-                usuario={usuario}
-              />
-            }
-          />
+          <Route path="/menu" element={<MenuPorRolPage obtenerMenu={cargarMenu} />} />
           <Route path="*" element={<Navigate replace to="/chat" />} />
         </Routes>
       </section>
