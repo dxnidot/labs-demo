@@ -17,3 +17,4 @@
   - Confirmado: el importador debe ser un caso de prueba, no una integración con cuentas reales.
   - Inferido: hay que mapear columnas de forma explícita para evitar errores de contenido.
   - Pendiente: decidir si el caso requiere anotaciones de negocio o un proceso más general de normalización.
+  - Publica `CargoRegistrado` en lugar de escribir directamente en la proyección ([ADR-0003](../decisions/0003-arquitectura-por-eventos.md)).

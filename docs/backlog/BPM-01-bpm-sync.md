@@ -17,3 +17,4 @@
   - Confirmado: este servicio no es el núcleo del producto, pero sí añade robustez al lab.
   - Inferido: las tareas dependen del estado de Keycloak y del realm del laboratorio.
   - Pendiente: confirmar si el servicio sale del módulo de seguridad o del módulo de negocio del lab.
+  - Publica `UsuarioCambioPuesto` ([ADR-0003](../decisions/0003-arquitectura-por-eventos.md)).

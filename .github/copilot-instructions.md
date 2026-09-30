@@ -4,15 +4,15 @@ Laboratorio personal en Windows (`D:\dev\labs`, PowerShell). Repo **público**. 
 
 ## Mapa del monorepo
 
-| Carpeta | Qué es | Puerto |
-| --- | --- | --- |
-| `keycloak/` | Keycloak 26 + PostgreSQL (Docker Compose), realm `lab` | 8080 |
-| `kc-demo/` | API Spring Boot 4, Java 21, valida JWT y arma el menú por rol | 8081 |
-| `kc-front/` | Front Angular (se va a absorber en Lara, ver ADR-0002) | 4200 |
-| `bpm-sync/` | Sincronización BPM → Keycloak (pendiente) | — |
-| `agents/` | Agentes ADK: orquestador Python (8000, API server 8010), aclaraciones Java (8002), menu TypeScript (8003) | varios |
-| `agents-ui/` | Lara: UI en React + Vite + Tailwind con login de Keycloak | 5173 |
-| `docs/` | Backlog, ADR, planes y guía de UI | — |
+| Carpeta      | Qué es                                                                                                    | Puerto |
+| ------------ | --------------------------------------------------------------------------------------------------------- | ------ |
+| `keycloak/`  | Keycloak 26 + PostgreSQL (Docker Compose), realm `lab`                                                    | 8080   |
+| `kc-demo/`   | API Spring Boot 4, Java 21, valida JWT y arma el menú por rol                                             | 8081   |
+| `kc-front/`  | Front Angular (se va a absorber en Lara, ver ADR-0002)                                                    | 4200   |
+| `bpm-sync/`  | Sincronización BPM → Keycloak (pendiente)                                                                 | —      |
+| `agents/`    | Agentes ADK: orquestador Python (8000, API server 8010), aclaraciones Java (8002), menu TypeScript (8003) | varios |
+| `agents-ui/` | Lara: UI en React + Vite + Tailwind con login de Keycloak                                                 | 5173   |
+| `docs/`      | Backlog, ADR, planes y guía de UI                                                                         | —      |
 
 ## Reglas de trabajo
 
@@ -38,6 +38,13 @@ Laboratorio personal en Windows (`D:\dev\labs`, PowerShell). Repo **público**. 
 - Datos locales (sesiones SQLite, finanzas) viven en `agents/data/` y están ignorados por Git.
 - Keycloak: nunca `docker compose down -v`.
 
+## Logs y trazas
+
+- Usa el `traceId` del contexto; no generes IDs propios.
+- Loguea solo: `ERROR` con causa, `WARN` de recuperaciones o rechazos, `INFO` de hechos de negocio con conteos.
+- Nunca loguees tokens, secrets, contraseñas, bodies completos ni prompts completos.
+- Ver [docs/decisions/0004-trazabilidad-y-logs.md](../docs/decisions/0004-trazabilidad-y-logs.md).
+
 ## Documentación
 
 No la leas completa; abre solo el archivo que la tarea necesita.
@@ -50,17 +57,17 @@ No la leas completa; abre solo el archivo que la tarea necesita.
 
 ## Skills disponibles (`.github/skills/`)
 
-| Skill | Úsala cuando |
-| --- | --- |
-| `keycloak-lab` | Levantar o detener el lab, puertos, realm, usuarios, sacar tokens |
-| `verificar-docs-oficiales` | Antes de afirmar versiones, APIs o comandos de cualquier librería |
-| `java-springboot` | Código en `kc-demo`, `bpm-sync` o el agente Java |
-| `clean-architecture` | Diseñar capas, puertos y dependencias (respetando la convención hexagonal) |
-| `system-design` | Decisiones entre servicios: A2A, API server, persistencia, flujos |
-| `python-design-patterns` | Código del orquestador y agentes en Python |
-| `typescript-advanced-types` | Tipos en `agents-ui`, `kc-front` o el agente TypeScript |
-| `vercel-react-best-practices` | Componentes, hooks y rendimiento en `agents-ui` |
-| `find-skills` | Buscar una skill nueva cuando ninguna de estas aplica |
+| Skill                         | Úsala cuando                                                               |
+| ----------------------------- | -------------------------------------------------------------------------- |
+| `keycloak-lab`                | Levantar o detener el lab, puertos, realm, usuarios, sacar tokens          |
+| `verificar-docs-oficiales`    | Antes de afirmar versiones, APIs o comandos de cualquier librería          |
+| `java-springboot`             | Código en `kc-demo`, `bpm-sync` o el agente Java                           |
+| `clean-architecture`          | Diseñar capas, puertos y dependencias (respetando la convención hexagonal) |
+| `system-design`               | Decisiones entre servicios: A2A, API server, persistencia, flujos          |
+| `python-design-patterns`      | Código del orquestador y agentes en Python                                 |
+| `typescript-advanced-types`   | Tipos en `agents-ui`, `kc-front` o el agente TypeScript                    |
+| `vercel-react-best-practices` | Componentes, hooks y rendimiento en `agents-ui`                            |
+| `find-skills`                 | Buscar una skill nueva cuando ninguna de estas aplica                      |
 
 ## Commits (cuando el autor los pida)
 

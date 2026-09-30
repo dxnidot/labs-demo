@@ -17,3 +17,4 @@
   - Confirmado: el importador debe sostener datos sintéticos y no reales.
   - Inferido: la validación del esquema es esencial para evitar corrupción de la data.
   - Pendiente: establecer el formato exacto de la hoja y los campos mínimos del modelo de finanzas.
+  - Publica `CargoRegistrado` en lugar de escribir directamente en la proyección ([ADR-0003](../decisions/0003-arquitectura-por-eventos.md)).

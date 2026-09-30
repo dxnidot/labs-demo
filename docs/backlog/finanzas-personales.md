@@ -24,3 +24,5 @@
 - [FIN-01 · Importador xlsx/csv](FIN-01-importador-xlsx-csv.md)
 - [FIN-02 · Importador de Google Takeout](FIN-02-importador-takeout.md)
 - [FIN-03 · Detección de gastos fijos y proyección](FIN-03-deteccion-gastos-fijos.md)
+- [FIN-04 · Importador de estado de cuenta de inversiones (PDF mensual) y valuación con precios públicos](FIN-04-importador-inversiones-pdf.md)
+- [FIN-05 · Captura de cargos desde notificaciones del celular](FIN-05-notificaciones-celular.md)
