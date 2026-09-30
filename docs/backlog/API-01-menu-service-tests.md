@@ -1,4 +1,5 @@
 # API-01 · Pruebas unitarias de MenuService (JUnit 5 + Mockito, AAA)
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: kc-demo

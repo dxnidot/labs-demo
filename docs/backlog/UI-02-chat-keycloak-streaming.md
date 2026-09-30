@@ -1,4 +1,5 @@
 # UI-02 · Chat con login de Keycloak y streaming (C.3–C.4)
+
 - Estado: Pendiente
 - Prioridad: Alta
 - Parte del lab: C.3–C.4

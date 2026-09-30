@@ -1,4 +1,5 @@
 # <ID> · <Título>
+
 - Estado: Pendiente | En curso | Hecho | Cancelado
 - Prioridad: Alta | Media | Baja
 - Parte del lab: <sección del tutorial, ej. B.2>

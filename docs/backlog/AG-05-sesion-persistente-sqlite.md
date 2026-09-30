@@ -1,4 +1,5 @@
 # AG-05 · Sesión persistente en SQLite (B.5)
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: B.5

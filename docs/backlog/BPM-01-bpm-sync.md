@@ -1,4 +1,5 @@
 # BPM-01 · Servicio bpm-sync: dry-run, idempotente, grupo básico por defecto, detección de huérfanas
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: BPM

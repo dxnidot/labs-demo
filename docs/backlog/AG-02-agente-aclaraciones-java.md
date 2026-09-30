@@ -1,4 +1,5 @@
 # AG-02 · Agente aclaraciones en Java con A2A :8002 (B.2)
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: B.2

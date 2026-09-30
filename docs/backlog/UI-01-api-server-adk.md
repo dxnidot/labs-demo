@@ -1,4 +1,5 @@
 # UI-01 · API server de ADK en :8010 (C.2)
+
 - Estado: Pendiente
 - Prioridad: Alta
 - Parte del lab: C.2

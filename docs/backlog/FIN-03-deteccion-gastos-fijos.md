@@ -1,4 +1,5 @@
 # FIN-03 · Detección de gastos fijos y proyección calculada en código (D.3)
+
 - Estado: Pendiente
 - Prioridad: Baja
 - Parte del lab: Finanzas

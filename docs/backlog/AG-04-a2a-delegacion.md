@@ -1,4 +1,5 @@
 # AG-04 · Orquestador delega por A2A: transferencia y pregunta/respuesta (B.4)
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: B.4

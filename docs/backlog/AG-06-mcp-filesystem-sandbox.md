@@ -1,4 +1,5 @@
 # AG-06 · MCP filesystem de solo lectura en sandbox (B.6)
+
 - Estado: Pendiente
 - Prioridad: Baja
 - Parte del lab: B.6

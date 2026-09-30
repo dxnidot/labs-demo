@@ -1,35 +1,35 @@
 # Backlog
 
-| ID | Título | Prioridad | Estado | Depende de | archivo |
-| --- | --- | --- | --- | --- | --- |
-| DOC-01 | Plantillas de backlog, bug y ADR + ADR 0001 de versiones | Alta | Pendiente | — | [DOC-01-plantillas-backlog-bug-adr.md](DOC-01-plantillas-backlog-bug-adr.md) |
-| CP-01 | Instrucciones, agentes y skills de Copilot (A.1) | Alta | Pendiente | — | [CP-01-copilot-instrucciones-agentes-skills.md](CP-01-copilot-instrucciones-agentes-skills.md) |
-| AG-00 | Entorno: PYTHONUTF8, venv, google-adk[a2a], litellm>=1.84 (Módulo 0) | Alta | Pendiente | — | [AG-00-entorno-adk.md](AG-00-entorno-adk.md) |
-| AG-01 | Orquestador Python en adk web (B.1) | Alta | Pendiente | AG-00 | [AG-01-orquestador-python.md](AG-01-orquestador-python.md) |
-| KC-02 | Client público agents-ui en realm lab (C.1) | Alta | Pendiente | — | [KC-02-client-publico-agents-ui.md](KC-02-client-publico-agents-ui.md) |
-| UI-01 | API server de ADK en :8010 (C.2) | Alta | Pendiente | AG-01 | [UI-01-api-server-adk.md](UI-01-api-server-adk.md) |
-| UI-02 | Chat con login de Keycloak y streaming (C.3–C.4) | Alta | Pendiente | KC-02, UI-01 | [UI-02-chat-keycloak-streaming.md](UI-02-chat-keycloak-streaming.md) |
-| KC-01 | Subir Keycloak a 26.7.5 (parche, sin down -v) | Media | Pendiente | — | [KC-01-keycloak-26-7-5.md](KC-01-keycloak-26-7-5.md) |
-| DOC-02 | Guía de UI de Lara con capturas | Media | Pendiente | — | [DOC-02-guia-ui-lara.md](DOC-02-guia-ui-lara.md) |
-| API-01 | Pruebas unitarias de MenuService (JUnit 5 + Mockito, AAA) | Media | Pendiente | — | [API-01-menu-service-tests.md](API-01-menu-service-tests.md) |
-| CP-02 | Probar test-engineer, keycloak-security y skill keycloak-lab (A.2) | Media | Pendiente | CP-01, API-01 | [CP-02-pruebas-copilot.md](CP-02-pruebas-copilot.md) |
-| AG-02 | Agente aclaraciones en Java con A2A :8002 (B.2) | Media | Pendiente | AG-01 | [AG-02-agente-aclaraciones-java.md](AG-02-agente-aclaraciones-java.md) |
-| AG-03 | Agente menu en TypeScript con A2A :8003 (B.3) | Media | Pendiente | AG-01 | [AG-03-agente-menu-typescript.md](AG-03-agente-menu-typescript.md) |
-| AG-04 | Orquestador delega por A2A: transferencia y pregunta/respuesta (B.4) | Media | Pendiente | AG-02, AG-03 | [AG-04-a2a-delegacion.md](AG-04-a2a-delegacion.md) |
-| AG-05 | Sesión persistente en SQLite (B.5) | Media | Pendiente | AG-01 | [AG-05-sesion-persistente-sqlite.md](AG-05-sesion-persistente-sqlite.md) |
-| AG-07 | Validar el JWT del usuario en el agente (conexión con Keycloak) | Media | Pendiente | UI-02 | [AG-07-jwt-del-agente.md](AG-07-jwt-del-agente.md) |
-| UI-03 | Design system de Lara: tokens y componentes base | Media | Pendiente | DOC-02 | [UI-03-design-system-lara.md](UI-03-design-system-lara.md) |
-| UI-04 | Vistas de Lara (C.5) | Media | Pendiente | UI-02, UI-03 | [UI-04-vistas-lara.md](UI-04-vistas-lara.md) |
-| FE-01 | Menú por rol dentro de Lara y retiro de kc-front Angular | Media | Pendiente | UI-04 | [FE-01-menu-por-rol.md](FE-01-menu-por-rol.md) |
-| BPM-01 | Servicio bpm-sync: dry-run, idempotente, grupo basico por defecto, detección de huérfanas | Media | Pendiente | KC-01 | [BPM-01-bpm-sync.md](BPM-01-bpm-sync.md) |
-| AG-06 | MCP filesystem de solo lectura en sandbox (B.6) | Baja | Pendiente | AG-01 | [AG-06-mcp-filesystem-sandbox.md](AG-06-mcp-filesystem-sandbox.md) |
-| FE-02 | Angular 22.2.1 con ng update (TypeScript se queda en 6.0) | Baja | Pendiente | — | [FE-02-angular-22-2-1.md](FE-02-angular-22-2-1.md) |
-| KC-03 | Realm como código (export/import) | Baja | Pendiente | — | [KC-03-realm-como-codigo.md](KC-03-realm-como-codigo.md) |
-| UI-05 | Catálogo A2UI para respuestas del agente (a futuro, caso aparte) | Baja | Pendiente | UI-02, UI-03 | [UI-05-catalogo-a2ui.md](UI-05-catalogo-a2ui.md) |
-| FIN-00 | Finanzas personales (épica) | Baja | Pendiente | UI-04 | [finanzas-personales.md](finanzas-personales.md) |
-| FIN-01 | Importador xlsx/csv (D.1) | Baja | Pendiente | UI-04 | [FIN-01-importador-xlsx-csv.md](FIN-01-importador-xlsx-csv.md) |
-| FIN-02 | Importador de Google Takeout (D.2) | Baja | Pendiente | FIN-01 | [FIN-02-importador-takeout.md](FIN-02-importador-takeout.md) |
-| FIN-03 | Detección de gastos fijos y proyección calculada en código (D.3) | Baja | Pendiente | FIN-01 | [FIN-03-deteccion-gastos-fijos.md](FIN-03-deteccion-gastos-fijos.md) |
-| EXT-01 | Open WebUI con DeepSeek y RAG de documentación oficial (Módulo 7) | Baja | Pendiente | — | [EXT-01-openwebui-rag.md](EXT-01-openwebui-rag.md) |
-| EXT-02 | Buscador propio con SearXNG (opcional) | Baja | Pendiente | EXT-01 | [EXT-02-searxng.md](EXT-02-searxng.md) |
-| EXT-03 | Aviso por Telegram cuando Copilot pide permiso o termina (hook, opcional) | Baja | Pendiente | CP-01 | [EXT-03-aviso-telegram-copilot.md](EXT-03-aviso-telegram-copilot.md) |
+| ID     | Título                                                                                    | Prioridad | Estado    | Depende de    | archivo                                                                                        |
+| ------ | ----------------------------------------------------------------------------------------- | --------- | --------- | ------------- | ---------------------------------------------------------------------------------------------- |
+| DOC-01 | Plantillas de backlog, bug y ADR + ADR 0001 de versiones                                  | Alta      | Pendiente | —             | [DOC-01-plantillas-backlog-bug-adr.md](DOC-01-plantillas-backlog-bug-adr.md)                   |
+| CP-01  | Instrucciones, agentes y skills de Copilot (A.1)                                          | Alta      | Pendiente | —             | [CP-01-copilot-instrucciones-agentes-skills.md](CP-01-copilot-instrucciones-agentes-skills.md) |
+| AG-00  | Entorno: PYTHONUTF8, venv, google-adk[a2a], litellm>=1.84 (Módulo 0)                      | Alta      | Pendiente | —             | [AG-00-entorno-adk.md](AG-00-entorno-adk.md)                                                   |
+| AG-01  | Orquestador Python en adk web (B.1)                                                       | Alta      | Pendiente | AG-00         | [AG-01-orquestador-python.md](AG-01-orquestador-python.md)                                     |
+| KC-02  | Client público agents-ui en realm lab (C.1)                                               | Alta      | Pendiente | —             | [KC-02-client-publico-agents-ui.md](KC-02-client-publico-agents-ui.md)                         |
+| UI-01  | API server de ADK en :8010 (C.2)                                                          | Alta      | Pendiente | AG-01         | [UI-01-api-server-adk.md](UI-01-api-server-adk.md)                                             |
+| UI-02  | Chat con login de Keycloak y streaming (C.3–C.4)                                          | Alta      | Pendiente | KC-02, UI-01  | [UI-02-chat-keycloak-streaming.md](UI-02-chat-keycloak-streaming.md)                           |
+| KC-01  | Subir Keycloak a 26.7.5 (parche, sin down -v)                                             | Media     | Pendiente | —             | [KC-01-keycloak-26-7-5.md](KC-01-keycloak-26-7-5.md)                                           |
+| DOC-02 | Guía de UI de Lara con capturas                                                           | Media     | Pendiente | —             | [DOC-02-guia-ui-lara.md](DOC-02-guia-ui-lara.md)                                               |
+| API-01 | Pruebas unitarias de MenuService (JUnit 5 + Mockito, AAA)                                 | Media     | Pendiente | —             | [API-01-menu-service-tests.md](API-01-menu-service-tests.md)                                   |
+| CP-02  | Probar test-engineer, keycloak-security y skill keycloak-lab (A.2)                        | Media     | Pendiente | CP-01, API-01 | [CP-02-pruebas-copilot.md](CP-02-pruebas-copilot.md)                                           |
+| AG-02  | Agente aclaraciones en Java con A2A :8002 (B.2)                                           | Media     | Pendiente | AG-01         | [AG-02-agente-aclaraciones-java.md](AG-02-agente-aclaraciones-java.md)                         |
+| AG-03  | Agente menu en TypeScript con A2A :8003 (B.3)                                             | Media     | Pendiente | AG-01         | [AG-03-agente-menu-typescript.md](AG-03-agente-menu-typescript.md)                             |
+| AG-04  | Orquestador delega por A2A: transferencia y pregunta/respuesta (B.4)                      | Media     | Pendiente | AG-02, AG-03  | [AG-04-a2a-delegacion.md](AG-04-a2a-delegacion.md)                                             |
+| AG-05  | Sesión persistente en SQLite (B.5)                                                        | Media     | Pendiente | AG-01         | [AG-05-sesion-persistente-sqlite.md](AG-05-sesion-persistente-sqlite.md)                       |
+| AG-07  | Validar el JWT del usuario en el agente (conexión con Keycloak)                           | Media     | Pendiente | UI-02         | [AG-07-jwt-del-agente.md](AG-07-jwt-del-agente.md)                                             |
+| UI-03  | Design system de Lara: tokens y componentes base                                          | Media     | Pendiente | DOC-02        | [UI-03-design-system-lara.md](UI-03-design-system-lara.md)                                     |
+| UI-04  | Vistas de Lara (C.5)                                                                      | Media     | Pendiente | UI-02, UI-03  | [UI-04-vistas-lara.md](UI-04-vistas-lara.md)                                                   |
+| FE-01  | Menú por rol dentro de Lara y retiro de kc-front Angular                                  | Media     | Pendiente | UI-04         | [FE-01-menu-por-rol.md](FE-01-menu-por-rol.md)                                                 |
+| BPM-01 | Servicio bpm-sync: dry-run, idempotente, grupo basico por defecto, detección de huérfanas | Media     | Pendiente | KC-01         | [BPM-01-bpm-sync.md](BPM-01-bpm-sync.md)                                                       |
+| AG-06  | MCP filesystem de solo lectura en sandbox (B.6)                                           | Baja      | Pendiente | AG-01         | [AG-06-mcp-filesystem-sandbox.md](AG-06-mcp-filesystem-sandbox.md)                             |
+| FE-02  | Angular 22.2.1 con ng update (TypeScript se queda en 6.0)                                 | Baja      | Pendiente | —             | [FE-02-angular-22-2-1.md](FE-02-angular-22-2-1.md)                                             |
+| KC-03  | Realm como código (export/import)                                                         | Baja      | Pendiente | —             | [KC-03-realm-como-codigo.md](KC-03-realm-como-codigo.md)                                       |
+| UI-05  | Catálogo A2UI para respuestas del agente (a futuro, caso aparte)                          | Baja      | Pendiente | UI-02, UI-03  | [UI-05-catalogo-a2ui.md](UI-05-catalogo-a2ui.md)                                               |
+| FIN-00 | Finanzas personales (épica)                                                               | Baja      | Pendiente | UI-04         | [finanzas-personales.md](finanzas-personales.md)                                               |
+| FIN-01 | Importador xlsx/csv (D.1)                                                                 | Baja      | Pendiente | UI-04         | [FIN-01-importador-xlsx-csv.md](FIN-01-importador-xlsx-csv.md)                                 |
+| FIN-02 | Importador de Google Takeout (D.2)                                                        | Baja      | Pendiente | FIN-01        | [FIN-02-importador-takeout.md](FIN-02-importador-takeout.md)                                   |
+| FIN-03 | Detección de gastos fijos y proyección calculada en código (D.3)                          | Baja      | Pendiente | FIN-01        | [FIN-03-deteccion-gastos-fijos.md](FIN-03-deteccion-gastos-fijos.md)                           |
+| EXT-01 | Open WebUI con DeepSeek y RAG de documentación oficial (Módulo 7)                         | Baja      | Pendiente | —             | [EXT-01-openwebui-rag.md](EXT-01-openwebui-rag.md)                                             |
+| EXT-02 | Buscador propio con SearXNG (opcional)                                                    | Baja      | Pendiente | EXT-01        | [EXT-02-searxng.md](EXT-02-searxng.md)                                                         |
+| EXT-03 | Aviso por Telegram cuando Copilot pide permiso o termina (hook, opcional)                 | Baja      | Pendiente | CP-01         | [EXT-03-aviso-telegram-copilot.md](EXT-03-aviso-telegram-copilot.md)                           |

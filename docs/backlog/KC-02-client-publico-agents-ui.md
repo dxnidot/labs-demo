@@ -1,4 +1,5 @@
 # KC-02 · Client público agents-ui en realm lab (C.1)
+
 - Estado: Pendiente
 - Prioridad: Alta
 - Parte del lab: C.1

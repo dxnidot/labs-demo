@@ -1,4 +1,5 @@
 # CP-02 · Probar test-engineer, keycloak-security y skill keycloak-lab (A.2)
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: A.2

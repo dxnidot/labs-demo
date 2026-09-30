@@ -1,4 +1,5 @@
 # UI-03 · Design system de Lara: tokens y componentes base
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: UI

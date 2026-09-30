@@ -1,4 +1,5 @@
 # FIN-02 · Importador de Google Takeout (D.2)
+
 - Estado: Pendiente
 - Prioridad: Baja
 - Parte del lab: Finanzas

@@ -1,4 +1,5 @@
 # UI-04 · Vistas de Lara (C.5)
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: C.5

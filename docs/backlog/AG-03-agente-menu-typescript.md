@@ -1,4 +1,5 @@
 # AG-03 · Agente menu en TypeScript con A2A :8003 (B.3)
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: B.3

@@ -1,4 +1,5 @@
 # EXT-02 · Buscador propio con SearXNG (opcional)
+
 - Estado: Pendiente
 - Prioridad: Baja
 - Parte del lab: Extensiones

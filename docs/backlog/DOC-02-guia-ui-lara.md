@@ -1,4 +1,5 @@
 # DOC-02 · Guía de UI de Lara con capturas
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: Docs

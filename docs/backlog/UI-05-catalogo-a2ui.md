@@ -1,4 +1,5 @@
 # UI-05 · Catálogo A2UI para respuestas del agente (a futuro, caso aparte)
+
 - Estado: Pendiente
 - Prioridad: Baja
 - Parte del lab: UI

@@ -1,4 +1,5 @@
 # CP-01 · Instrucciones, agentes y skills de Copilot (A.1)
+
 - Estado: Pendiente
 - Prioridad: Alta
 - Parte del lab: A.1

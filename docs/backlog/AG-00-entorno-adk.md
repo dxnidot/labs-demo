@@ -1,4 +1,5 @@
 # AG-00 · Entorno: PYTHONUTF8, venv, google-adk[a2a], litellm>=1.84 (Módulo 0)
+
 - Estado: Pendiente
 - Prioridad: Alta
 - Parte del lab: Módulo 0

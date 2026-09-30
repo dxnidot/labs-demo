@@ -1,4 +1,5 @@
 # AG-07 · Validar el JWT del usuario en el agente (conexión con Keycloak)
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: Seguridad

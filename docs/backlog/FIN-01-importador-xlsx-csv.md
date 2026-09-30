@@ -1,4 +1,5 @@
 # FIN-01 · Importador xlsx/csv (D.1)
+
 - Estado: Pendiente
 - Prioridad: Baja
 - Parte del lab: Finanzas

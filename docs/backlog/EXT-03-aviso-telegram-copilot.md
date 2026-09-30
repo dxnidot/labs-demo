@@ -1,4 +1,5 @@
 # EXT-03 · Aviso por Telegram cuando Copilot pide permiso o termina (hook, opcional)
+
 - Estado: Pendiente
 - Prioridad: Baja
 - Parte del lab: Extensiones

@@ -1,4 +1,5 @@
 # KC-01 · Subir Keycloak a 26.7.5 (parche, sin down -v)
+
 - Estado: Pendiente
 - Prioridad: Media
 - Parte del lab: keycloak

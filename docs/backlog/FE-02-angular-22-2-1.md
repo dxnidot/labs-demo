@@ -1,4 +1,5 @@
 # FE-02 · Angular 22.2.1 con ng update (TypeScript se queda en 6.0)
+
 - Estado: Pendiente
 - Prioridad: Baja
 - Parte del lab: Frontend

@@ -1,4 +1,5 @@
 # EXT-01 · Open WebUI con DeepSeek y RAG de documentación oficial (Módulo 7)
+
 - Estado: Pendiente
 - Prioridad: Baja
 - Parte del lab: Extensiones
