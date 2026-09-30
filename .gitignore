@@ -1,6 +1,30 @@
 ﻿# Secretos locales
 .env
 !.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Entornos de Python / Node / build
+.venv/
+venv/
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+target/
+**/target/
+coverage/
+**/coverage/
+
+# Documentación privada
+/docs/private/
+docs/private/
+
+# Agentes y sandbox
+agents/**/.env
 
 # IDE y sistema operativo
 .idea/
