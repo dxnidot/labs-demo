@@ -1,0 +1,18 @@
+# API-01 · Pruebas unitarias de MenuService (JUnit 5 + Mockito, AAA)
+- Estado: Pendiente
+- Prioridad: Media
+- Parte del lab: kc-demo
+- Depende de: —
+- Fecha: 2026-09-30
+- Contexto: El servicio de menú debe quedar cubierto por pruebas unitarias para validar el filtrado y la lógica por rol. Esto ayuda a proveer una base estable antes de conectar la UI o agentes ADK.
+- Criterio de aceptación:
+  - `cd kc-demo && mvn test -Dtest=MenuServiceTests` pasa con la suite dedicada a `MenuService`.
+  - `grep -R "@DisplayName\|assertThrows\|assertDoesNotThrow\|Mockito" kc-demo/src/test/java` confirma la convención AAA y el uso de Mockito.
+  - La salida de `mvn test` reporta 0 failures para la clase `MenuServiceTests`.
+- Archivos relevantes:
+  - kc-demo/src/test/java/
+  - kc-demo/src/main/java/com/example/kcdemo/MenuService.java
+- Notas:
+  - Confirmado: la prueba se centra en la lógica del servicio y no en la capa HTTP.
+  - Inferido: la forma de comparar permisos y acciones debe quedar reproducible por JUnit 5.
+  - Pendiente: validar qué exactos roles y acciones genera el menú final del proyecto.

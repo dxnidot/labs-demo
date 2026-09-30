@@ -1,30 +1,33 @@
 ﻿# Secretos locales
 .env
+.env.*
 !.env.example
-**/.env
-**/.env.*
-!**/.env.example
 
-# Entornos de Python / Node / build
+# Dependencias y builds
+node_modules/
 .venv/
 venv/
-node_modules/
-**/node_modules/
 dist/
-**/dist/
 build/
-**/build/
 target/
-**/target/
 coverage/
-**/coverage/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Datos locales de agentes (sesiones, finanzas)
+agents/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
 
 # Documentación privada
-/docs/private/
 docs/private/
-
-# Agentes y sandbox
-agents/**/.env
 
 # IDE y sistema operativo
 .idea/

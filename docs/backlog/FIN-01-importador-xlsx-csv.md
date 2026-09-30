@@ -1,0 +1,18 @@
+# FIN-01 · Importador xlsx/csv (D.1)
+- Estado: Pendiente
+- Prioridad: Baja
+- Parte del lab: Finanzas
+- Depende de: UI-04
+- Fecha: 2026-09-30
+- Contexto: La importación de datos de movimientos permite a la UI mostrar un primer resumen de gastos e ingresos sin depender de datos locales manuales. El flujo debe ser controlado y no reutilizar información personal real.
+- Criterio de aceptación:
+  - `find . -type f | grep -E "csv|xlsx"` devuelve la estructura del importador o de los datos de prueba del laboratorio.
+  - Un CSV o XLSX sintético se importa sin error y genera una vista de resúmenes.
+  - La app marca filas inválidas y evita aceptar datos sospechosos sin una validación explícita.
+- Archivos relevantes:
+  - docs/
+  - kc-front/src/
+- Notas:
+  - Confirmado: el importador debe sostener datos sintéticos y no reales.
+  - Inferido: la validación del esquema es esencial para evitar corrupción de la data.
+  - Pendiente: establecer el formato exacto de la hoja y los campos mínimos del modelo de finanzas.

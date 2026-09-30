@@ -1,0 +1,18 @@
+# AG-05 · Sesión persistente en SQLite (B.5)
+- Estado: Pendiente
+- Prioridad: Media
+- Parte del lab: B.5
+- Depende de: AG-01
+- Fecha: 2026-09-30
+- Contexto: Para que la conversación del agente sea reutilizable y no dependa de memoria volátil, conviene persistir el estado de sesión en SQLite. Esto ayuda a probar flujos de vuelta, reanudación y trazabilidad.
+- Criterio de aceptación:
+  - `find agents -type f | grep -E "sqlite|session"` devuelve la estructura de código e imágenes puntuales para la sesión persistente.
+  - Un reinicio del servicio mantiene la sesión del usuario y el historial disponible al reabrir la app.
+  - `sqlite3 agents/data/session.db '.schema'` o equivalente muestra la tabla de sesiones y mensajes del backend.
+- Archivos relevantes:
+  - agents/
+  - .gitignore
+- Notas:
+  - Confirmado: la sesión debe persistir en un almacenamiento local del laboratorio.
+  - Inferido: la ruta debe quedarse fuera del repositorio público por seguridad.
+  - Pendiente: validar si el almacenamiento se mantiene en `agents/data` o en una ruta de configuración distinta.

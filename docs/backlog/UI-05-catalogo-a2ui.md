@@ -1,0 +1,18 @@
+# UI-05 · Catálogo A2UI para respuestas del agente (a futuro, caso aparte)
+- Estado: Pendiente
+- Prioridad: Baja
+- Parte del lab: UI
+- Depende de: UI-02, UI-03
+- Fecha: 2026-09-30
+- Contexto: El catálogo A2UI documenta el conjunto de respuesta visual del agente para mejorar consistencia y reutilización. Es un esfuerzo futuro, separado del flujo principal del chat.
+- Criterio de aceptación:
+  - `find docs -type f | grep -i "a2ui\|catalogo\|responses"` encuentran la documentación del catálogo visual.
+  - Un ejemplo de respuesta del agente se renderiza con el mismo componente de diseño en todas las pantallas del producto.
+  - `grep -R "catalogo\|a2ui\|componentes\|response" docs kc-front/src` confirma la integración de los componentes de respuesta.
+- Archivos relevantes:
+  - docs/
+  - kc-front/src/
+- Notas:
+  - Confirmado: este es un caso aparte y no reemplaza el flujo principal del chat.
+  - Inferido: el catálogo debe apoyarse en componentes base ya definidos.
+  - Pendiente: revisar el nivel de detalle del catálogo antes de cerrar la versión final.

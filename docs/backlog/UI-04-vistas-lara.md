@@ -1,0 +1,18 @@
+# UI-04 · Vistas de Lara (C.5)
+- Estado: Pendiente
+- Prioridad: Media
+- Parte del lab: C.5
+- Depende de: UI-02, UI-03
+- Fecha: 2026-09-30
+- Contexto: La vista principal del producto debe mostrar un flujo mínimo completo: login, chat, historial, detalles del agente y estado de la sesión. Esto permite validar la experiencia de extremo a extremo.
+- Criterio de aceptación:
+  - `grep -R "login\|chat\|historial\|resumen\|agenda" kc-front/src/app` encuentra las vistas mínimas del producto.
+  - `npm run build` termina sin errores cuando todas las vistas están enlazadas en la app.
+  - Una navegación básica en la página principal muestra las rutas del producto sin error 404.
+- Archivos relevantes:
+  - kc-front/src/app/
+  - docs/design/
+- Notas:
+  - Confirmado: la UI debe reflejar el flujo mínimo del laboratorio.
+  - Inferido: la vista de historial y la de conversación son las dos piezas más sensibles para la validación del producto.
+  - Pendiente: confirmar el catálogo exacto de pantallas antes de la implementación final.

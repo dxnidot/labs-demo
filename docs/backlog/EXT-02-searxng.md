@@ -1,0 +1,18 @@
+# EXT-02 · Buscador propio con SearXNG (opcional)
+- Estado: Pendiente
+- Prioridad: Baja
+- Parte del lab: Extensiones
+- Depende de: EXT-01
+- Fecha: 2026-09-30
+- Contexto: Un buscador propio puede servir como capa de referencia para queries documentales. Está pensado como apoyo para este laboratorio, no como sustituto de la fuente documental oficial.
+- Criterio de aceptación:
+  - `grep -R "SearXNG\|searx" .` encuentra la configuración del buscador.
+  - Un arranque del servicio devuelve una URL de búsqueda activa.
+  - Una consulta de prueba devuelve resultados del índice correspondiente y no bloquea el flujo principal del lab.
+- Archivos relevantes:
+  - docs/
+  - .
+- Notas:
+  - Confirmado: es opcional y secundario respecto al núcleo del laboratorio.
+  - Inferido: su beneficio es mejor para validación documental que para la lógica del negocio.
+  - Pendiente: evaluar si el mantenimiento del servicio vale la complejidad adicional.

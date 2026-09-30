@@ -1,0 +1,18 @@
+# EXT-03 · Aviso por Telegram cuando Copilot pide permiso o termina (hook, opcional)
+- Estado: Pendiente
+- Prioridad: Baja
+- Parte del lab: Extensiones
+- Depende de: CP-01
+- Fecha: 2026-09-30
+- Contexto: Un hook de avisos puede ayudar a validar cuándo Copilot pide permiso o finaliza una acción. Es opcional y está orientado a mejorar la visibilidad del laboratorio sin tocar la lógica principal del agente.
+- Criterio de aceptación:
+  - `grep -R "telegram\|hook\|copilot.*permiso\|aviso" .` encuentra la integración del hook.
+  - Una prueba de integración con un webhook ficticio devuelve una salida de estado sin errores de formato.
+  - La notificación se dispara solo cuando Copilot pide permiso o termina la tarea, y no en cada paso intermedio.
+- Archivos relevantes:
+  - .github/
+  - docs/
+- Notas:
+  - Confirmado: es una extensión opcional y de supervisión del laboratorio.
+  - Inferido: no debe reemplazar la lógica de validación ni la trazabilidad del proceso principal.
+  - Pendiente: establecer el canal exacto y las reglas de activación antes de producción.

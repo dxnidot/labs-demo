@@ -1,0 +1,18 @@
+# EXT-01 · Open WebUI con DeepSeek y RAG de documentación oficial (Módulo 7)
+- Estado: Pendiente
+- Prioridad: Baja
+- Parte del lab: Extensiones
+- Depende de: —
+- Fecha: 2026-09-30
+- Contexto: El laboratorio puede incorporar una capa extra para consultar documentación oficial en un entorno controlado. La idea es utilizar un frontend ligero con RAG y un modelo de referencia para comparar respuestas con el contexto documental.
+- Criterio de aceptación:
+  - `grep -R "Open WebUI\|DeepSeek\|RAG\|documentacion oficial" .` encuentra la base de la integración.
+  - Un comando de levantamiento del servicio devuelve la URL del frontend de Open WebUI.
+  - Un query de prueba con texto documental oficial responde con contenido recuperado y cita la referencia vinculada.
+- Archivos relevantes:
+  - docs/
+  - keycloak/
+- Notas:
+  - Confirmado: esta es una extensión opcional del lab.
+  - Inferido: la documentación debe ser la fuente de verdad y no la memoria personal del autor.
+  - Pendiente: decidir si este módulo se integra al flujo principal o se mantiene como experimento aislado.

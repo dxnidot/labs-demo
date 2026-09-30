@@ -1,0 +1,18 @@
+# KC-03 · Realm como código (export/import)
+- Estado: Pendiente
+- Prioridad: Baja
+- Parte del lab: keycloak
+- Depende de: —
+- Fecha: 2026-09-30
+- Contexto: El realm de laboratorio crece con usuarios, roles y clientes, y conviene dejarlo reproducible. Esto permite levantar el entorno de forma estable y evitar instalaciones manuales repetidas.
+- Criterio de aceptación:
+  - `docker exec -it <keycloak-container> /opt/keycloak/bin/kc.sh export --dir /tmp/keycloak-export` genera un archivo de exportación del realm.
+  - `ls /tmp/keycloak-export` muestra un conjunto de archivos del realm `lab` y no solo un snapshot del contenedor.
+  - Un segundo `docker compose up` re-crea el realm sin pérdida de configuración o con un cambio documentado en el flujo del lab.
+- Archivos relevantes:
+  - keycloak/
+  - docs/plans/estado-lab.md
+- Notas:
+  - Confirmado: el realm debe poder reproducirse sin hacerlo a mano cada vez.
+  - Inferido: esta tarea es posterior a la validación del entorno raíz y a la UI.
+  - Pendiente: elegir la estrategia de export/import del realm según la versión final de Keycloak.

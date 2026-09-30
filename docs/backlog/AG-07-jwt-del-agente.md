@@ -1,0 +1,18 @@
+# AG-07 · Validar el JWT del usuario en el agente (conexión con Keycloak)
+- Estado: Pendiente
+- Prioridad: Media
+- Parte del lab: Seguridad
+- Depende de: UI-02
+- Fecha: 2026-09-30
+- Contexto: Los agentes del lab deben validar el JWT del usuario para asegurar que la sesión corresponde a un usuario autenticado y con el conjunto de roles correcto. Esto evita que la lógica del agente se use sin el contexto de autorización esperado.
+- Criterio de aceptación:
+  - `grep -R "JWT\|Bearer\|audience\|issuer\|jwks" agents kc-demo` encuentra la validación del token del usuario.
+  - Un token de Keycloak no válido devuelve `401` o un error de validación explícito.
+  - Un token válido y con roles esperados permite continuar la conversación del flujo de negocio.
+- Archivos relevantes:
+  - agents/
+  - kc-demo/
+- Notas:
+  - Confirmado: la validación debe apoyar el flujo real de Keycloak.
+  - Inferido: la verificación del `issuer` y del `aud` es crucial para evitar tokens cruzados.
+  - Pendiente: confirmar el `realm` final y los claim que usará la UI y el agente.

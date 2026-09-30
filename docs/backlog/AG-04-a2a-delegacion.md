@@ -1,0 +1,18 @@
+# AG-04 · Orquestador delega por A2A: transferencia y pregunta/respuesta (B.4)
+- Estado: Pendiente
+- Prioridad: Media
+- Parte del lab: B.4
+- Depende de: AG-02, AG-03
+- Fecha: 2026-09-30
+- Contexto: El orquestador debe delegar tareas a agentes especializados y decidir cuándo responde directamente y cuándo transfiere la conversación. Esto convierte la arquitectura en un sistema colaborativo más que en un único chatbot.
+- Criterio de aceptación:
+  - `grep -R "delegate\|transfer\|routing\|A2A\|question-answer" agents` demuestra la lógica de delegación entre agentes.
+  - Una conversación con una petición que requiere aclaración se dirige al agente de aclaraciones y devuelve respuesta bien formada.
+  - Una petición de menú se resuelve en el agente de menú y no en el orquestador principal.
+- Archivos relevantes:
+  - agents/
+  - docs/backlog/
+- Notas:
+  - Confirmado: la delegación por A2A es central para la terna del caso de uso.
+  - Inferido: el orquestador solo debe decidir el paso, no repetir la lógica del negocio de los agentes.
+  - Pendiente: validar la forma precisa del payload A2A en la versión final del SDK.
