@@ -1,19 +1,21 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 interface SidebarItemProps {
   active?: boolean;
   children: ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
+  to: string;
 }
 
 /**
- * Elemento de navegación lateral con estado accesible.
+ * Enlace lateral con estado de página accesible.
  * @author Daniel
  * @since 2026-09-30
  */
-export function SidebarItem({ active = false, children, onClick }: SidebarItemProps) {
+export function SidebarItem({ active = false, children, onClick, to }: SidebarItemProps) {
   return (
-    <button
+    <Link
       aria-current={active ? "page" : undefined}
       className={`flex min-h-11 w-full items-center truncate rounded-button px-3 text-left text-sm transition-colors ${
         active
@@ -21,9 +23,9 @@ export function SidebarItem({ active = false, children, onClick }: SidebarItemPr
           : "text-text-2 hover:bg-surface-hover hover:text-text"
       }`}
       onClick={onClick}
-      type="button"
+      to={to}
     >
       <span className="truncate">{children}</span>
-    </button>
+    </Link>
   );
 }

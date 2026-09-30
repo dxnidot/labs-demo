@@ -1,20 +1,15 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Mensaje } from "../domain/Mensaje";
-import type { SesionChat } from "../domain/SesionChat";
 import type { Usuario } from "../domain/Usuario";
 import { AdkAgenteAdapter } from "../infrastructure/adapters/AdkAgenteAdapter";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { EnviarMensaje } from "../application/use-cases/EnviarMensaje";
-import { IniciarSesion } from "../application/use-cases/IniciarSesion";
 import { Button } from "./components/Button";
-import { IconButton } from "./components/IconButton";
 import { Pill } from "./components/Pill";
-import { Sidebar } from "./components/Sidebar";
-import { SidebarItem } from "./components/SidebarItem";
+import { useChatSessions } from "./useChatSessions";
 
-const iniciarSesion = new IniciarSesion(keycloakAuthAdapter);
 const agente = new AdkAgenteAdapter(keycloakAuthAdapter);
 const enviarMensaje = new EnviarMensaje(keycloakAuthAdapter, agente);
 
@@ -77,20 +72,22 @@ const colorEtiqueta = {
 };
 
 /**
- * Presenta Lara con historial de sesiones y conversación en streaming.
+ * Presenta la conversación de Lara y su respuesta en streaming.
  * @author Daniel
  * @since 2026-09-30
- * @modified Daniel 2026-09-30 Añade shell Lara e historial de sesiones.
+ * @modified Daniel 2026-09-30 Mueve navegación e historial al shell.
  */
-export function ChatPage() {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [sesiones, setSesiones] = useState<SesionChat[]>([]);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+export function ChatPage({ usuario }: { usuario: Usuario }) {
+  const {
+    activeSessionId,
+    refreshSessions,
+    sessions,
+    setActiveSessionId,
+  } = useChatSessions();
   const [mensajes, setMensajes] = useState<Mensaje[]>([]);
   const [texto, setTexto] = useState("");
-  const [estado, setEstado] = useState("Conectando con Keycloak…");
+  const [estado, setEstado] = useState("");
   const [cargando, setCargando] = useState(false);
-  const [cargandoHistorial, setCargandoHistorial] = useState(false);
   const [cargandoSesion, setCargandoSesion] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mostrarIrAlFinal, setMostrarIrAlFinal] = useState(false);
@@ -98,43 +95,37 @@ export function ChatPage() {
   const listaMensajesRef = useRef<HTMLElement>(null);
   const seguirAlFinal = useRef(true);
 
-  const actualizarRecientes = useCallback(async (userId: string) => {
-    setCargandoHistorial(true);
-    try {
-      setSesiones(await agente.listarSesiones(userId));
-    } catch (reason: unknown) {
-      setError(reason instanceof Error ? reason.message : "No se pudo cargar el historial.");
-    } finally {
-      setCargandoHistorial(false);
-    }
-  }, []);
-
   useEffect(() => {
-    let activo = true;
-    iniciarSesion
-      .ejecutar()
-      .then((autenticado) => {
-        if (activo) {
-          setUsuario(autenticado);
-          setEstado("");
+    if (!activeSessionId) {
+      setMensajes([]);
+      return;
+    }
+
+    let active = true;
+    setError(null);
+    setCargandoSesion(true);
+    setMensajes([]);
+    agente
+      .obtenerSesion(usuario.id, activeSessionId)
+      .then((sessionMessages) => {
+        if (active) {
+          setMensajes(sessionMessages);
         }
       })
       .catch((reason: unknown) => {
-        if (activo) {
-          setError(reason instanceof Error ? reason.message : "No se pudo iniciar sesión.");
-          setEstado("");
+        if (active) {
+          setError(reason instanceof Error ? reason.message : "No se pudo abrir la conversación.");
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setCargandoSesion(false);
         }
       });
     return () => {
-      activo = false;
+      active = false;
     };
-  }, []);
-
-  useEffect(() => {
-    if (usuario) {
-      void actualizarRecientes(usuario.id);
-    }
-  }, [actualizarRecientes, usuario]);
+  }, [activeSessionId, usuario.id]);
 
   useEffect(() => {
     const list = listaMensajesRef.current;
@@ -143,45 +134,6 @@ export function ChatPage() {
       setMostrarIrAlFinal(false);
     }
   }, [mensajes, estado, cargandoSesion]);
-
-  async function iniciarChatNuevo() {
-    if (!usuario || cargando || cargandoSesion) {
-      return;
-    }
-    setError(null);
-    setCargandoSesion(true);
-    try {
-      const newSessionId = await agente.crearSesion(usuario.id);
-      setSessionId(newSessionId);
-      setMensajes([]);
-      setTexto("");
-      setEstado("");
-      seguirAlFinal.current = true;
-      setMostrarIrAlFinal(false);
-    } catch (reason: unknown) {
-      setError(reason instanceof Error ? reason.message : "No se pudo crear una sesión.");
-    } finally {
-      setCargandoSesion(false);
-    }
-  }
-
-  async function seleccionarSesion(sesion: SesionChat) {
-    if (!usuario || cargando || cargandoSesion) {
-      return;
-    }
-    setError(null);
-    setCargandoSesion(true);
-    setSessionId(sesion.id);
-    setMensajes([]);
-    seguirAlFinal.current = true;
-    try {
-      setMensajes(await agente.obtenerSesion(usuario.id, sesion.id));
-    } catch (reason: unknown) {
-      setError(reason instanceof Error ? reason.message : "No se pudo abrir la conversación.");
-    } finally {
-      setCargandoSesion(false);
-    }
-  }
 
   async function enviar(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -202,9 +154,9 @@ export function ChatPage() {
 
     let receivedText = false;
     try {
-      const activeSessionId = await enviarMensaje.ejecutar(
+      const sentSessionId = await enviarMensaje.ejecutar(
         mensaje,
-        sessionId,
+        activeSessionId,
         (update) => {
           if (update.tipo === "herramienta") {
             setEstado(`Consultando ${update.nombre}…`);
@@ -228,13 +180,11 @@ export function ChatPage() {
           );
         },
       );
-      setSessionId(activeSessionId);
+      setActiveSessionId(sentSessionId);
       if (!receivedText) {
         throw new Error("El agente terminó el flujo sin una respuesta de texto.");
       }
-      if (usuario) {
-        await actualizarRecientes(usuario.id);
-      }
+      await refreshSessions();
     } catch (reason: unknown) {
       setMensajes((actuales) =>
         actuales.filter(
@@ -249,14 +199,6 @@ export function ChatPage() {
     }
   }
 
-  async function cerrarSesion() {
-    try {
-      await keycloakAuthAdapter.logout();
-    } catch {
-      setError("No se pudo cerrar la sesión de Keycloak.");
-    }
-  }
-
   function desplazarAlFinal() {
     const list = listaMensajesRef.current;
     if (list) {
@@ -266,81 +208,10 @@ export function ChatPage() {
     }
   }
 
-  const sesionActiva = sesiones.find((sesion) => sesion.id === sessionId);
-
-  if (!usuario) {
-    return (
-      <main className="flex h-dvh items-center justify-center overflow-hidden bg-bg px-6 text-text">
-        <section className="w-full max-w-md rounded-card border border-border bg-surface p-8">
-          <p className="font-mono text-sm text-accent">Lara · LOCAL</p>
-          <h1 className="mt-3 text-2xl font-semibold">Iniciando sesión</h1>
-          <p className="mt-3 text-sm text-muted">{error ?? estado}</p>
-        </section>
-      </main>
-    );
-  }
+  const sesionActiva = sessions.find((sesion) => sesion.id === activeSessionId);
 
   return (
-    <main className="flex h-dvh overflow-hidden bg-bg font-sans text-text">
-      <Sidebar>
-        <div className="flex items-center gap-3 border-b border-divider pb-5">
-          <span aria-hidden="true" className="text-3xl leading-none text-accent">
-            ◷
-          </span>
-          <span className="text-2xl font-semibold">Lara</span>
-        </div>
-
-        <div className="pt-5">
-          <Button
-            className="w-full justify-start"
-            disabled={cargando || cargandoSesion}
-            onClick={() => void iniciarChatNuevo()}
-            variant="primary"
-          >
-            <span aria-hidden="true" className="text-xl leading-none">+</span>
-            Nuevo chat
-          </Button>
-        </div>
-
-        <section aria-label="Recientes" className="mt-7 min-h-0 flex-1 overflow-y-auto">
-          <div className="mb-2 flex items-center justify-between px-3">
-            <h2 className="font-mono text-[11px] uppercase tracking-[0.08em] text-faint">
-              Recientes
-            </h2>
-            {cargandoHistorial && <span className="text-xs text-muted">Cargando…</span>}
-          </div>
-          <nav aria-label="Historial de chats" className="space-y-1">
-            {sesiones.map((sesion) => (
-              <SidebarItem
-                active={sesion.id === sessionId}
-                key={sesion.id}
-                onClick={() => void seleccionarSesion(sesion)}
-              >
-                {sesion.titulo}
-              </SidebarItem>
-            ))}
-            {!cargandoHistorial && sesiones.length === 0 && (
-              <p className="px-3 py-2 text-xs text-faint">Aún no hay conversaciones.</p>
-            )}
-          </nav>
-        </section>
-
-        <footer className="mt-4 flex items-center gap-3 border-t border-divider pt-4">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-pill bg-surface-active font-semibold text-accent">
-            {usuario.username.slice(0, 1).toUpperCase()}
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">{usuario.username}</p>
-            <p className="truncate font-mono text-xs text-muted">
-              {usuario.roles[0] ?? "LOCAL"} · LOCAL
-            </p>
-          </div>
-          <IconButton aria-label="Cerrar sesión" onClick={() => void cerrarSesion()}>
-            <span aria-hidden="true">↪</span>
-          </IconButton>
-        </footer>
-      </Sidebar>
-
+    <>
       <section className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header className="flex h-[72px] shrink-0 items-center justify-between border-b border-divider px-6 min-[980px]:px-8">
           <div className="flex min-w-0 items-center gap-3">
@@ -547,6 +418,6 @@ export function ChatPage() {
           </footer>
         )}
       </section>
-    </main>
+    </>
   );
 }

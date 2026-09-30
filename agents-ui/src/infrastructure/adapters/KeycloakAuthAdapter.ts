@@ -72,11 +72,13 @@ export class KeycloakAuthAdapter implements AuthPort {
     const clientRoles = Object.values(keycloak.resourceAccess ?? {}).flatMap(
       (access) => access.roles ?? [],
     );
+    const chatApiRoles = keycloak.resourceAccess?.["chat-api"]?.roles ?? [];
 
     return {
       id,
       username,
       roles: [...new Set([...realmRoles, ...clientRoles])],
+      chatApiRoles: [...new Set(chatApiRoles)],
     };
   }
 }

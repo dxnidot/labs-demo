@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ChatPage } from "./ui/ChatPage";
+import { BrowserRouter } from "react-router";
+import { AppShell } from "./ui/AppShell";
 import "./index.css";
 
 const root = document.getElementById("root");
@@ -10,6 +11,8 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <ChatPage />
+    <BrowserRouter>
+      <AppShell />
+    </BrowserRouter>
   </StrictMode>,
 );
