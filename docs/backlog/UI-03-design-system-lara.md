@@ -1,6 +1,6 @@
 # UI-03 · Design system de Lara: tokens y componentes base
 
-- Estado: Pendiente
+- Estado: Hecho
 - Prioridad: Media
 - Parte del lab: UI
 - Depende de: DOC-02
@@ -15,5 +15,6 @@
   - docs/design/
 - Notas:
   - Confirmado: el sistema visual debe ser reutilizable y consistente.
+  - Confirmado: tokens Tailwind v4 y componentes base implementados en agents-ui/.
   - Inferido: los componentes base deben quedar separados de la lógica del negocio.
-  - Pendiente: decidir si la implementación final usa Tailwind o estilos CSS dedicados.
+  - Cerrado: 2026-09-30

@@ -10,6 +10,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ Contraseñas de Keycloak en `keycloak/.env` (ignorado) + `.env.example`
 - [x] ✅ `.gitignore` con reglas `.env`, `!.env.example` y `docs/private/`
 - [x] ✅ Estructura `docs/` (backlog, bugs, decisions, plans, archive, private)
+- [x] ✅ DOC-02 · Guía de UI de Lara: README y 13 capturas
 - [ ] ⏳ Auditoría de secretos completa (`git ls-files` filtrado)
 - [ ] 🔄 DOC-01 · ADR de versiones en `docs/decisions/0001-versiones.md`
 - [ ] 🔄 DOC-01 · Plantillas: backlog, bug y ADR
@@ -57,8 +58,9 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 ## agents-ui / Lara (React, puerto 5173)
 
 - [x] ✅ UI-01 · API server de ADK (8010)
-- [ ] 🔄 UI-02 · Chat con login de Keycloak y streaming
-- [ ] ⏳ UI-04 · C.5: vistas de Lara
+- [x] ✅ UI-02 · Chat con login de Keycloak y streaming — login Keycloak, run_sse, Enter, razonamiento oculto y Markdown seguro
+- [x] ✅ UI-03 · Design system de Lara — tokens Tailwind v4 y componentes base
+- [ ] 🔄 UI-04 · C.5: shell del chat e historial implementados; demás vistas pendientes
 
 ## Personal (a futuro)
 

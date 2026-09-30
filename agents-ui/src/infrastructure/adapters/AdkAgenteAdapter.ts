@@ -1,5 +1,8 @@
 import type { AuthPort } from "../../application/ports/AuthPort";
 import type { AgentePort, ActualizacionStreaming } from "../../application/ports/AgentePort";
+import type { Mensaje } from "../../domain/Mensaje";
+import type { SesionChat } from "../../domain/SesionChat";
+import { mapearEventosSesion, mapearSesiones } from "./sesiones";
 import { procesarStreamSse } from "./sse";
 
 async function* decodificarChunks(
@@ -23,9 +26,31 @@ async function* decodificarChunks(
  * Adapta las sesiones ADK y su flujo SSE al puerto del agente.
  * @author Daniel
  * @since 2026-09-30
+ * @modified Daniel 2026-09-30 Añade consultas de historial ADK.
  */
 export class AdkAgenteAdapter implements AgentePort {
   constructor(private readonly auth: AuthPort) {}
+
+  async listarSesiones(userId: string): Promise<SesionChat[]> {
+    const response = await this.solicitar(
+      `/adk/apps/orquestador/users/${encodeURIComponent(userId)}/sessions`,
+    );
+    const sessions: unknown = await response.json();
+    return mapearSesiones(sessions);
+  }
+
+  async obtenerSesion(userId: string, sessionId: string): Promise<Mensaje[]> {
+    const response = await this.solicitar(
+      `/adk/apps/orquestador/users/${encodeURIComponent(userId)}/sessions/${encodeURIComponent(sessionId)}`,
+    );
+    const session: unknown = await response.json();
+    if (!esRegistro(session)) {
+      throw new Error("El servidor ADK devolvió una sesión inválida.");
+    }
+    const lastUpdateTime =
+      typeof session.lastUpdateTime === "number" ? session.lastUpdateTime : 0;
+    return mapearEventosSesion(session.events, lastUpdateTime);
+  }
 
   async crearSesion(userId: string): Promise<string> {
     const token = await this.auth.updateToken();
@@ -55,6 +80,20 @@ export class AdkAgenteAdapter implements AgentePort {
       throw new Error("El servidor ADK no devolvió un identificador de sesión válido.");
     }
     return session.id;
+  }
+
+  private async solicitar(url: string): Promise<Response> {
+    const token = await this.auth.updateToken();
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`No se pudo consultar el historial del agente (HTTP ${response.status}).`);
+    }
+    return response;
   }
 
   async enviarMensaje(
@@ -96,4 +135,9 @@ export class AdkAgenteAdapter implements AgentePort {
       reader.releaseLock();
     }
   }
+
+}
+
+function esRegistro(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

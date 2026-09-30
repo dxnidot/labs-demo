@@ -1,6 +1,6 @@
 # DOC-02 · Guía de UI de Lara con capturas
 
-- Estado: Pendiente
+- Estado: Hecho
 - Prioridad: Media
 - Parte del lab: Docs
 - Depende de: —
@@ -15,5 +15,6 @@
   - docs/backlog/
 - Notas:
   - Confirmado: la guía debe ser pública y mostrar el comportamiento del producto sin revelar datos personales.
+  - Confirmado: docs/design/lara/README.md y 13 capturas en docs/design/lara/png/.
   - Inferido: la estructura de diseño se trabaja en paralelo con la evolución de la UI.
-  - Pendiente: validar si la carpeta docs/design/lara se crea desde cero o se integra con otra guía existente.
+  - Cerrado: 2026-09-30

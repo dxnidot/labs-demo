@@ -1,6 +1,6 @@
 # UI-04 · Vistas de Lara (C.5)
 
-- Estado: Pendiente
+- Estado: En curso
 - Prioridad: Media
 - Parte del lab: C.5
 - Depende de: UI-02, UI-03
@@ -16,4 +16,4 @@
 - Notas:
   - Confirmado: la UI debe reflejar el flujo mínimo del laboratorio.
   - Inferido: la vista de historial y la de conversación son las dos piezas más sensibles para la validación del producto.
-  - Pendiente: confirmar el catálogo exacto de pantallas antes de la implementación final.
+  - Confirmado: shell de chat e historial de sesiones implementados; las demás vistas siguen pendientes.

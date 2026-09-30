@@ -1,6 +1,6 @@
 # UI-02 · Chat con login de Keycloak y streaming (C.3–C.4)
 
-- Estado: En curso
+- Estado: Hecho
 - Prioridad: Alta
 - Parte del lab: C.3–C.4
 - Depende de: KC-02, UI-01
@@ -14,6 +14,6 @@
   - kc-front/src/app/
   - agents/
 - Notas:
-  - Confirmado: la autenticación final debe pasar por Keycloak.
+  - Confirmado: login con Keycloak (client agents-ui), streaming por run_sse, Enter para enviar, razonamiento oculto y Markdown seguro; el API server se levanta con --allow_origins http://localhost:5173.
   - Inferido: el streaming puede usarse para respuestas intermedias del agente o del A2A.
-  - Pendiente: validar la URL final del puerto real de la UI y del endpoint del orquestador.
+  - Cerrado: 2026-09-30

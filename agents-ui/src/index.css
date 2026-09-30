@@ -1,19 +1,59 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
+@theme {
+  --color-bg: #111316;
+  --color-sidebar: #15181c;
+  --color-surface: #1a1e23;
+  --color-surface-hover: #20252b;
+  --color-surface-active: #252b33;
+  --color-border: #2b3139;
+  --color-divider: #22272e;
+  --color-text: #e6e9ed;
+  --color-text-2: #c5ccd4;
+  --color-muted: #a7afb9;
+  --color-faint: #8b94a0;
+  --color-accent: #7cc4f2;
+  --color-accent-ink: #0a1a26;
+  --color-mint: #a8e6cf;
+  --color-butter: #f2e3a0;
+  --color-pink: #f4b6c9;
+  --color-lavender: #c9b8f2;
+  --color-peach: #f7c8a0;
+  --color-pill-accent: #1e2a33;
+  --color-pill-mint: #1f3029;
+  --color-pill-lavender: #2a2536;
+  --color-pill-pink: #33242a;
+  --color-pill-butter: #332e1e;
+  --color-pill-peach: #33291f;
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  --radius-button: 9px;
+  --radius-card: 13px;
+  --radius-composer: 16px;
+  --radius-pill: 999px;
+}
+
 :root {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #f4f4f5;
-  background: #09090b;
+  color: var(--color-text);
+  background: var(--color-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
 body {
   min-width: 320px;
-  min-height: 100vh;
-  margin: 0;
+  overflow: hidden;
 }
 
 button,
