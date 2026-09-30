@@ -1,7 +1,7 @@
 # FIN-03 · Detección de gastos fijos y proyección calculada en código (D.3)
 
 - Estado: Pendiente
-- Prioridad: Baja
+- Prioridad: Media
 - Parte del lab: Finanzas
 - Depende de: FIN-01
 - Fecha: 2026-09-30
@@ -11,8 +11,8 @@
   - Un conjunto sintético de movimientos genera una proyección mensual verificable con reglas explícitas.
   - La app marca el gasto fijo y la varianza frente a la línea base sin ambigüedad.
 - Archivos relevantes:
-  - docs/
-  - kc-front/src/
+  - agents/
+  - agents-ui/
 - Notas:
   - Confirmado: el cálculo debe pensarse para datos sintéticos.
   - Inferido: la lógica del cálculo necesita reglas definidas y testeables.

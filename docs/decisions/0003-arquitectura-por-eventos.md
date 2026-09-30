@@ -1,6 +1,6 @@
 # ADR-0003: Arquitectura por eventos
 
-- Contexto: `Confirmado:` finanzas, bpm-sync y la auditoría de Keycloak tienen casos donde un hecho puede interesar a varios consumidores; chat, menú por rol y aclaraciones requieren respuesta directa.
+- Contexto: `Confirmado:` finanzas, bpm-sync y la auditoría de Keycloak tienen casos donde un hecho puede interesar a varios consumidores; chat, menú por rol, cálculos financieros y traducción requieren respuesta directa.
 - Decisión:
   - Usa eventos cuando algo ya pasó y varios consumidores reaccionan; usa llamadas directas cuando quien llama espera una respuesta.
   - Antes del primer caso de finanzas con dos o más consumidores, mantén los eventos dentro de cada servicio, sin broker.

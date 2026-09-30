@@ -1,18 +1,20 @@
 # FIN-01 · Importador xlsx/csv (D.1)
 
 - Estado: Pendiente
-- Prioridad: Baja
+- Prioridad: Media
 - Parte del lab: Finanzas
 - Depende de: UI-04
 - Fecha: 2026-09-30
-- Contexto: La importación de datos de movimientos permite a la UI mostrar un primer resumen de gastos e ingresos sin depender de datos locales manuales. El flujo debe ser controlado y no reutilizar información personal real.
+- Contexto: Importar localmente ingresos y transacciones para que Lara calcule resúmenes sin enviar los movimientos originales al LLM.
 - Criterio de aceptación:
   - `find . -type f | grep -E "csv|xlsx"` devuelve la estructura del importador o de los datos de prueba del laboratorio.
-  - Un CSV o XLSX sintético se importa sin error y genera una vista de resúmenes.
+  - Un CSV o XLSX de prueba se importa sin error y genera agregados; los archivos y movimientos locales se guardan bajo `agents/data/`, ignorado por Git.
+  - El LLM solo recibe agregados y resultados calculados, nunca sueldo ni transacciones sin procesar.
   - La app marca filas inválidas y evita aceptar datos sospechosos sin una validación explícita.
 - Archivos relevantes:
-  - docs/
-  - kc-front/src/
+  - agents/data/
+  - agents/
+  - agents-ui/
 - Notas:
   - Confirmado: el importador debe sostener datos sintéticos y no reales.
   - Inferido: la validación del esquema es esencial para evitar corrupción de la data.

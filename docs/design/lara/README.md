@@ -117,7 +117,7 @@ El item activo usa `aria-current="page"`. Cerrar sesión llama a `logout` de Key
 
 - Encabezado: título de la conversación + agente y modelo.
 - Mensajes del usuario a la derecha; respuestas con avatar a la izquierda.
-- **Eventos A2A** como separador centrado en mono ("orquestador → aclaraciones · A2A · transfiere el control").
+- **Eventos A2A** como separador centrado en mono ("orquestador → calculos-financieros · A2A · transfiere el control").
 - Pasos del flujo determinista como lista con check.
 - Composer: adjuntar, agente activo, memoria activa, enviar. Streaming: el texto aparece mientras llega.
 - La salida del agente se pinta como texto. **Nunca** `dangerouslySetInnerHTML`.

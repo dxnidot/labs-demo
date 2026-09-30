@@ -10,7 +10,7 @@ Laboratorio personal en Windows (`D:\dev\labs`, PowerShell). Repo **público**. 
 | `kc-demo/`   | API Spring Boot 4, Java 21, valida JWT y arma el menú por rol                                             | 8081   |
 | `kc-front/`  | Front Angular (se va a absorber en Lara, ver ADR-0002)                                                    | 4200   |
 | `bpm-sync/`  | Sincronización BPM → Keycloak (pendiente)                                                                 | —      |
-| `agents/`    | Agentes ADK: orquestador Python (8000, API server 8010), aclaraciones Java (8002), menu TypeScript (8003) | varios |
+| `agents/`    | Agentes ADK: orquestador Python (8000, API server 8010), cálculos financieros Java (8002), traductor TypeScript (8003) | varios |
 | `agents-ui/` | Lara: UI en React + Vite + Tailwind con login de Keycloak                                                 | 5173   |
 | `docs/`      | Backlog, ADR, planes y guía de UI                                                                         | —      |
 

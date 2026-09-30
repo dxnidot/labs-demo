@@ -22,7 +22,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ Authorization Services (RPT)
 - [ ] ⏳ KC-01 · Subir Keycloak a 26.7.5 (parche)
 - [x] ✅ KC-02 · Client público `agents-ui`
-- [ ] ⏳ KC-03 · Realm como código (export/import)
+- [ ] ⏳ KC-03 · Realm como código (export/import) — Track de identidad: solo para pruebas
 
 ## kc-demo (Spring Boot, puerto 8081)
 
@@ -38,7 +38,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 
 ## bpm-sync
 
-- [ ] ⏳ BPM-01 · Diseño listo; implementación sin iniciar
+- [ ] ⏳ BPM-01 · Diseño listo; implementación sin iniciar — Track de identidad: solo para pruebas
 
 ## .github (Copilot)
 
@@ -49,9 +49,9 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 
 - [x] ✅ AG-00 · Entorno: venv, `google-adk[a2a]`, `litellm>=1.84`
 - [x] ✅ AG-01 · Orquestador Python en `adk web` (8000)
-- [ ] ⏳ AG-02 · Agente Java con agent card (8002)
-- [ ] ⏳ AG-03 · Agente TypeScript con agent card (8003)
-- [ ] ⏳ AG-04 · Delegación A2A
+- [ ] ⏳ AG-02 · Cálculos financieros Java sin LLM (8002)
+- [ ] ⏳ AG-03 · Traductor TypeScript A2A (8003)
+- [ ] ⏳ AG-04 · Delegación A2A a cálculos financieros y traductor
 - [ ] ⏳ AG-05 · Sesión persistente en SQLite
 - [ ] ⏳ AG-06 · MCP filesystem de solo lectura (opcional)
 
@@ -61,10 +61,12 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ UI-02 · Chat con login de Keycloak y streaming — login Keycloak, run_sse, Enter, razonamiento oculto y Markdown seguro
 - [x] ✅ UI-03 · Design system de Lara — tokens Tailwind v4 y componentes base
 - [ ] 🔄 UI-04 · En curso: shell del chat e historial; demás vistas pendientes
-- [ ] 🔄 FE-01 · En curso: menú por rol en Lara; retiro de kc-front pendiente de validación
+- [ ] 🔄 FE-01 · En curso: menú por rol en Lara; retiro de kc-front pendiente de validación — Track de identidad: solo para pruebas
 
-## Personal (a futuro)
+## Finanzas personales
 
-- [ ] ⏳ FIN-01 · D.1: importador xlsx/csv
+- [ ] ⏳ FIN-01 · D.1: importador xlsx/csv (Media)
 - [ ] ⏳ FIN-02 · D.2: importador Takeout (validar formato real primero)
-- [ ] ⏳ FIN-03 · D.3: detección de fijos y proyección
+- [ ] ⏳ FIN-03 · D.3: detección de fijos y proyección (Media)
+- [ ] ⏳ FIN-06 · Registro de ingresos (sueldo) y porcentaje comprometido en gastos fijos
+- [ ] ⏳ FIN-07 · Recomendación educativa: pago total vs mínimo, intereses y fechas
