@@ -1,6 +1,6 @@
 # CP-01 · Instrucciones, agentes y skills de Copilot (A.1)
 
-- Estado: Pendiente
+- Estado: Hecho
 - Prioridad: Alta
 - Parte del lab: A.1
 - Depende de: —
@@ -16,4 +16,5 @@
 - Notas:
   - Confirmado: la configuración del repo debe usar la mínima superficie posible y reglas claras.
   - Inferido: los agentes deben responder en español y seguir la convención del laboratorio.
-  - Pendiente: validar el contenido exacto de los archivos con la doc oficial de Copilot antes de cerrar la implementación final.
+  - Confirmado: formato de instructions, agents (tools, handoffs) y skills validado con la doc oficial de VS Code.
+  - Cerrado: 2026-09-30.

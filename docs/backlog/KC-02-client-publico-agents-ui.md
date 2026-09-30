@@ -1,6 +1,6 @@
 # KC-02 · Client público agents-ui en realm lab (C.1)
 
-- Estado: Pendiente
+- Estado: Hecho
 - Prioridad: Alta
 - Parte del lab: C.1
 - Depende de: —
@@ -16,4 +16,5 @@
 - Notas:
   - Confirmado: la app es pública y no debe manejar secretos del navegador.
   - Inferido: el login debe ser `checkLoginIframe=false` para simplificar el flujo local.
-  - Pendiente: validar el client actual y el realm real antes de crear el flujo final.
+  - Confirmado: client público agents-ui en el realm lab, sin credenciales, redirect http://localhost:5173/*.
+  - Cerrado: 2026-09-30.

@@ -1,6 +1,6 @@
 # DOC-01 · Plantillas de backlog, bug y ADR + ADR 0001 de versiones
 
-- Estado: Pendiente
+- Estado: En curso
 - Prioridad: Alta
 - Parte del lab: Docs
 - Depende de: —

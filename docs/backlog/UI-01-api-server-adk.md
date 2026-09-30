@@ -1,6 +1,6 @@
 # UI-01 · API server de ADK en :8010 (C.2)
 
-- Estado: Pendiente
+- Estado: Hecho
 - Prioridad: Alta
 - Parte del lab: C.2
 - Depende de: AG-01
@@ -16,4 +16,5 @@
 - Notas:
   - Confirmado: el puerto debe ser estable para no romper el flujo del laboratorio.
   - Inferido: el servicio debe ser el punto de integración entre ADK y la UI.
-  - Pendiente: validar la ruta final del server según la versión del SDK de ADK utilizada.
+  - Confirmado: adk api_server escucha en 127.0.0.1:8010; rutas de sesión y run_sse tomadas del OpenAPI local.
+  - Cerrado: 2026-09-30.

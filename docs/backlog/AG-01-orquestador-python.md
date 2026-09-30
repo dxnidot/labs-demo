@@ -1,6 +1,6 @@
 # AG-01 · Orquestador Python en adk web (B.1)
 
-- Estado: Pendiente
+- Estado: Hecho
 - Prioridad: Alta
 - Parte del lab: B.1
 - Depende de: AG-00
@@ -16,4 +16,5 @@
 - Notas:
   - Confirmado: el orquestador es la entrada principal del laboratorio.
   - Inferido: `temperature=0.2` ayuda a respuestas más predecibles.
-  - Pendiente: validar la forma exacta del conector de modelo y la configuración de `LiteLlm` en la versión instalada.
+  - Confirmado: LiteLlm con el modelo deepseek/deepseek-flash funciona en adk web.
+  - Cerrado: 2026-09-30.

@@ -1,6 +1,6 @@
 # AG-00 · Entorno: PYTHONUTF8, venv, google-adk[a2a], litellm>=1.84 (Módulo 0)
 
-- Estado: Pendiente
+- Estado: Hecho
 - Prioridad: Alta
 - Parte del lab: Módulo 0
 - Depende de: —
@@ -16,4 +16,5 @@
 - Notas:
   - Confirmado: `PYTHONUTF8=1` es importante en Windows para evitar problemas de Unicode en LiteLLM.
   - Inferido: no se deben guardar claves ni secretos dentro del código ni en el repositorio público.
-  - Pendiente: validar el entorno real si cambia la versión final de ADK o LiteLLM.
+  - Confirmado: google-adk 2.10.0 y litellm 1.103.1 instalados; versiones en agents/requirements.txt.
+  - Cerrado: 2026-09-30.
