@@ -19,6 +19,7 @@ __pycache__/
 
 # Datos locales de agentes (sesiones, finanzas)
 agents/data/
+.adk/
 *.db
 *.sqlite
 *.sqlite3
