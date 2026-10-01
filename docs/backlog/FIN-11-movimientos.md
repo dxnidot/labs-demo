@@ -20,5 +20,5 @@
 - Notas:
   - Confirmado: FIN-10 deriva el usuario del JWT y persiste tarjetas con propietario.
   - Confirmado: los montos no se agregan entre MXN y USD.
-  - Inferido: para preservar el historial financiero, al eliminar una tarjeta los movimientos quedan sin asociación de tarjeta.
+  - Confirmado: al eliminar una tarjeta, sus movimientos se conservan y `card_id` queda en `NULL` (`ON DELETE SET NULL`).
   - Confirmado: `.\mvnw.cmd test` pasa con 22 pruebas, sin fallos ni errores.
