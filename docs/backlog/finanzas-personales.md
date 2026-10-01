@@ -32,3 +32,4 @@
 - [FIN-09 · Vista Mis tarjetas y Próximos pagos (solo lectura)](FIN-09-vista-proximos-pagos.md)
 - [FIN-10 · Microservicio de tarjetas y calendario financiero](FIN-10-microservicio-finanzas.md) — Hecho
 - [FIN-11 · Movimientos: gastos e ingresos](FIN-11-movimientos.md) — Hecho
+- [FIN-12 · Pestaña Finanzas en Lara](FIN-12-pestana-finanzas.md) — Hecho

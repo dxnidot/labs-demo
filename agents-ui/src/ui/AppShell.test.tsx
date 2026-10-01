@@ -82,6 +82,21 @@ describe("AppShell routes", () => {
     );
   });
 
+  it("abre /finanzas y marca activa la pestaña Finanzas", async () => {
+    prepararFetch([]);
+
+    render(
+      <MemoryRouter initialEntries={["/finanzas"]}>
+        <AppShell />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole("heading", { name: "Finanzas" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current")).toBe(
+      "page",
+    );
+  });
+
   it("oculta MENÚ cuando falla la API sin mostrar un error en la interfaz", async () => {
     prepararFetch([], true);
     vi.spyOn(console, "error").mockImplementation(() => {});

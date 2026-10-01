@@ -13,6 +13,7 @@ import { IconButton } from "./components/IconButton";
 import { Sidebar } from "./components/Sidebar";
 import { SidebarItem } from "./components/SidebarItem";
 import { ChatPage } from "./ChatPage";
+import { FinanzasPage } from "./FinanzasPage";
 import { MenuOpcionPage } from "./MenuOpcionPage";
 import { PagosPage } from "./PagosPage";
 import { ChatSessionsProvider, useChatSessions } from "./useChatSessions";
@@ -22,7 +23,7 @@ const apiHttpClient = new ApiHttpClient(keycloakAuthAdapter);
 const menuPort = new HttpMenuAdapter(apiHttpClient);
 const obtenerMenu = new ObtenerMenu(menuPort);
 const cargarMenu = () => obtenerMenu.ejecutar();
-const rutasFijasLara = new Set(["/", "/chat", "/finanzas/pagos"]);
+const rutasFijasLara = new Set(["/", "/chat", "/finanzas", "/finanzas/pagos"]);
 
 /**
  * Autentica al usuario y compone el shell persistente con sus vistas.
@@ -31,6 +32,7 @@ const rutasFijasLara = new Set(["/", "/chat", "/finanzas/pagos"]);
  * @modified Daniel 2026-09-30 Integra menú dinámico y conserva rutas fijas.
  * @modified Daniel 2026-09-30 Sustituye glifos de navegación con Lucide.
  * @modified Daniel 2026-09-30 Agrega la vista fija de pagos de Finanzas.
+ * @modified Daniel 2026-09-30 Integra la vista del panel de Finanzas.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -160,6 +162,9 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
 
         <nav aria-label="Vistas" className="mt-4 space-y-1">
           <SidebarItem active={pathname === "/chat"} to="/chat">Chat</SidebarItem>
+          <SidebarItem active={pathname === "/finanzas"} to="/finanzas">
+            Finanzas
+          </SidebarItem>
           <SidebarItem active={pathname === "/finanzas/pagos"} to="/finanzas/pagos">
             Pagos
           </SidebarItem>
@@ -236,6 +241,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
         <Routes>
           <Route path="/" element={<Navigate replace to="/chat" />} />
           <Route path="/chat" element={<ChatPage usuario={usuario} />} />
+          <Route path="/finanzas" element={<FinanzasPage />} />
           <Route path="/finanzas/pagos" element={<PagosPage />} />
           {menu.map((opcion) => (
             <Route

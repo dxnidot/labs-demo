@@ -1,0 +1,26 @@
+# FIN-12 · Pestaña Finanzas en Lara
+
+- Estado: Hecho
+- Prioridad: Alta
+- Parte del lab: C.5
+- Depende de: FIN-11, FIN-09
+- Fecha: 2026-09-30
+- Cerrado: 2026-09-30
+- Contexto: Añadir a Lara una pestaña `/finanzas` con tablas de movimientos y tarjetas y gráficas del resumen mensual devuelto por el servicio.
+- Criterio de aceptación:
+  - La pestaña consulta directamente `finanzas/` para movimientos, resumen mensual y tarjetas.
+  - Presenta tablas de gastos, ingresos y tarjetas, y gráficas de gastos e ingresos por categoría.
+  - La UI no calcula totales ni combina importes; presenta los resúmenes del servicio separados por tipo y moneda.
+  - La serie de gráficas usa los tokens de diseño `chart-1` a `chart-4`, mapeados a la escala hoki-200..500 de Lara.
+  - La interfaz y los componentes de gráfica son adaptables, accesibles y muestran estados de carga, vacío y error.
+  - Vitest cubre ruta, tabla de tarjetas, separación por tipo/moneda, gráficas, estados de carga/vacío/error y reintento; `npm test` y `npm run build` pasan.
+- Archivos relevantes:
+  - `agents-ui/`
+  - `docs/design/lara/README.md`
+- Notas:
+  - Confirmado: el entorno instalado usa React 19.3.0 y Tailwind CSS 4.3.3.
+  - Confirmado: el repositorio oficial de Tremor publica componentes Tailwind; el manifest actual muestra React 18.3.1 y Tailwind 4.1.3, sin documentar compatibilidad específica con React 19.
+  - Confirmado: el manifest oficial de Recharts admite React 19; su instalación con npm es la opción recomendada para SPA.
+  - Confirmado: `npm test` pasa con 29 pruebas y `npm run build` finaliza correctamente.
+  - Inferido: se elige Recharts para el entorno actual por su compatibilidad explícita de React 19; sus gráficas SVG no dependen de Tailwind.
+  - Fuentes oficiales consultadas: [Tremor installation](https://www.tremor.so/docs/getting-started/installation), [Tremor package.json](https://github.com/tremorlabs/tremor/blob/main/package.json), [Recharts package.json](https://github.com/recharts/recharts/blob/main/package.json), [Recharts installation](https://recharts.github.io/en-US/guide/installation/).

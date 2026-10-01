@@ -76,3 +76,4 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ FIN-09 · Hecho: Mis tarjetas y Próximos pagos (solo lectura)
 - [x] ✅ FIN-10 · Hecho: microservicio de tarjetas y calendario financiero
 - [x] ✅ FIN-11 · Hecho: movimientos de gastos e ingresos
+- [x] ✅ FIN-12 · Hecho: pestaña Finanzas en Lara
