@@ -5,6 +5,8 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 
 > Todos los datos de las pantallas son de ejemplo. Nada de esto es información real.
 
+**Exact values:** para spacing, tamaños y estructura exactos, consulta `html/lara-canvas.html`; los PNG muestran el aspecto. El HTML es el canvas completo: todas las pantallas comparten un shell y cambian por vista; Finanzas corresponde al bloque de la vista `finanzas` y sus tabs. Si discrepan, el PNG manda para el aspecto y el HTML para las medidas.
+
 ## Cómo usar esta guía con Copilot
 
 - No la cargues completa en cada conversación. Pásale solo lo que necesita la tarea:
@@ -28,7 +30,7 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 | `neutral-700`      | `#434343` | Neutro oscuro                            |
 | `neutral-800`      | `#292929` | Hover, activo, bordes, divisores y pills |
 | `neutral-900`      | `#1A1A1A` | Sidebar y superficies                   |
-| `neutral-950`      | `#000000` | Fondo de la app                          |
+| `neutral-950`      | `#14171B` | Fondo de la app                          |
 | `hoki-50`          | `#F6F7F9` | Hoki claro                               |
 | `hoki-100`         | `#ECEFF2` | Hoki claro                               |
 | `hoki-200`         | `#D4DCE3` | Accent hover, highlight, gráfico 1       |
@@ -40,7 +42,7 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 | `hoki-800`         | `#384754` | Hoki oscuro                              |
 | `hoki-900`         | `#323D48` | Hoki oscuro                              |
 | `hoki-950`         | `#212830` | Tinta sobre accent/highlight             |
-| `bg`               | `#000000` | Fondo                                   |
+| `bg`               | `#14171B` | Fondo                                   |
 | `sidebar`, `surface` | `#1A1A1A` | Barra lateral, tarjetas y composer       |
 | `surface-hover`, `surface-active`, `border`, `divider` | `#292929` | Estados y separadores |
 | `text`              | `#FAFAFA` | Texto principal                           |
@@ -82,6 +84,7 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 - Espaciado: padding de pantalla 32px · gap entre bloques 24px · gap en grids 16px.
 - Barra lateral: 272px fija. Contenido del chat: `max-width: 760px` centrado.
 - Área táctil mínima 44px en la navegación. En menos de 980px la barra lateral se oculta y los grids pasan a una columna.
+- Las barras de desplazamiento están ocultas en todas las áreas con scroll (`scrollbar-width: none` y `::-webkit-scrollbar { display: none }`); el desplazamiento sigue funcionando.
 
 ## Estructura de la app
 
@@ -115,8 +118,11 @@ El item activo usa `aria-current="page"`. Cerrar sesión llama a `logout` de Key
 | 09  | `png/09-menu-por-rol.png`       | Menú por rol        | kc-front           | kc-demo `GET /api/menu`                               |
 | 10  | `png/10-usuarios-roles.png`     | Usuarios y roles    | Keycloak           | Admin REST API, solo lectura                          |
 | 11  | `png/11-sincronizacion-bpm.png` | Sincronización BPM  | bpm-sync           | Resultado del dry-run                                 |
-| 12  | `png/12-finanzas.png`           | Finanzas            | Parte D (a futuro) | BD local de finanzas                                  |
-| 13  | `png/13-gastos-fijos.png`       | Gastos fijos        | Parte D (a futuro) | BD local de finanzas                                  |
+| 12  | `png/12-finanzas.png`           | Finanzas            | FIN                | servicio finanzas (`:8083`)                           |
+| 13  | `png/13-gastos-fijos.png`       | Gastos fijos        | FIN                | servicio finanzas (`:8083`)                           |
+| 14  | `png/14-finanzas-tarjetas.png`  | Tarjetas y pagos    | FIN                | servicio finanzas (`:8083`)                           |
+
+Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron (ADR-0005, FE-01). Ignora esos elementos.
 
 ### 01 · Login
 
@@ -196,12 +202,16 @@ El item activo usa `aria-current="page"`. Cerrar sesión llama a `logout` de Key
 - Pill **Dry-run** y botón para ejecutarlo. Contadores: crear, actualizar, sin cambios, huérfanas.
 - Tabla con la acción por usuario. Las huérfanas no se borran solas.
 
-### 12 · Finanzas (a futuro)
+### 12 · Finanzas
 
 ![Finanzas](png/12-finanzas.png)
 
-- Selector de mes y botón **Importar xlsx o Takeout**.
-- KPIs: gasto del mes, fijos, variables. Barras por categoría. Últimos movimientos con su origen (xlsx / Google Wallet).
+- Encabezado con selector de periodo y alternador MXN/USD.
+- Tabs **Resumen · Gastos · Ingresos · Tarjetas y pagos · Trading MX · Trading USA**. La pestaña activa se refleja en la URL, por ejemplo `/finanzas/gastos`.
+- Resumen: 4 KPIs (con **próximo pago** destacado), ingresos vs. gastos de 6 meses, gastos por categoría, próximos pagos y últimos movimientos con su origen (chat, CSV, notificación o manual).
+- Panel derecho **Asistente de finanzas** (~384px), plegable y como drawer en pantallas estrechas. Renderiza Markdown con `react-markdown`, incluidas tablas.
+- Para varias transacciones, muestra un preview y una confirmación para el conjunto (**Confirmar las N**). El botón para adjuntar archivos va dentro del composer; finanzas procesa los archivos, nunca se envían al LLM.
+- No hay una caja separada de **Importar CSV**. Trading MX y Trading USA muestran un estado vacío hasta FIN-04.
 
 ### 13 · Gastos fijos (a futuro)
 
@@ -211,10 +221,18 @@ El item activo usa `aria-current="page"`. Cerrar sesión llama a `logout` de Key
 - Proyección de 6 meses en barras; el pico va en durazno con su explicación en texto.
 - La proyección se calcula en código, no con el LLM.
 
+### 14 · Tarjetas y pagos
+
+![Tarjetas y pagos](png/14-finanzas-tarjetas.png)
+
+- Tabla de tarjetas con solo un toggle para activarlas o desactivarlas.
+- Próximos 30 días agrupados por fecha; las tarjetas inactivas no se muestran.
+- La entrada lateral anterior `/finanzas/pagos` ahora es esta pestaña.
+
 ## Reglas para implementar
 
 - Arquitectura hexagonal ligera: `AuthPort`, `AgentePort` y un puerto por fuente de datos de cada vista.
 - Tokens solo en memoria. Nada en `localStorage`.
 - Vistas de administración (BD, usuarios, BPM, herramientas) **solo lectura** desde Lara.
-- Finanzas: datos en `agents/data/` (ignorado por Git); al agente solo le llegan resúmenes.
+- Finanzas: datos en el servicio finanzas (Postgres local); al LLM solo le llegan resultados calculados.
 - Botones reales (`<button>`, `<a>`), `aria-label` en botones de solo ícono, contraste AA.
