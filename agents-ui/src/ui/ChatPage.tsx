@@ -52,14 +52,26 @@ const componentesMarkdown: Components = {
 };
 
 const sugerencias = [
-  { tone: "lavender" as const, etiqueta: "menu · A2A", texto: "¿Qué opciones de menú tengo?" },
   {
-    tone: "pink" as const,
-    etiqueta: "aclaraciones · A2A",
-    texto: "Quiero levantar una aclaración",
+    tone: "mint" as const,
+    etiqueta: "finanzas",
+    texto: "¿Cuánto llevo en gastos fijos este mes?",
   },
-  { tone: "accent" as const, etiqueta: "memoria", texto: "¿Cómo configuro PKCE?" },
-  { tone: "mint" as const, etiqueta: "finanzas", texto: "¿Cuánto llevo en gastos fijos?" },
+  {
+    tone: "peach" as const,
+    etiqueta: "cálculos",
+    texto: "¿Me conviene pagar el total o el mínimo de mi tarjeta?",
+  },
+  {
+    tone: "lavender" as const,
+    etiqueta: "traductor",
+    texto: "Traduce este texto al inglés",
+  },
+  {
+    tone: "accent" as const,
+    etiqueta: "memoria",
+    texto: "¿Qué hablamos la última vez sobre mi presupuesto?",
+  },
 ];
 
 const colorEtiqueta = {
@@ -75,7 +87,8 @@ const colorEtiqueta = {
  * Presenta la conversación de Lara y su respuesta en streaming.
  * @author Daniel
  * @since 2026-09-30
- * @modified Daniel 2026-09-30 Mueve navegación al shell y titula la sesión inicial.
+ * @modified Daniel Tovar 2026-09-30 Mueve navegación al shell y titula la sesión inicial.
+ * @modified Daniel Tovar 2026-09-30 Actualiza sugerencias al enfoque de finanzas personales.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {
@@ -279,7 +292,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                           event.currentTarget.form?.requestSubmit();
                         }
                       }}
-                      placeholder="Pregunta, pide una aclaración o busca en tu memoria…"
+                      placeholder="Pregunta por tus gastos, tu tarjeta o pide una traducción…"
                       rows={2}
                       value={texto}
                     />
