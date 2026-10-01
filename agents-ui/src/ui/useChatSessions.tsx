@@ -7,10 +7,14 @@ import {
   type ReactNode,
 } from "react";
 import type { SesionChat } from "../domain/SesionChat";
+import type { Mensaje } from "../domain/Mensaje";
+import type { ActualizacionStreaming } from "../application/ports/AgentePort";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { AdkAgenteAdapter } from "../infrastructure/adapters/AdkAgenteAdapter";
+import { EnviarMensaje } from "../application/use-cases/EnviarMensaje";
 
 const agente = new AdkAgenteAdapter(keycloakAuthAdapter);
+const casoEnviarMensaje = new EnviarMensaje(keycloakAuthAdapter, agente);
 
 interface ChatSessionsValue {
   activeSessionId: string | null;
@@ -20,6 +24,12 @@ interface ChatSessionsValue {
   selectSession: (sessionId: string) => void;
   sessions: SesionChat[];
   setActiveSessionId: (sessionId: string | null) => void;
+  obtenerSesion: (sessionId: string) => Promise<Mensaje[]>;
+  enviarMensaje: (
+    texto: string,
+    sessionId: string | null,
+    onUpdate: (update: ActualizacionStreaming) => void,
+  ) => Promise<string>;
 }
 
 interface ChatSessionsProviderProps {
@@ -33,7 +43,7 @@ const ChatSessionsContext = createContext<ChatSessionsValue | null>(null);
  * Comparte el historial y la sesión activa entre el shell lateral y el chat.
  * @author Daniel
  * @since 2026-09-30
- * @modified Daniel 2026-09-30 Crea la sesión al enviar el primer mensaje.
+ * @modified Daniel 2026-09-30 Comparte el puerto y caso de uso de chat embebido.
  */
 export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderProps) {
   const [sessions, setSessions] = useState<SesionChat[]>([]);
@@ -59,6 +69,18 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
   const selectSession = useCallback((sessionId: string) => {
     setActiveSessionId(sessionId);
   }, []);
+  const obtenerSesion = useCallback(
+    (sessionId: string) => agente.obtenerSesion(userId, sessionId),
+    [userId],
+  );
+  const enviarMensaje = useCallback(
+    (
+      texto: string,
+      sessionId: string | null,
+      onUpdate: (update: ActualizacionStreaming) => void,
+    ) => casoEnviarMensaje.ejecutar(texto, sessionId, onUpdate),
+    [],
+  );
 
   useEffect(() => {
     void refreshSessions().catch((reason: unknown) => {
@@ -74,7 +96,9 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
         activeSessionId,
         historyError,
         isLoadingHistory,
+        obtenerSesion,
         refreshSessions,
+        enviarMensaje,
         selectSession,
         sessions,
         setActiveSessionId,
@@ -89,7 +113,7 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
  * Accede al historial compartido entre las vistas de chat y menú.
  * @author Daniel
  * @since 2026-09-30
- * @modified Daniel 2026-09-30 Comparte el inicio diferido de sesiones.
+ * @modified Daniel 2026-09-30 Comparte operaciones ADK para el chat financiero.
  */
 export function useChatSessions(): ChatSessionsValue {
   const context = useContext(ChatSessionsContext);

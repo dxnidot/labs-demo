@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import com.example.finanzas.application.importaciones.ImportacionNoEncontradaException;
+import com.example.finanzas.application.importaciones.ImportacionPropiedadException;
 import com.example.finanzas.domain.movimiento.MovimientoNoEncontradoException;
 import com.example.finanzas.domain.tarjeta.TarjetaNoEncontradaException;
 
@@ -33,6 +35,16 @@ public class ApiExceptionHandler {
     @ExceptionHandler(MovimientoNoEncontradoException.class)
     public ResponseEntity<ApiError> movimientoNoEncontrado(MovimientoNoEncontradoException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ImportacionNoEncontradaException.class)
+    public ResponseEntity<ApiError> importacionNoEncontrada(ImportacionNoEncontradaException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ImportacionPropiedadException.class)
+    public ResponseEntity<ApiError> importacionDeOtroPropietario(ImportacionPropiedadException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiError("Acceso denegado"));
     }
 
     @ExceptionHandler({

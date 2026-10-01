@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,7 @@ import com.example.finanzas.domain.movimiento.Movimiento;
  * Persiste movimientos con todas las lecturas y escrituras limitadas al propietario.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified 2026-09-30
  */
 @Repository
 public class JdbcMovimientoRepository implements MovimientoRepository {
@@ -48,6 +50,40 @@ public class JdbcMovimientoRepository implements MovimientoRepository {
                 movimiento.origen().name(),
                 movimiento.tipo().name());
         return movimiento;
+    }
+
+    @Override
+    public void crearTodos(List<Movimiento> movimientos) {
+        if (movimientos.isEmpty()) {
+            return;
+        }
+
+        jdbcTemplate.batchUpdate("""
+                INSERT INTO movimientos (
+                    id, owner_sub, fecha, monto, moneda, comercio, categoria, card_id, origen, tipo
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(java.sql.PreparedStatement statement, int index)
+                    throws java.sql.SQLException {
+                Movimiento movimiento = movimientos.get(index);
+                statement.setObject(1, movimiento.id());
+                statement.setString(2, movimiento.ownerSub());
+                statement.setObject(3, movimiento.fecha());
+                statement.setBigDecimal(4, movimiento.monto());
+                statement.setString(5, movimiento.moneda().name());
+                statement.setString(6, movimiento.comercio());
+                statement.setString(7, movimiento.categoria());
+                statement.setObject(8, movimiento.tarjetaId());
+                statement.setString(9, movimiento.origen().name());
+                statement.setString(10, movimiento.tipo().name());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return movimientos.size();
+            }
+        });
     }
 
     @Override

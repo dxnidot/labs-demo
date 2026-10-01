@@ -4,15 +4,9 @@ import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Mensaje } from "../domain/Mensaje";
 import type { Usuario } from "../domain/Usuario";
-import { AdkAgenteAdapter } from "../infrastructure/adapters/AdkAgenteAdapter";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
-import { EnviarMensaje } from "../application/use-cases/EnviarMensaje";
 import { Button } from "./components/Button";
 import { Pill } from "./components/Pill";
 import { useChatSessions } from "./useChatSessions";
-
-const agente = new AdkAgenteAdapter(keycloakAuthAdapter);
-const enviarMensaje = new EnviarMensaje(keycloakAuthAdapter, agente);
 
 const componentesMarkdown: Components = {
   h1: ({ children }) => <h1 className="mb-3 mt-5 text-2xl font-semibold">{children}</h1>,
@@ -90,7 +84,7 @@ const colorEtiqueta = {
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Mueve navegación al shell y titula la sesión inicial.
  * @modified Daniel Tovar 2026-09-30 Actualiza sugerencias al enfoque de finanzas personales.
- * @modified Daniel 2026-09-30 Sustituye glifos decorativos con Lucide.
+ * @modified Daniel 2026-09-30 Reutiliza el puerto de sesión compartido con Finanzas.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {
@@ -98,6 +92,8 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     refreshSessions,
     sessions,
     setActiveSessionId,
+    obtenerSesion,
+    enviarMensaje,
   } = useChatSessions();
   const [mensajes, setMensajes] = useState<Mensaje[]>([]);
   const [texto, setTexto] = useState("");
@@ -120,8 +116,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     setError(null);
     setCargandoSesion(true);
     setMensajes([]);
-    agente
-      .obtenerSesion(usuario.id, activeSessionId)
+    obtenerSesion(activeSessionId)
       .then((sessionMessages) => {
         if (active) {
           setMensajes(sessionMessages);
@@ -140,7 +135,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     return () => {
       active = false;
     };
-  }, [activeSessionId, usuario.id]);
+  }, [activeSessionId, obtenerSesion]);
 
   useEffect(() => {
     const list = listaMensajesRef.current;
@@ -169,7 +164,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
 
     let receivedText = false;
     try {
-      const sentSessionId = await enviarMensaje.ejecutar(
+      const sentSessionId = await enviarMensaje(
         mensaje,
         activeSessionId,
         (update) => {

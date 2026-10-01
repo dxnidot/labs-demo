@@ -1,0 +1,27 @@
+# FIN-15 · Chat de Finanzas e importación CSV
+
+- Estado: Hecho
+- Prioridad: Alta
+- Parte del lab: Finanzas / Lara
+- Depende de: FIN-14, FIN-12
+- Fecha: 2026-09-30
+- Contexto: Incrustar el chat del agente de Finanzas en la pestaña `/finanzas` y permitir importar movimientos mediante una vista previa confirmable. El adjunto viaja directamente del navegador al microservicio Java y nunca al agente ADK/LLM.
+- Criterio de aceptación:
+  - La pestaña incluye un panel de chat conectado al agente mediante el adaptador ADK existente; mensajes y streaming se mantienen autenticados.
+  - El panel permite seleccionar CSV y enviarlo a `POST /api/finanzas/importaciones/preview` con el JWT del usuario. El archivo no se añade al mensaje ADK, eventos SSE, prompts, herramientas ni logs.
+  - Esquema CSV: encabezados `fecha,monto,moneda,comercio,categoria,tarjetaId,tipo`; `tarjetaId` puede venir vacío, el servicio fija el origen a `IMPORT` y monto debe ser positivo.
+  - Java analiza CSV RFC 4180; previsualiza registros sin persistir, muestra errores sin eco de filas/contenido sensible y ofrece confirmar explícitamente.
+  - Los previews son temporales, ligados al `sub` autenticado, caducan a los 15 minutos y no se persisten a disco; confirmar desde otro usuario se rechaza.
+  - Confirmar un preview consume su identificador para evitar replay y crea los movimientos de forma atómica, validando que toda tarjeta opcional pertenezca al usuario.
+  - Rechazar archivos no CSV, vacíos, mayores de 1 MiB, con más de 1000 filas, encabezados/campos inválidos o datos incompletos.
+  - `npm test`, `npm run build`, `.\mvnw.cmd test` y `pytest` pasan en sus respectivos directorios.
+- Archivos relevantes:
+  - `agents-ui/`
+  - `finanzas/`
+- Notas:
+  - Confirmado: el adaptador ADK existente transmite solo texto y admite una sesión por conversación; los archivos no se enviarán por esa interfaz.
+  - Confirmado: FIN-11 asigna origen `IMPORT` y mantiene los montos positivos con tipo separado.
+  - Confirmado: se usa Apache Commons CSV 1.14.1; documentación y APIs oficiales consultadas: https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVParser.html, https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html, https://repo.maven.apache.org/maven2/org/apache/commons/commons-csv/maven-metadata.xml
+  - Confirmado: pruebas Java — 40 aprobadas; UI — 31 aprobadas y build correcto; agente Python — 37 aprobadas.
+  - Confirmado + Cerrado: FIN-15 cumple los criterios de aceptación y se completa en `feat/finanzas-agente`.
+  - Inferido: los previews se mantienen en memoria del servicio; un reinicio los descarta y el usuario puede volver a subir el archivo.

@@ -11,10 +11,13 @@ import com.example.finanzas.domain.movimiento.Movimiento;
  * Define operaciones de persistencia de movimientos acotadas por propietario.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified 2026-09-30
  */
 public interface MovimientoRepository {
 
     Movimiento crear(Movimiento movimiento);
+
+    void crearTodos(List<Movimiento> movimientos);
 
     List<Movimiento> listarPorPropietario(String ownerSub);
 

@@ -13,6 +13,7 @@ import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
 import { HttpFinanzasAdapter } from "../infrastructure/adapters/HttpFinanzasAdapter";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { Button } from "./components/Button";
+import { FinanzasChatPanel } from "./FinanzasChatPanel";
 
 const FinanzasCharts = lazy(() =>
   import("./FinanzasCharts").then((module) => ({ default: module.FinanzasCharts })),
@@ -36,6 +37,7 @@ const formatoFecha = new Intl.DateTimeFormat("es-MX", {
  * Presenta movimientos y tarjetas junto con el resumen mensual de finanzas.
  * @author Daniel
  * @since 2026-09-30
+ * @modified Daniel 2026-09-30 Integra chat e importación CSV con confirmación.
  */
 export function FinanzasPage() {
   const [periodo, setPeriodo] = useState(periodoActual);
@@ -108,6 +110,11 @@ export function FinanzasPage() {
             />
           </label>
         </header>
+
+        <FinanzasChatPanel
+          finanzas={finanzasPort}
+          onImportConfirmed={() => setRecarga((actual) => actual + 1)}
+        />
 
         {cargando && (
           <p className="mb-6 rounded-card border border-border bg-surface p-5 text-sm text-muted" role="status">

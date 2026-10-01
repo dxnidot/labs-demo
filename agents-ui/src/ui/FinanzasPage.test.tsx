@@ -16,8 +16,20 @@ const authFake = vi.hoisted(() => ({
   logout: vi.fn(async () => {}),
 }));
 
+const chatFake = vi.hoisted(() => ({
+  activeSessionId: null as string | null,
+  enviarMensaje: vi.fn(async () => "sesion-chat"),
+  obtenerSesion: vi.fn(async () => []),
+  refreshSessions: vi.fn(async () => {}),
+  setActiveSessionId: vi.fn(),
+}));
+
 vi.mock("../infrastructure/adapters/KeycloakAuthAdapter", () => ({
   keycloakAuthAdapter: authFake,
+}));
+
+vi.mock("./useChatSessions", () => ({
+  useChatSessions: () => chatFake,
 }));
 
 const movimientos: MovimientoFinanciero[] = [
@@ -88,6 +100,11 @@ const tarjetas: Tarjeta[] = [
 
 beforeEach(() => {
   authFake.updateToken.mockReset().mockResolvedValue("token-finanzas-prueba");
+  chatFake.activeSessionId = null;
+  chatFake.enviarMensaje.mockReset().mockResolvedValue("sesion-chat");
+  chatFake.obtenerSesion.mockReset().mockResolvedValue([]);
+  chatFake.refreshSessions.mockReset().mockResolvedValue();
+  chatFake.setActiveSessionId.mockReset();
   vi.stubGlobal(
     "fetch",
     vi.fn(async (input: RequestInfo | URL) =>
@@ -268,6 +285,137 @@ describe("FinanzasPage", () => {
     expect(await screen.findByText("Tarjeta principal")).toBeTruthy();
     expect(screen.queryByRole("alert")).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(6);
+  });
+
+  it("previsualiza el CSV solo en Finanzas y refresca la vista al confirmar explícitamente", async () => {
+    const importado: MovimientoFinanciero = {
+      id: "movimiento-importado",
+      fecha: `${periodoPrueba}-07`,
+      monto: 45,
+      moneda: "MXN",
+      comercio: "Comercio importado",
+      categoria: "Compras",
+      tarjetaId: null,
+      origen: "IMPORT",
+      tipo: "GASTO",
+    };
+    let confirmada = false;
+    const fetchMock = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        const ruta = String(input);
+        if (ruta === "/api/finanzas/importaciones/preview") {
+          return new Response(
+            JSON.stringify({
+              importId: "importacion-1",
+              totalRegistros: 1,
+              movimientos: [
+                {
+                  fecha: importado.fecha,
+                  monto: importado.monto,
+                  moneda: importado.moneda,
+                  comercio: importado.comercio,
+                  categoria: importado.categoria,
+                  tarjetaId: importado.tarjetaId,
+                  tipo: importado.tipo,
+                },
+              ],
+            }),
+            { status: 200 },
+          );
+        }
+        if (ruta === "/api/finanzas/importaciones/importacion-1/confirmar") {
+          expect(init?.method).toBe("POST");
+          confirmada = true;
+          return new Response(JSON.stringify({ totalRegistros: 1 }), { status: 200 });
+        }
+        return respuestaFinanzas(ruta, {
+          movimientos: confirmada ? [...movimientos, importado] : movimientos,
+          resumen,
+          tarjetas,
+        });
+      },
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<FinanzasPage />);
+    expect(await screen.findByText("Tarjeta principal")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Confirmar importación" })).toBeNull();
+
+    const archivoCsv = new File(["fecha,monto"], "movimientos.csv", {
+      type: "text/csv",
+    });
+    fireEvent.change(screen.getByLabelText("Archivo CSV"), {
+      target: { files: [archivoCsv] },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Previsualizar CSV" }));
+
+    const tablaPreview = await screen.findByRole("table", {
+      name: "Previsualización de movimientos",
+    });
+    expect(within(tablaPreview).getByText("Comercio importado")).toBeTruthy();
+    expect(
+      fetchMock.mock.calls.some(([ruta]) =>
+        String(ruta).includes("/confirmar"),
+      ),
+    ).toBe(false);
+    expect(
+      fetchMock.mock.calls.map(([ruta]) => String(ruta)).filter((ruta) => ruta.startsWith("/adk/")),
+    ).toEqual([]);
+    expect(chatFake.enviarMensaje).not.toHaveBeenCalled();
+
+    const previewCall = fetchMock.mock.calls.find(
+      ([ruta]) => String(ruta) === "/api/finanzas/importaciones/preview",
+    );
+    expect(previewCall).toBeDefined();
+    const previewInit = previewCall?.[1];
+    expect(previewInit?.method).toBe("POST");
+    expect(previewInit?.body).toBeInstanceOf(FormData);
+    expect(Array.from((previewInit?.body as FormData).keys())).toEqual(["archivo"]);
+    const archivoEnviado = (previewInit?.body as FormData).get("archivo");
+    expect(archivoEnviado).toBeInstanceOf(File);
+    expect((archivoEnviado as File).name).toBe(archivoCsv.name);
+    expect(new Headers(previewInit?.headers).has("Content-Type")).toBe(false);
+    expect(new Headers(previewInit?.headers).get("Authorization")).toBe(
+      "Bearer token-finanzas-prueba",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar importación" }));
+    expect(await screen.findByRole("status")).toHaveProperty(
+      "textContent",
+      "Importación confirmada: 1 registros.",
+    );
+    expect(await screen.findByText("Comercio importado")).toBeTruthy();
+    expect(
+      fetchMock.mock.calls.filter(
+        ([ruta]) => String(ruta) === "/api/finanzas/movimientos",
+      ),
+    ).toHaveLength(2);
+  });
+
+  it("muestra los errores de preview sin habilitar una confirmación", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input) === "/api/finanzas/importaciones/preview") {
+        return new Response("", { status: 503 });
+      }
+      return respuestaFinanzas(String(input), { movimientos, resumen, tarjetas });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<FinanzasPage />);
+    await screen.findByText("Tarjeta principal");
+    fireEvent.change(screen.getByLabelText("Archivo CSV"), {
+      target: {
+        files: [new File(["fecha,monto"], "movimientos.csv", { type: "text/csv" })],
+      },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Previsualizar CSV" }));
+
+    expect(await screen.findByRole("alert")).toHaveProperty(
+      "textContent",
+      "La API respondió HTTP 503.",
+    );
+    expect(screen.queryByRole("button", { name: "Confirmar importación" })).toBeNull();
+    expect(chatFake.enviarMensaje).not.toHaveBeenCalled();
   });
 });
 

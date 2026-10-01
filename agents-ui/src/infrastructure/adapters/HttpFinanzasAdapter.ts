@@ -8,13 +8,17 @@ import type {
   TipoMovimiento,
 } from "../../domain/MovimientoFinanciero";
 import type { Tarjeta } from "../../domain/Tarjeta";
+import type {
+  PreviewImportacion,
+  ResultadoImportacion,
+} from "../../domain/ImportacionFinanciera";
 import { ApiHttpClient } from "./ApiHttpClient";
 
 /**
  * Adapta la API autenticada de finanzas a su puerto de aplicación.
  * @author Daniel
  * @since 2026-09-30
- * @modified Daniel 2026-09-30 Integra movimientos y resúmenes mensuales.
+ * @modified Daniel 2026-09-30 Integra la previsualización y confirmación CSV.
  */
 export class HttpFinanzasAdapter implements FinanzasPort {
   constructor(private readonly http: ApiHttpClient) {}
@@ -79,6 +83,28 @@ export class HttpFinanzasAdapter implements FinanzasPort {
     );
     if (!esTarjeta(response)) {
       throw new Error("La API de finanzas devolvió una tarjeta inválida.");
+    }
+    return response;
+  }
+
+  async previsualizarImportacion(archivo: File): Promise<PreviewImportacion> {
+    const response = await this.http.solicitarArchivo(
+      "/api/finanzas/importaciones/preview",
+      archivo,
+    );
+    if (!esPreviewImportacion(response)) {
+      throw new Error("La API de finanzas devolvió una previsualización inválida.");
+    }
+    return response;
+  }
+
+  async confirmarImportacion(importId: string): Promise<ResultadoImportacion> {
+    const response = await this.http.solicitar(
+      `/api/finanzas/importaciones/${encodeURIComponent(importId)}/confirmar`,
+      { method: "POST" },
+    );
+    if (!esResultadoImportacion(response)) {
+      throw new Error("La API de finanzas devolvió una confirmación inválida.");
     }
     return response;
   }
@@ -174,5 +200,56 @@ function esEventoCalendario(value: unknown): value is EventoCalendario {
     (value.tipo === "CORTE" || value.tipo === "PAGO") &&
     "alias" in value &&
     typeof value.alias === "string"
+  );
+}
+
+function esPreviewImportacion(value: unknown): value is PreviewImportacion {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "importId" in value &&
+    typeof value.importId === "string" &&
+    value.importId.length > 0 &&
+    "totalRegistros" in value &&
+    typeof value.totalRegistros === "number" &&
+    Number.isInteger(value.totalRegistros) &&
+    value.totalRegistros >= 0 &&
+    "movimientos" in value &&
+    Array.isArray(value.movimientos) &&
+    value.movimientos.every(esMovimientoImportacion)
+  );
+}
+
+function esMovimientoImportacion(value: unknown): boolean {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "fecha" in value &&
+    typeof value.fecha === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value.fecha) &&
+    "monto" in value &&
+    typeof value.monto === "number" &&
+    Number.isFinite(value.monto) &&
+    "moneda" in value &&
+    esMoneda(value.moneda) &&
+    "comercio" in value &&
+    typeof value.comercio === "string" &&
+    "categoria" in value &&
+    typeof value.categoria === "string" &&
+    "tarjetaId" in value &&
+    (typeof value.tarjetaId === "string" || value.tarjetaId === null) &&
+    "tipo" in value &&
+    esTipoMovimiento(value.tipo)
+  );
+}
+
+function esResultadoImportacion(value: unknown): value is ResultadoImportacion {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "totalRegistros" in value &&
+    typeof value.totalRegistros === "number" &&
+    Number.isInteger(value.totalRegistros) &&
+    value.totalRegistros >= 0
   );
 }

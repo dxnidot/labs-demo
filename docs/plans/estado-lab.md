@@ -79,3 +79,4 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ FIN-12 · Hecho: pestaña Finanzas en Lara
 - [x] ✅ FIN-13 · Hecho: autenticación del agente hacia finanzas
 - [x] ✅ FIN-14 · Hecho: agente ADK de finanzas
+- [x] ✅ FIN-15 · Hecho: chat de Finanzas e importación CSV (depende de FIN-14, FIN-12)
