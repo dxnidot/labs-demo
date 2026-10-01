@@ -5,7 +5,7 @@ import type { FinanzasPort } from "../application/ports/FinanzasPort";
 import { AlternarEstadoTarjeta } from "../application/use-cases/AlternarEstadoTarjeta";
 import { Card } from "./components/Card";
 import { Tag } from "./components/Tag";
-import { claseFoco } from "./components/foco";
+import { claseFocoInterno } from "./components/foco";
 import { enmascarar, fechaConDiaSemana } from "./finanzasFormato";
 
 interface FinanzasTarjetasTabProps {
@@ -19,6 +19,7 @@ interface FinanzasTarjetasTabProps {
  * Tabla de tarjetas con interruptor de activa y calendario de los próximos 30 días.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-09-30 Foco del switch hacia adentro para que la tabla con scroll no lo recorte.
  */
 export function FinanzasTarjetasTab({
   eventos,
@@ -99,7 +100,7 @@ export function FinanzasTarjetasTab({
                       <button
                         aria-checked={tarjeta.activa}
                         aria-label={`${tarjeta.alias} activa`}
-                        className={`relative h-6 w-10 rounded-pill border-0 p-0 transition-colors disabled:opacity-50 ${claseFoco} ${
+                        className={`relative h-6 w-10 rounded-pill border-0 p-0 transition-colors disabled:opacity-50 ${claseFocoInterno} ${
                           tarjeta.activa ? "bg-accent" : "bg-neutral-700"
                         }`}
                         disabled={actualizando.has(tarjeta.id)}

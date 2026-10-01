@@ -1,0 +1,24 @@
+# UI-08 · Lara responsive y layout de página único
+
+- Estado: En curso
+- Prioridad: Media
+- Parte del lab: C.5
+- Depende de: UI-07
+- Fecha: 2026-09-30
+- Contexto: En Finanzas › Tarjetas y pagos las pestañas se aplastan cuando el contenido es más alto que la pantalla, y bajo 980px la barra lateral se oculta sin dejar forma de navegar. Hace falta un layout de página único y que Lara se pueda usar en pantallas estrechas.
+- Criterio de aceptación:
+  - Todas las vistas usan `PageLayout`: encabezado y pie fijos (`shrink-0`) y un único contenedor con scroll; ningún encabezado, tablist, toolbar o composer se encoge con contenido largo.
+  - Bajo 980px hay un encabezado superior con el botón "Abrir navegación" (`aria-expanded`) que abre la barra lateral como drawer con fondo, Escape, foco atrapado y devuelto; se cierra al navegar.
+  - En Finanzas en angosto el botón "Asistente" está siempre visible y abre el drawer del chat.
+  - A 320px no hay scroll horizontal de página; las tablas tienen su propio `overflow-x: auto`; las pestañas se desplazan en horizontal con la activa visible.
+  - Tamaños en rem, áreas táctiles de 44px y login con scroll en ventanas bajas.
+  - `npm test` y `npm run build` terminan sin errores desde `agents-ui/`.
+- Archivos relevantes:
+  - agents-ui/src/ui/components/PageLayout.tsx
+  - agents-ui/src/ui/AppShell.tsx
+  - agents-ui/src/ui/
+- Notas:
+  - Confirmado: causa del bug de las pestañas: hijos de columnas flex con altura fija que se encogen (`flex-shrink` + `min-height: 0` por `overflow`).
+  - Confirmado: Playwright no se instala en esta historia; la revisión a 320, 375, 768 y 1280 px y al 200% de zoom se hace a mano (ver QA-01).
+  - Pendiente: "en N días" del próximo pago se calcula en la UI solo como diferencia de fechas para mostrar; FIN-17 debe devolver `diasRestantes` en `/calendario`.
+  - Pendiente: validar contra capturas de la app en ejecución.

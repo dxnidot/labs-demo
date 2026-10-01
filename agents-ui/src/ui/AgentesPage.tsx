@@ -1,7 +1,7 @@
 import { agentesConfig } from "../agentesConfig";
 import { Card } from "./components/Card";
 import { EstadoVacio } from "./components/EstadoVacio";
-import { VistaPantalla } from "./components/VistaPantalla";
+import { PageLayout } from "./components/PageLayout";
 
 const agentesPendientes = [
   { nombre: "calculos-financieros", detalle: "Java · A2A · :8002", pendiente: "AG-02" },
@@ -12,14 +12,15 @@ const agentesPendientes = [
  * Pantalla "Agentes": orquestador y subagente de finanzas desde la configuración estática.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  */
 export function AgentesPage() {
   return (
-    <VistaPantalla
+    <PageLayout
       subtitulo="Quién atiende, a quién delega y cómo colaboran."
       titulo="Agentes"
     >
-      <div className="grid grid-cols-1 gap-4 min-[981px]:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-3">
         {agentesConfig.map((agente) => (
           <Card key={agente.nombre}>
             <h2 className="m-0 text-[17px] font-semibold">{agente.nombre}</h2>
@@ -38,6 +39,6 @@ export function AgentesPage() {
           </Card>
         ))}
       </div>
-    </VistaPantalla>
+    </PageLayout>
   );
 }

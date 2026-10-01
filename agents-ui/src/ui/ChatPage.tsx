@@ -5,7 +5,9 @@ import remarkGfm from "remark-gfm";
 import type { Mensaje } from "../domain/Mensaje";
 import type { Usuario } from "../domain/Usuario";
 import { Button } from "./components/Button";
+import { claseFoco, claseFocoContenedor } from "./components/foco";
 import { LaraLogo } from "./components/LaraLogo";
+import { PageLayout } from "./components/PageLayout";
 import { modeloOrquestador } from "../agentesConfig";
 import { useChatSessions } from "./useChatSessions";
 
@@ -67,7 +69,7 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
   return (
     <button
       aria-label="Enviar"
-      className="inline-flex size-10 items-center justify-center rounded-[10px] bg-accent text-accent-ink transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50"
+      className={`inline-flex size-11 shrink-0 items-center justify-center rounded-[10px] bg-accent text-accent-ink transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 min-[980px]:size-10 ${claseFoco}`}
       disabled={deshabilitado}
       type="submit"
     >
@@ -84,6 +86,7 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
  * @modified Daniel Tovar 2026-09-30 Actualiza sugerencias al enfoque de finanzas personales.
  * @modified Daniel 2026-09-30 Reutiliza el puerto de sesión compartido con Finanzas.
  * @modified Daniel Tovar 2026-09-30 Ajustado a las maquetas 03 y 04 (logo, composer, sugerencias de finanzas).
+ * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (cabecera y composer fijos, conversación como único scroll), foco visible y avatar solo con la L.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {
@@ -102,7 +105,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
   const [error, setError] = useState<string | null>(null);
   const [mostrarIrAlFinal, setMostrarIrAlFinal] = useState(false);
   const composicionActiva = useRef(false);
-  const listaMensajesRef = useRef<HTMLElement>(null);
+  const listaMensajesRef = useRef<HTMLDivElement>(null);
   const seguirAlFinal = useRef(true);
 
   useEffect(() => {
@@ -230,153 +233,105 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
   }
 
   return (
-    <section className="flex min-h-0 min-w-0 flex-1 flex-col">
-      {(mensajes.length > 0 || cargandoSesion) && (
-        <header className="flex h-[60px] shrink-0 items-center justify-between gap-4 border-b border-divider px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            <h1 className="m-0 truncate text-[15px] font-medium">
-              {sesionActiva?.titulo ?? "Nuevo chat"}
-            </h1>
-            <span className="whitespace-nowrap rounded-pill border border-border bg-surface px-2.5 py-0.5 font-mono text-xs text-muted">
-              {`orquestador · ${modeloOrquestador.split("/")[1]}`}
-            </span>
-          </div>
-        </header>
-      )}
-
-      <div className="relative flex min-h-0 flex-1 flex-col">
-        <section
-          aria-label="Conversación"
-          aria-live="polite"
-          className="min-h-0 flex-1 overflow-y-auto px-6 py-8"
-          onScroll={(event) => {
-            const element = event.currentTarget;
-            const alFinal = element.scrollHeight - element.scrollTop - element.clientHeight < 48;
-            seguirAlFinal.current = alFinal;
-            setMostrarIrAlFinal(!alFinal);
-          }}
-          ref={listaMensajesRef}
-        >
-          <div className="mx-auto flex min-h-full w-full max-w-[760px] flex-col gap-6">
-            {mensajes.length === 0 && !cargandoSesion && (
-              <div className="m-auto flex w-full max-w-[760px] flex-col gap-7 py-6">
-                <div className="flex items-center gap-3.5">
-                  <LaraLogo tamano={36} />
-                  <h1 className="m-0 text-[34px] font-medium tracking-[-0.02em]">
-                    Hola, {usuario.username}. ¿En qué te ayudo?
-                  </h1>
-                </div>
-                <form
-                  className="flex flex-col gap-3 rounded-composer border border-border bg-surface p-4"
-                  onSubmit={enviar}
-                >
-                  <label className="sr-only" htmlFor="mensaje">
-                    Mensaje para Lara
-                  </label>
-                  <textarea
-                    className="w-full resize-none bg-transparent text-[15px] text-text outline-none placeholder:text-faint"
-                    disabled={cargando}
-                    id="mensaje"
-                    onChange={(event) => setTexto(event.target.value)}
-                    onCompositionEnd={() => {
-                      composicionActiva.current = false;
-                    }}
-                    onCompositionStart={() => {
-                      composicionActiva.current = true;
-                    }}
-                    onKeyDown={alPulsarTecla}
-                    placeholder="Pregunta por tus gastos, tus tarjetas o tu calendario de pagos…"
-                    rows={3}
-                    value={texto}
-                  />
-                  <div className="flex items-center justify-between gap-2">
-                    <ChipAgente />
-                    <BotonEnviar deshabilitado={cargando || !texto.trim()} />
-                  </div>
-                </form>
-                <div className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1100px]:grid-cols-4">
-                  {sugerencias.map((sugerencia) => (
-                    <button
-                      className="flex flex-col gap-1.5 rounded-[12px] border border-border bg-surface p-4 text-left text-sm transition-colors hover:border-neutral-700 hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                      key={sugerencia}
-                      onClick={() => setTexto(sugerencia)}
-                      type="button"
-                    >
-                      <span className="font-mono text-xs text-faint">finanzas</span>
-                      {sugerencia}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {cargandoSesion && <p className="m-auto text-sm text-muted">Cargando conversación…</p>}
-
-            {mensajes.map((mensaje, index) => (
-              <article
-                className={
-                  mensaje.rol === "usuario"
-                    ? "max-w-[80%] self-end rounded-[14px] bg-surface-active px-4 py-3 text-[15px] leading-[1.55]"
-                    : "flex w-full gap-3.5 text-[15px] leading-[1.6]"
-                }
-                key={`${mensaje.fecha.getTime()}-${index}`}
-              >
-                {mensaje.rol === "agente" && (
-                  <span className="inline-flex size-[30px] shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface">
-                    <LaraLogo tamano={18} />
-                  </span>
-                )}
-                <div className="min-w-0 break-words">
-                  {mensaje.rol === "usuario" ? (
-                    <p className="m-0 whitespace-pre-wrap">{mensaje.texto}</p>
-                  ) : (
-                    <div className="text-text">
-                      {mensaje.texto ? (
-                        <ReactMarkdown components={componentesMarkdown} remarkPlugins={[remarkGfm]}>
-                          {mensaje.texto}
-                        </ReactMarkdown>
-                      ) : (
-                        cargando && <span className="text-muted">…</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </article>
-            ))}
-
-            {estado && <p className="mx-auto font-mono text-xs text-muted">{estado}</p>}
-            {error && (
-              <p className="rounded-card border border-border bg-surface-active px-4 py-3 text-sm text-danger" role="alert">
-                {error}
-              </p>
-            )}
-          </div>
-        </section>
-
-        {mostrarIrAlFinal && (
+    <PageLayout
+      cabecera={
+        mensajes.length > 0 || cargandoSesion ? (
+          <header className="flex h-15 items-center justify-between gap-4 border-b border-divider px-4 sm:px-6">
+            <div className="flex min-w-0 items-center gap-3">
+              <h1 className="m-0 truncate text-[15px] font-medium">
+                {sesionActiva?.titulo ?? "Nuevo chat"}
+              </h1>
+              <span className="whitespace-nowrap rounded-pill border border-border bg-surface px-2.5 py-0.5 font-mono text-xs text-muted">
+                {`orquestador · ${modeloOrquestador.split("/")[1]}`}
+              </span>
+            </div>
+          </header>
+        ) : undefined
+      }
+      contenidoClassName="px-4 py-6 sm:px-6 sm:py-8"
+      contenidoProps={{
+        "aria-label": "Conversación",
+        "aria-live": "polite",
+        onScroll: (event) => {
+          const element = event.currentTarget;
+          const alFinal = element.scrollHeight - element.scrollTop - element.clientHeight < 48;
+          seguirAlFinal.current = alFinal;
+          setMostrarIrAlFinal(!alFinal);
+        },
+        role: "log",
+      }}
+      contenidoRef={listaMensajesRef}
+      flotante={
+        mostrarIrAlFinal ? (
           <Button
             className="absolute bottom-4 left-1/2 -translate-x-1/2 shadow-lg"
             onClick={desplazarAlFinal}
           >
             Ir al final ↓
           </Button>
-        )}
-      </div>
-
-      {(mensajes.length > 0 || cargandoSesion) && (
-        <footer className="shrink-0 px-6 pb-5">
-          <div className="mx-auto flex w-full max-w-[760px] flex-col gap-2.5">
+        ) : undefined
+      }
+      libre
+      pie={
+        mensajes.length > 0 || cargandoSesion ? (
+          <footer className="px-4 pb-4 sm:px-6 sm:pb-5">
+            <div className="mx-auto flex w-full max-w-[760px] flex-col gap-2.5">
+              <form
+                className={`flex flex-col gap-3 rounded-composer border border-border bg-surface py-3.5 pl-4 pr-3.5 ${claseFocoContenedor}`}
+                onSubmit={enviar}
+              >
+                <label className="sr-only" htmlFor="mensaje-chat">
+                  Mensaje para Lara
+                </label>
+                <textarea
+                  className="w-full resize-none bg-transparent text-[15px] text-text outline-none placeholder:text-faint"
+                  disabled={cargando || cargandoSesion}
+                  id="mensaje-chat"
+                  onChange={(event) => setTexto(event.target.value)}
+                  onCompositionEnd={() => {
+                    composicionActiva.current = false;
+                  }}
+                  onCompositionStart={() => {
+                    composicionActiva.current = true;
+                  }}
+                  onKeyDown={alPulsarTecla}
+                  placeholder="Escribe a Lara…"
+                  rows={2}
+                  value={texto}
+                />
+                <div className="flex items-center justify-between gap-2">
+                  <ChipAgente />
+                  <BotonEnviar deshabilitado={cargando || cargandoSesion || !texto.trim()} />
+                </div>
+              </form>
+              <p className="m-0 text-center text-xs text-faint">
+                Lara puede equivocarse. Verifica los datos importantes.
+              </p>
+            </div>
+          </footer>
+        ) : undefined
+      }
+    >
+      <div className="mx-auto flex min-h-full w-full max-w-190 flex-col gap-6">
+        {mensajes.length === 0 && !cargandoSesion && (
+          <div className="m-auto flex w-full max-w-[760px] flex-col gap-7 py-6">
+            <div className="flex items-center gap-3.5">
+              <LaraLogo tamano={36} />
+              <h1 className="m-0 text-2xl font-medium tracking-[-0.02em] sm:text-[2.125rem]">
+                Hola, {usuario.username}. ¿En qué te ayudo?
+              </h1>
+            </div>
             <form
-              className="flex flex-col gap-3 rounded-composer border border-border bg-surface py-3.5 pl-4 pr-3.5"
+              className={`flex flex-col gap-3 rounded-composer border border-border bg-surface p-4 ${claseFocoContenedor}`}
               onSubmit={enviar}
             >
-              <label className="sr-only" htmlFor="mensaje-chat">
+              <label className="sr-only" htmlFor="mensaje">
                 Mensaje para Lara
               </label>
               <textarea
                 className="w-full resize-none bg-transparent text-[15px] text-text outline-none placeholder:text-faint"
-                disabled={cargando || cargandoSesion}
-                id="mensaje-chat"
+                disabled={cargando}
+                id="mensaje"
                 onChange={(event) => setTexto(event.target.value)}
                 onCompositionEnd={() => {
                   composicionActiva.current = false;
@@ -385,21 +340,72 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                   composicionActiva.current = true;
                 }}
                 onKeyDown={alPulsarTecla}
-                placeholder="Escribe a Lara…"
-                rows={2}
+                placeholder="Pregunta por tus gastos, tus tarjetas o tu calendario de pagos…"
+                rows={3}
                 value={texto}
               />
               <div className="flex items-center justify-between gap-2">
                 <ChipAgente />
-                <BotonEnviar deshabilitado={cargando || cargandoSesion || !texto.trim()} />
+                <BotonEnviar deshabilitado={cargando || !texto.trim()} />
               </div>
             </form>
-            <p className="m-0 text-center text-xs text-faint">
-              Lara puede equivocarse. Verifica los datos importantes.
-            </p>
+            <div className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1100px]:grid-cols-4">
+              {sugerencias.map((sugerencia) => (
+                <button
+                  className={`flex flex-col gap-1.5 rounded-[12px] border border-border bg-surface p-4 text-left text-sm transition-colors hover:border-neutral-700 hover:bg-surface-hover ${claseFoco}`}
+                  key={sugerencia}
+                  onClick={() => setTexto(sugerencia)}
+                  type="button"
+                >
+                  <span className="font-mono text-xs text-faint">finanzas</span>
+                  {sugerencia}
+                </button>
+              ))}
+            </div>
           </div>
-        </footer>
-      )}
-    </section>
+        )}
+
+        {cargandoSesion && <p className="m-auto text-sm text-muted">Cargando conversación…</p>}
+
+        {mensajes.map((mensaje, index) => (
+          <article
+            className={
+              mensaje.rol === "usuario"
+                ? "max-w-[80%] self-end rounded-[14px] bg-surface-active px-4 py-3 text-[15px] leading-[1.55]"
+                : "flex w-full gap-3.5 text-[15px] leading-[1.6]"
+            }
+            key={`${mensaje.fecha.getTime()}-${index}`}
+          >
+            {mensaje.rol === "agente" && (
+              <span className="inline-flex size-7.5 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface">
+                <LaraLogo soloL tamano={18} />
+              </span>
+            )}
+            <div className="min-w-0 break-words">
+              {mensaje.rol === "usuario" ? (
+                <p className="m-0 whitespace-pre-wrap">{mensaje.texto}</p>
+              ) : (
+                <div className="text-text">
+                  {mensaje.texto ? (
+                    <ReactMarkdown components={componentesMarkdown} remarkPlugins={[remarkGfm]}>
+                      {mensaje.texto}
+                    </ReactMarkdown>
+                  ) : (
+                    cargando && <span className="text-muted">…</span>
+                  )}
+                </div>
+              )}
+            </div>
+          </article>
+        ))}
+
+        {estado && <p className="mx-auto font-mono text-xs text-muted">{estado}</p>}
+        {error && (
+          <p className="rounded-card border border-border bg-surface-active px-4 py-3 text-sm text-danger" role="alert">
+            {error}
+          </p>
+        )}
+      </div>
+    </PageLayout>
   );
 }

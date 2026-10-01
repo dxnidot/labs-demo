@@ -1,6 +1,6 @@
 import { herramientasConfig, type PermisoHerramienta } from "../agentesConfig";
 import { EstadoVacio } from "./components/EstadoVacio";
-import { VistaPantalla } from "./components/VistaPantalla";
+import { PageLayout } from "./components/PageLayout";
 
 const colorPermiso: Record<PermisoHerramienta, string> = {
   permitida: "text-ok",
@@ -12,15 +12,16 @@ const colorPermiso: Record<PermisoHerramienta, string> = {
  * Pantalla "Herramientas MCP": function tools del orquestador y finanzas desde la configuración estática.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  */
 export function HerramientasPage() {
   return (
-    <VistaPantalla
+    <PageLayout
       subtitulo="Lo que el orquestador y sus agentes pueden hacer."
       titulo="Herramientas MCP"
     >
-      <div className="overflow-auto rounded-card border border-border">
-        <table className="w-full border-collapse text-[13px]">
+      <div className="overflow-x-auto rounded-card border border-border">
+        <table className="w-full min-w-120 border-collapse text-[13px]">
           <thead>
             <tr>
               {["herramienta", "origen", "permiso"].map((columna) => (
@@ -54,6 +55,6 @@ export function HerramientasPage() {
         </table>
       </div>
       <EstadoVacio fuente="MCP filesystem" pendiente="AG-06" />
-    </VistaPantalla>
+    </PageLayout>
   );
 }

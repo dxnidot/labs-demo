@@ -11,13 +11,15 @@ import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
 import { HttpFinanzasAdapter } from "../infrastructure/adapters/HttpFinanzasAdapter";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { Button } from "./components/Button";
-import { claseFoco } from "./components/foco";
+import { claseFoco, claseFocoInterno } from "./components/foco";
+import { PageLayout } from "./components/PageLayout";
 import { FinanzasChatPanel } from "./FinanzasChatPanel";
 import { fechaLocalActual, periodoActual } from "./finanzasFormato";
 import { FinanzasMovimientosTab } from "./FinanzasMovimientosTab";
 import { FinanzasResumenTab } from "./FinanzasResumenTab";
 import { FinanzasTarjetasTab } from "./FinanzasTarjetasTab";
 import { FinanzasTradingTab } from "./FinanzasTradingTab";
+import { useScrollPestanaActiva } from "./useScrollPestanaActiva";
 import { useVistaEstrecha } from "./useVistaEstrecha";
 
 const finanzasPort = new HttpFinanzasAdapter(new ApiHttpClient(keycloakAuthAdapter));
@@ -54,10 +56,12 @@ function esPestana(valor: string | undefined): valor is PestanaId {
  * @modified Daniel Tovar 2026-09-30 Rediseño con pestañas como rutas, alternador de moneda y panel derecho.
  * @modified Daniel Tovar 2026-09-30 ARIA completo de pestañas, foco visible y retorno de foco del asistente.
  * @modified Daniel Tovar 2026-09-30 La pestaña activa lleva solo la línea inferior (.ftab de la maqueta).
+ * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (pestañas fijas, único scroll), botón Asistente siempre visible en angosto y pestañas con scroll.
  */
 export function FinanzasPage() {
   const { tab } = useParams();
   const estrecha = useVistaEstrecha();
+  const listaPestanas = useScrollPestanaActiva(tab ?? "");
   const [periodo, setPeriodo] = useState(periodoActual);
   const [moneda, setMoneda] = useState<Moneda>("MXN");
   const [datos, setDatos] = useState<ResumenFinanciero | null>(null);
@@ -143,85 +147,87 @@ export function FinanzasPage() {
     void cargar(periodo, true);
   }
 
-  return (
-    <div className="flex min-h-0 flex-1">
-      <div className="flex min-w-0 flex-1 flex-col gap-5 overflow-y-auto px-8 py-7">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div className="flex flex-col gap-1.5">
-            <h1 className="m-0 text-[26px] font-semibold">Finanzas</h1>
-            <p className="m-0 text-sm text-muted">
-              Calculado por el servicio finanzas · solo en tu PC.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <label className="sr-only" htmlFor="periodo-finanzas">Periodo</label>
-            <input
-              className="min-h-8 rounded-pill border border-border bg-transparent px-3 text-[13px] text-text-2 scheme-dark"
-              id="periodo-finanzas"
-              onChange={(event) => {
-                const nuevoPeriodo = event.currentTarget.value;
-                if (periodoValido.test(nuevoPeriodo)) {
-                  setPeriodo(nuevoPeriodo);
-                }
-              }}
-              type="month"
-              value={periodo}
-            />
-            <div
-              aria-label="Moneda"
-              className="inline-flex rounded-pill border border-border p-0.75"
-              role="group"
-            >
-              {monedas.map((opcion) => (
-                <button
-                  aria-pressed={moneda === opcion}
-                  className={`min-h-7.5 rounded-pill px-3 font-mono text-xs ${claseFoco} ${
-                    moneda === opcion ? "bg-accent text-accent-ink" : "text-muted"
-                  }`}
-                  key={opcion}
-                  onClick={() => setMoneda(opcion)}
-                  type="button"
-                >
-                  {opcion}
-                </button>
-              ))}
-            </div>
-            {!asistenteAbierto && (
-              <Button
-                className={claseFoco}
-                id={idBotonAsistente}
-                onClick={abrirAsistente}
-                variant="primary"
-              >
-                <MessageCircle aria-hidden="true" className="size-4" />
-                Asistente
-              </Button>
-            )}
-          </div>
-        </header>
-
-        <div
-          aria-label="Secciones de finanzas"
-          className="flex gap-1 overflow-x-auto border-b border-border"
-          role="tablist"
+  const acciones = (
+    <div className="flex flex-wrap items-center gap-2">
+      <label className="sr-only" htmlFor="periodo-finanzas">Periodo</label>
+      <input
+        className="min-h-11 rounded-pill border border-border bg-transparent px-3 text-[13px] text-text-2 scheme-dark min-[980px]:min-h-8"
+        id="periodo-finanzas"
+        onChange={(event) => {
+          const nuevoPeriodo = event.currentTarget.value;
+          if (periodoValido.test(nuevoPeriodo)) {
+            setPeriodo(nuevoPeriodo);
+          }
+        }}
+        type="month"
+        value={periodo}
+      />
+      <div
+        aria-label="Moneda"
+        className="inline-flex rounded-pill border border-border p-0.75"
+        role="group"
+      >
+        {monedas.map((opcion) => (
+          <button
+            aria-pressed={moneda === opcion}
+            className={`min-h-9 rounded-pill px-3 font-mono text-xs min-[980px]:min-h-7.5 ${claseFocoInterno} ${
+              moneda === opcion ? "bg-accent text-accent-ink" : "text-muted"
+            }`}
+            key={opcion}
+            onClick={() => setMoneda(opcion)}
+            type="button"
+          >
+            {opcion}
+          </button>
+        ))}
+      </div>
+      {(estrecha || !asistenteAbierto) && (
+        <Button
+          className={claseFoco}
+          id={idBotonAsistente}
+          onClick={abrirAsistente}
+          variant="primary"
         >
-          {pestanas.map((pestana) => (
-            <Link
-              aria-controls={idPanelPestanas}
-              aria-selected={pestana.id === tab}
-              className={`inline-flex min-h-10 items-center whitespace-nowrap rounded-none border-b-2 bg-transparent px-3.5 text-sm hover:text-text ${claseFoco} ${
-                pestana.id === tab ? "border-accent text-text" : "border-transparent text-muted"
-              }`}
-              id={idPestana(pestana.id)}
-              key={pestana.id}
-              role="tab"
-              to={`/finanzas/${pestana.id}`}
-            >
-              {pestana.etiqueta}
-            </Link>
-          ))}
-        </div>
+          <MessageCircle aria-hidden="true" className="size-4" />
+          Asistente
+        </Button>
+      )}
+    </div>
+  );
 
+  const pestanasNav = (
+    <div
+      aria-label="Secciones de finanzas"
+      className="flex shrink-0 gap-1 overflow-x-auto border-b border-border"
+      ref={listaPestanas}
+      role="tablist"
+    >
+      {pestanas.map((pestana) => (
+        <Link
+          aria-controls={idPanelPestanas}
+          aria-selected={pestana.id === tab}
+          className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-none border-b-2 bg-transparent px-3.5 text-sm hover:text-text min-[980px]:min-h-10 ${claseFocoInterno} ${
+            pestana.id === tab ? "border-accent text-text" : "border-transparent text-muted"
+          }`}
+          id={idPestana(pestana.id)}
+          key={pestana.id}
+          role="tab"
+          to={`/finanzas/${pestana.id}`}
+        >
+          {pestana.etiqueta}
+        </Link>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="flex min-h-0 min-w-0 flex-1">
+      <PageLayout
+        acciones={acciones}
+        pestanas={pestanasNav}
+        subtitulo="Calculado por el servicio finanzas · solo en tu PC."
+        titulo="Finanzas"
+      >
         <div aria-labelledby={idPestana(tab)} id={idPanelPestanas} role="tabpanel">
           {cargando && (
             <p className="m-0 rounded-card border border-border bg-surface p-5 text-sm text-muted" role="status">
@@ -273,7 +279,7 @@ export function FinanzasPage() {
           {datos && tab === "trading-mx" && <FinanzasTradingTab mercado="mx" />}
           {datos && tab === "trading-usa" && <FinanzasTradingTab mercado="usa" />}
         </div>
-      </div>
+      </PageLayout>
 
       <FinanzasChatPanel
         abierto={asistenteAbierto}

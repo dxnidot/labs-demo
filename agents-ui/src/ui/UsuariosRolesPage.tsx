@@ -2,7 +2,7 @@ import { ObtenerClaimsToken } from "../application/use-cases/ObtenerClaimsToken"
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { Card } from "./components/Card";
 import { EstadoVacio } from "./components/EstadoVacio";
-import { VistaPantalla } from "./components/VistaPantalla";
+import { PageLayout } from "./components/PageLayout";
 
 const obtenerClaims = new ObtenerClaimsToken(keycloakAuthAdapter);
 
@@ -10,6 +10,7 @@ const obtenerClaims = new ObtenerClaimsToken(keycloakAuthAdapter);
  * Pantalla "Usuarios y roles": inspector de los claims del token en memoria; tabla vacía.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  */
 export function UsuariosRolesPage() {
   const claims = obtenerClaims.ejecutar();
@@ -17,11 +18,11 @@ export function UsuariosRolesPage() {
     typeof claims?.preferred_username === "string" ? claims.preferred_username : "usuario actual";
 
   return (
-    <VistaPantalla
+    <PageLayout
       subtitulo="Vista de consulta del realm lab. Los cambios se hacen en Keycloak."
       titulo="Usuarios y roles"
     >
-      <div className="grid grid-cols-1 gap-4 min-[981px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-2">
         <EstadoVacio className="self-start" fuente="Keycloak Admin REST API" pendiente="UI-07" />
         <Card>
           <div className="flex items-center justify-between gap-3">
@@ -40,6 +41,6 @@ export function UsuariosRolesPage() {
           </p>
         </Card>
       </div>
-    </VistaPantalla>
+    </PageLayout>
   );
 }

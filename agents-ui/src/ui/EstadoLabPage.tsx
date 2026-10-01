@@ -4,7 +4,8 @@ import type { Disponibilidad, EstadoServicio } from "../domain/ServicioLab";
 import { HttpEstadoLabAdapter } from "../infrastructure/adapters/HttpEstadoLabAdapter";
 import { Card } from "./components/Card";
 import { EstadoVacio } from "./components/EstadoVacio";
-import { VistaPantalla } from "./components/VistaPantalla";
+import { claseFoco } from "./components/foco";
+import { PageLayout } from "./components/PageLayout";
 
 const comprobarServicios = new ComprobarServicios(new HttpEstadoLabAdapter());
 
@@ -27,6 +28,7 @@ function Punto({ clase }: { clase: string }) {
  * Pantalla "Estado del lab": comprobaciones reales de salud y pendientes marcados como vacíos.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  */
 export function EstadoLabPage() {
   const [estados, setEstados] = useState<EstadoServicio[] | null>(null);
@@ -41,10 +43,10 @@ export function EstadoLabPage() {
   }, [comprobar]);
 
   return (
-    <VistaPantalla
+    <PageLayout
       acciones={
         <button
-          className="inline-flex min-h-8 items-center rounded-pill border border-border px-3 text-[13px] text-text-2 hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className={`inline-flex min-h-11 items-center rounded-pill border border-border px-3 text-[13px] text-text-2 hover:bg-surface-hover min-[980px]:min-h-8 ${claseFoco}`}
           onClick={() => void comprobar()}
           type="button"
         >
@@ -54,9 +56,9 @@ export function EstadoLabPage() {
       subtitulo="Qué está arriba en tu PC y qué sigue en el checklist."
       titulo="Estado del lab"
     >
-      <div className="grid grid-cols-1 gap-4 min-[981px]:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-4">
         {estados === null && (
-          <p className="m-0 text-sm text-muted min-[981px]:col-span-4" role="status">
+          <p className="m-0 text-sm text-muted min-[980px]:col-span-4" role="status">
             Comprobando servicios…
           </p>
         )}
@@ -84,7 +86,7 @@ export function EstadoLabPage() {
         <span className="inline-flex items-center gap-2"><Punto clase="bg-danger" />Sin respuesta</span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 min-[981px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-2">
         <Card>
           <h2 className="m-0 text-base font-semibold">Avance por parte</h2>
           <EstadoVacio fuente="docs/plans/estado-lab.md" pendiente="UI-07" />
@@ -94,6 +96,6 @@ export function EstadoLabPage() {
           <EstadoVacio fuente="docs/plans/estado-lab.md" pendiente="UI-07" />
         </Card>
       </div>
-    </VistaPantalla>
+    </PageLayout>
   );
 }

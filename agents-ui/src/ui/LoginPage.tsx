@@ -1,4 +1,5 @@
 import { Lock } from "lucide-react";
+import { claseFoco } from "./components/foco";
 import { LaraLogo } from "./components/LaraLogo";
 
 interface LoginPageProps {
@@ -17,17 +18,19 @@ const areas = [
   { nombre: "Agentes", color: "text-accent" },
   { nombre: "Identidad", color: "text-highlight" },
   { nombre: "Memoria", color: "text-faint" },
-  { nombre: "Finanzas", color: "text-chart-4" },
+  { nombre: "Finanzas", color: "text-text-2" },
 ] as const;
 
 /**
  * Pantalla de login de Lara: un solo botón que redirige a Keycloak (sin formulario propio).
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-09-30 Scroll propio en ventanas bajas (body no desplaza) y chip Finanzas con contraste AA.
  */
 export function LoginPage({ comprobando, error, onLogin }: LoginPageProps) {
   return (
-    <div className="grid min-h-dvh grid-cols-1 overflow-auto bg-bg font-sans text-text min-[861px]:grid-cols-[1.1fr_1fr]">
+    <div className="h-dvh overflow-y-auto bg-bg font-sans text-text">
+    <div className="grid min-h-full grid-cols-1 min-[861px]:grid-cols-[1.1fr_1fr]">
       <main className="flex items-center justify-center px-6 py-12">
         <div className="flex w-full max-w-[400px] flex-col gap-7">
           <div className="flex flex-col gap-2.5">
@@ -41,7 +44,7 @@ export function LoginPage({ comprobando, error, onLogin }: LoginPageProps) {
             </p>
           </div>
           <button
-            className="flex min-h-12 items-center justify-center gap-2.5 rounded-[10px] bg-accent text-[15px] font-semibold text-accent-ink transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
+            className={`flex min-h-12 items-center justify-center gap-2.5 rounded-[10px] bg-accent text-[15px] font-semibold text-accent-ink transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60 ${claseFoco}`}
             disabled={comprobando}
             onClick={onLogin}
             type="button"
@@ -102,6 +105,7 @@ export function LoginPage({ comprobando, error, onLogin }: LoginPageProps) {
         </div>
         <p className="m-0 font-mono text-xs text-faint">labs-demo · entorno LOCAL</p>
       </aside>
+    </div>
     </div>
   );
 }

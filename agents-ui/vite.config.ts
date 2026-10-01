@@ -28,6 +28,25 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              // Cadena de Markdown (la usan Chat y el asistente de Finanzas, que cargan al inicio).
+              name: "markdown",
+              test: /node_modules[\\/](react-markdown|remark-[^\\/]+|remark|micromark[^\\/]*|mdast-[^\\/]+|hast-[^\\/]+|unified|unist-[^\\/]+|vfile[^\\/]*|decode-named-character-reference|character-entities[^\\/]*|trim-lines|trough|bail|devlop|space-separated-tokens|comma-separated-tokens|property-information|html-url-attributes|is-plain-obj|ccount|markdown-table|longest-streak|zwitch|estree-util-[^\\/]+|style-to-[^\\/]+|inline-style-parser)[\\/]/,
+            },
+            {
+              name: "vendor",
+              test: /node_modules[\\/](react|react-dom|react-router|scheduler|keycloak-js|lucide-react)[\\/]/,
+            },
+          ],
+        },
+      },
+    },
+  },
   test: {
     environment: "node",
   },

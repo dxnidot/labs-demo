@@ -5,7 +5,9 @@ import type { Usuario } from "../domain/Usuario";
 import { AdkAgenteAdapter } from "../infrastructure/adapters/AdkAgenteAdapter";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { EstadoVacio } from "./components/EstadoVacio";
-import { VistaPantalla } from "./components/VistaPantalla";
+import { claseFocoInterno } from "./components/foco";
+import { PageLayout } from "./components/PageLayout";
+import { useScrollPestanaActiva } from "./useScrollPestanaActiva";
 
 const listarSesiones = new ListarSesiones(new AdkAgenteAdapter(keycloakAuthAdapter));
 const tablas = ["sessions", "events", "app_states", "user_states"] as const;
@@ -26,11 +28,13 @@ function formatearFecha(fecha: Date): string {
  * Pantalla "Base de datos": sesiones reales del usuario desde la API de ADK, solo lectura.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  */
 export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
   const [tabla, setTabla] = useState<Tabla>("sessions");
   const [sesiones, setSesiones] = useState<SesionChat[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const listaTablas = useScrollPestanaActiva(tabla);
 
   useEffect(() => {
     let activo = true;
@@ -52,36 +56,44 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
   }, [usuario.id]);
 
   return (
-    <VistaPantalla
+    <PageLayout
+      pestanas={
+        <>
+          <div className="flex flex-wrap gap-2">
+            <span className="rounded-pill border border-border px-3 py-1.5 font-mono text-xs text-text-2">
+              ADK API server · sessions
+            </span>
+            <span className="rounded-pill bg-surface-active px-3 py-1.5 font-mono text-xs text-warn">
+              Solo lectura
+            </span>
+          </div>
+
+          <div
+            aria-label="Tablas"
+            className="flex shrink-0 gap-1 overflow-x-auto"
+            ref={listaTablas}
+            role="tablist"
+          >
+            {tablas.map((nombre) => (
+              <button
+                aria-selected={tabla === nombre}
+                className={`min-h-11 shrink-0 whitespace-nowrap rounded-[8px] px-3.5 font-mono text-[13px] min-[980px]:min-h-9 ${claseFocoInterno} ${
+                  tabla === nombre ? "bg-surface-active text-text" : "text-muted"
+                }`}
+                key={nombre}
+                onClick={() => setTabla(nombre)}
+                role="tab"
+                type="button"
+              >
+                {nombre}
+              </button>
+            ))}
+          </div>
+        </>
+      }
       subtitulo="Sesiones, eventos y estado que guarda el orquestador."
       titulo="Base de datos"
     >
-      <div className="flex flex-wrap gap-2">
-        <span className="rounded-pill border border-border px-3 py-1.5 font-mono text-xs text-text-2">
-          ADK API server · sessions
-        </span>
-        <span className="rounded-pill bg-surface-active px-3 py-1.5 font-mono text-xs text-warn">
-          Solo lectura
-        </span>
-      </div>
-
-      <div aria-label="Tablas" className="flex flex-wrap gap-1" role="tablist">
-        {tablas.map((nombre) => (
-          <button
-            aria-selected={tabla === nombre}
-            className={`min-h-9 rounded-[8px] px-3.5 font-mono text-[13px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-              tabla === nombre ? "bg-surface-active text-text" : "text-muted"
-            }`}
-            key={nombre}
-            onClick={() => setTabla(nombre)}
-            role="tab"
-            type="button"
-          >
-            {nombre}
-          </button>
-        ))}
-      </div>
-
       <div role="tabpanel">
         {tabla !== "sessions" && (
           <EstadoVacio fuente={`ADK API server · tabla ${tabla}`} pendiente="AG-05" />
@@ -96,8 +108,8 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
           <EstadoVacio fuente="ADK API server · sesiones del usuario" pendiente="AG-05" />
         )}
         {tabla === "sessions" && sesiones && sesiones.length > 0 && (
-          <div className="overflow-auto rounded-card border border-border">
-            <table className="w-full border-collapse font-mono text-[13px]">
+          <div className="overflow-x-auto rounded-card border border-border">
+            <table className="w-full min-w-120 border-collapse font-mono text-[13px]">
               <thead>
                 <tr>
                   {columnas.map((columna) => (
@@ -125,6 +137,6 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
           </div>
         )}
       </div>
-    </VistaPantalla>
+    </PageLayout>
   );
 }

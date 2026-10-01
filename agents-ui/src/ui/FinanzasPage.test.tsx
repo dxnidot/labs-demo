@@ -661,3 +661,35 @@ function respuestaFinanzas(ruta: string, datos: DatosFalsos): Response {
   }
   return new Response("", { status: 404 });
 }
+
+describe("FinanzasPage · botón Asistente y pestañas en angosto", () => {
+  it("el botón Asistente sigue en el encabezado con el drawer abierto y abre el chat", () => {
+    simularVistaEstrecha();
+    renderizar();
+    const encabezado = document.querySelector('[data-slot="page-header"]');
+
+    fireEvent.click(screen.getByRole("button", { name: "Asistente" }));
+
+    expect(screen.getByRole("dialog", { name: "Asistente de finanzas" })).toBeTruthy();
+    expect(within(encabezado as HTMLElement).getByRole("button", { name: "Asistente" })).toBeTruthy();
+  });
+
+  it("las pestañas viven en una barra fija con scroll horizontal propio y la activa se hace visible", () => {
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: scrollIntoView,
+    });
+    try {
+      renderizar("/finanzas/gastos");
+
+      const lista = screen.getByRole("tablist", { name: "Secciones de finanzas" });
+      expect(lista.className).toContain("overflow-x-auto");
+      expect(lista.className).toContain("shrink-0");
+      expect(lista.closest('[data-slot="page-tabs"]')?.className).toContain("shrink-0");
+      expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest", inline: "nearest" });
+    } finally {
+      Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+    }
+  });
+});

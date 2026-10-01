@@ -7,7 +7,7 @@ import { HttpMenuAdapter } from "../infrastructure/adapters/HttpMenuAdapter";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { Card } from "./components/Card";
 import { EstadoVacio } from "./components/EstadoVacio";
-import { VistaPantalla } from "./components/VistaPantalla";
+import { PageLayout } from "./components/PageLayout";
 
 const obtenerMenu = new ObtenerMenu(new HttpMenuAdapter(new ApiHttpClient(keycloakAuthAdapter)));
 
@@ -15,6 +15,7 @@ const obtenerMenu = new ObtenerMenu(new HttpMenuAdapter(new ApiHttpClient(keyclo
  * Pantalla "Menú por rol": opciones reales de GET /api/menu para el usuario actual.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  */
 export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
   const [opciones, setOpciones] = useState<MenuOpcion[] | null>(null);
@@ -40,7 +41,7 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
   }, []);
 
   return (
-    <VistaPantalla
+    <PageLayout
       acciones={
         <span className="rounded-pill border border-border px-3 py-1.5 font-mono text-xs text-text-2">
           kc-demo · GET /api/menu
@@ -49,7 +50,7 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
       subtitulo="Lo que ve cada usuario según los roles de su token."
       titulo="Menú por rol"
     >
-      <div className="grid grid-cols-1 gap-4 min-[981px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-2">
         <Card aria-label={`Menú de ${usuario.username}`}>
           <div className="flex items-center gap-3">
             <span
@@ -103,6 +104,6 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
         />
       </div>
       <p className="m-0 text-[13px] text-faint">La acción también se valida en el backend.</p>
-    </VistaPantalla>
+    </PageLayout>
   );
 }

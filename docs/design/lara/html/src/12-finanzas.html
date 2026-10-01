@@ -7,8 +7,10 @@
 <!--
   Fuente legible de una pantalla de lara-canvas.html (el canvas va empaquetado en gzip + base64).
   HTML y CSS planos, sin scripts. Los estilos en línea y las clases son los del canvas.
-  Contiene la barra lateral y la vista "finanzas" con sus seis pestañas y el panel "Asistente de finanzas".
+  Contiene la barra lateral y la vista "finanzas" con sus cinco pestañas y el panel "Asistente de finanzas".
   Cada pestaña es un <div data-tab="...">; la activa es "resumen" y las demás llevan hidden.
+  data-banner="proximo-pago" es el bloque de próximo pago (visible en Resumen y en Tarjetas y pagos).
+  En Inversiones, data-cuenta="mx" es la cuenta visible y data-cuenta="usa" lleva hidden.
   data-chat="open" es el panel abierto; data-chat="closed" es el botón "Asistente" del encabezado.
   Todos los datos son de ejemplo. Si este archivo y el canvas empaquetado discrepan, manda el canvas.
 -->
@@ -77,15 +79,19 @@
 <div data-view="finanzas" style="display: contents">
 <div style="height: 100%; min-height: 0; display: flex">
 
-<div style="flex-grow: 1; min-width: 0; height: 100%; overflow: auto; padding: 28px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
-<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap">
-<div style="display: flex; flex-direction: column; gap: 6px">
-<h1 style="margin: 0; font-size: 26px; font-weight: 600">Finanzas</h1>
-<p style="margin: 0; font-size: 14px; color: #afbeca">Calculado por el servicio finanzas · datos de ejemplo, solo en tu PC.</p>
+<div style="flex-grow: 1; min-width: 0; height: 100%; display: flex; flex-direction: column">
+<div style="flex-shrink: 0; padding: 24px 32px 0; display: flex; flex-direction: column; gap: 18px; max-width: 1180px; width: 100%; box-sizing: border-box; margin: 0 auto">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.01em">Finanzas</h1>
+<p style="margin: 0; font-size: 13px; color: #839bad">Actualizado hace 2 min</p>
 </div>
-<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
-<label class="sr" for="periodo">Periodo</label>
-<button id="periodo" class="chip">Septiembre 2026 ▾</button>
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+<div role="group" aria-label="Periodo" style="display: inline-flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid #292929; border-radius: 999px">
+<button class="step" aria-label="Mes anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></button>
+<span class="num" style="min-width: 128px; text-align: center; font-size: 14px; font-weight: 500">Septiembre 2026</span>
+<button class="step" aria-label="Mes siguiente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
+</div>
 <div role="group" aria-label="Moneda" style="display: inline-flex; padding: 3px; border: 1px solid #292929; border-radius: 999px">
 <button class="seg" aria-pressed="true">MXN</button>
 <button class="seg" aria-pressed="false">USD</button>
@@ -96,29 +102,41 @@
 </div>
 </div>
 
-<div role="tablist" aria-label="Secciones de finanzas" style="display: flex; gap: 4px; padding-bottom: 2px; border-bottom: 1px solid #292929; overflow-x: auto">
-<button class="ftab" role="tab" aria-selected="true">Resumen</button>
-<button class="ftab" role="tab" aria-selected="false">Gastos</button>
-<button class="ftab" role="tab" aria-selected="false">Ingresos</button>
-<button class="ftab" role="tab" aria-selected="false">Tarjetas y pagos</button>
-<button class="ftab" role="tab" aria-selected="false">Trading MX</button>
-<button class="ftab" role="tab" aria-selected="false">Trading USA</button>
+<div role="tablist" aria-label="Secciones de finanzas" style="display: flex; gap: 4px; border-bottom: 1px solid #292929; overflow-x: auto">
+<button class="ftab" role="tab" aria-selected="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>Resumen</button>
+<button class="ftab" role="tab" aria-selected="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 9v8H9"></path></svg>Gastos</button>
+<button class="ftab" role="tab" aria-selected="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 17 7 7M7 15V7h8"></path></svg>Ingresos</button>
+<button class="ftab" role="tab" aria-selected="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path></svg>Tarjetas y pagos</button>
+<button class="ftab" role="tab" aria-selected="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 7-8.5 8.5-5-5L2 17"></path><path d="M16 7h6v6"></path></svg>Inversiones</button>
+</div>
+</div>
+
+<div style="flex-grow: 1; min-height: 0; overflow: auto">
+<div style="max-width: 1180px; margin: 0 auto; padding: 20px 32px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+
+<div data-banner="proximo-pago" style="display: contents">
+<div class="banner">
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<span style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #415363; font-weight: 600">Próximo pago</span>
+<span style="font-size: 20px; font-weight: 600">Tarjeta A <span class="mono" style="font-size: 15px; font-weight: 500">••••1234</span></span>
+<span class="num" style="font-size: 14px; color: #415363">Lunes 5 oct · en 5 días</span>
+</div>
+<button class="ghost">Ver calendario</button>
+</div>
 </div>
 
 <div data-tab="resumen" style="display: contents">
 <div style="display: flex; flex-direction: column; gap: 16px">
-<div class="grid4">
-<div class="card"><span style="font-size: 13px; color: #afbeca">Ingresos del mes</span><span class="mono" style="font-size: 26px; font-weight: 500">$32,000</span><span style="font-size: 12px; color: #839bad">sueldo + otros</span></div>
-<div class="card"><span style="font-size: 13px; color: #afbeca">Gastos del mes</span><span class="mono" style="font-size: 26px; font-weight: 500">$18,420</span><span style="font-size: 12px; color: #839bad">fijos $9,267 · variables $9,153</span></div>
-<div class="card"><span style="font-size: 13px; color: #afbeca">Te queda</span><span class="mono" style="font-size: 26px; font-weight: 500">$13,580</span><span style="font-size: 12px; color: #839bad">42% del ingreso</span></div>
-<div class="card" style="background: #d4dce3; border-color: #d4dce3; color: #212830"><span style="font-size: 13px; color: #415363">Próximo pago</span><span style="font-size: 22px; font-weight: 600">5 oct</span><span style="font-size: 12px; color: #415363">Tarjeta A ••••1234</span></div>
+<div class="grid3">
+<div class="card"><span style="font-size: 13px; color: #afbeca">Ingresos del mes</span><span class="num" style="font-size: 28px; font-weight: 600; letter-spacing: -0.01em">$32,000.00</span><span style="font-size: 12px; color: #839bad">sueldo y otros</span></div>
+<div class="card"><span style="font-size: 13px; color: #afbeca">Gastos del mes</span><span class="num" style="font-size: 28px; font-weight: 600; letter-spacing: -0.01em">$18,420.50</span><span class="num" style="font-size: 12px; color: #839bad">fijos $9,267 · variables $9,153.50</span></div>
+<div class="card"><span style="font-size: 13px; color: #afbeca">Te queda</span><span class="num" style="font-size: 28px; font-weight: 600; letter-spacing: -0.01em">$13,579.50</span><span class="num" style="font-size: 12px; color: #839bad">42.4% del ingreso</span></div>
 </div>
-
 <div class="grid2">
 <div class="card">
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Ingresos vs gastos · 6 meses</h2>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Ingresos vs gastos</h2>
 <div style="display: flex; gap: 14px; font-size: 12px; color: #afbeca"><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #d4dce3"></span>Ingresos</span><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #678398"></span>Gastos</span></div></div>
-<div style="display: flex; align-items: flex-end; gap: 18px; height: 180px; padding-top: 12px; border-bottom: 1px solid #292929">
+<div style="display: flex; align-items: flex-end; gap: 18px; height: 168px; padding-top: 12px; border-bottom: 1px solid #292929">
 <div style="flex-grow: 1; display: flex; align-items: flex-end; justify-content: center; gap: 4px; height: 100%"><div style="width: 14px; height: 85%; border-radius: 4px 4px 0 0; background: #d4dce3"></div><div style="width: 14px; height: 52%; border-radius: 4px 4px 0 0; background: #678398"></div></div>
 <div style="flex-grow: 1; display: flex; align-items: flex-end; justify-content: center; gap: 4px; height: 100%"><div style="width: 14px; height: 85%; border-radius: 4px 4px 0 0; background: #d4dce3"></div><div style="width: 14px; height: 58%; border-radius: 4px 4px 0 0; background: #678398"></div></div>
 <div style="flex-grow: 1; display: flex; align-items: flex-end; justify-content: center; gap: 4px; height: 100%"><div style="width: 14px; height: 88%; border-radius: 4px 4px 0 0; background: #d4dce3"></div><div style="width: 14px; height: 61%; border-radius: 4px 4px 0 0; background: #678398"></div></div>
@@ -126,41 +144,42 @@
 <div style="flex-grow: 1; display: flex; align-items: flex-end; justify-content: center; gap: 4px; height: 100%"><div style="width: 14px; height: 92%; border-radius: 4px 4px 0 0; background: #d4dce3"></div><div style="width: 14px; height: 55%; border-radius: 4px 4px 0 0; background: #678398"></div></div>
 <div style="flex-grow: 1; display: flex; align-items: flex-end; justify-content: center; gap: 4px; height: 100%"><div style="width: 14px; height: 85%; border-radius: 4px 4px 0 0; background: #d4dce3"></div><div style="width: 14px; height: 49%; border-radius: 4px 4px 0 0; background: #678398"></div></div>
 </div>
-<div class="mono" style="display: flex; gap: 18px; font-size: 12px; color: #839bad"><span style="flex-grow: 1; text-align: center">abr</span><span style="flex-grow: 1; text-align: center">may</span><span style="flex-grow: 1; text-align: center">jun</span><span style="flex-grow: 1; text-align: center">jul</span><span style="flex-grow: 1; text-align: center">ago</span><span style="flex-grow: 1; text-align: center">sep</span></div>
+<div style="display: flex; gap: 18px; font-size: 12px; color: #839bad"><span style="flex-grow: 1; text-align: center">abr</span><span style="flex-grow: 1; text-align: center">may</span><span style="flex-grow: 1; text-align: center">jun</span><span style="flex-grow: 1; text-align: center">jul</span><span style="flex-grow: 1; text-align: center">ago</span><span style="flex-grow: 1; text-align: center">sep</span></div>
 </div>
 <div class="card">
 <h2 style="margin: 0; font-size: 16px; font-weight: 600">Gastos por categoría</h2>
 <div style="display: flex; flex-direction: column; gap: 12px">
-<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 72px; gap: 12px; align-items: center; font-size: 13px"><span>Vivienda</span><div style="height: 10px; border-radius: 5px; background: #292929"><div style="width: 100%; height: 100%; border-radius: 5px; background: #d4dce3"></div></div><span class="mono" style="text-align: right">$7,500</span></div>
-<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 72px; gap: 12px; align-items: center; font-size: 13px"><span>Comida</span><div style="height: 10px; border-radius: 5px; background: #292929"><div style="width: 56%; height: 100%; border-radius: 5px; background: #afbeca"></div></div><span class="mono" style="text-align: right">$4,200</span></div>
-<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 72px; gap: 12px; align-items: center; font-size: 13px"><span>Transporte</span><div style="height: 10px; border-radius: 5px; background: #292929"><div style="width: 28%; height: 100%; border-radius: 5px; background: #839bad"></div></div><span class="mono" style="text-align: right">$2,100</span></div>
-<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 72px; gap: 12px; align-items: center; font-size: 13px"><span>Suscripciones</span><div style="height: 10px; border-radius: 5px; background: #292929"><div style="width: 12%; height: 100%; border-radius: 5px; background: #678398"></div></div><span class="mono" style="text-align: right">$890</span></div>
-<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 72px; gap: 12px; align-items: center; font-size: 13px"><span>Otros</span><div style="height: 10px; border-radius: 5px; background: #292929"><div style="width: 50%; height: 100%; border-radius: 5px; background: #4f667a"></div></div><span class="mono" style="text-align: right">$3,730</span></div>
+<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 80px; gap: 12px; align-items: center; font-size: 13px"><span>Vivienda</span><div style="height: 10px; border-radius: 5px; background: #292929"><div style="width: 100%; height: 100%; border-radius: 5px; background: #d4dce3"></div></div><span class="num" style="text-align: right">$7,500.00</span></div>
+<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 80px; gap: 12px; align-items: center; font-size: 13px"><span>Comida</span><div style="height: 10px; border-radius: 5px; background: #292929"><div style="width: 56%; height: 100%; border-radius: 5px; background: #afbeca"></div></div><span class="num" style="text-align: right">$4,200.00</span></div>
+<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 80px; gap: 12px; align-items: center; font-size: 13px"><span>Transporte</span><div style="height: 10px; border-radius: 5px; background: #292929"><div style="width: 28%; height: 100%; border-radius: 5px; background: #839bad"></div></div><span class="num" style="text-align: right">$2,100.00</span></div>
+<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 80px; gap: 12px; align-items: center; font-size: 13px"><span>Suscripciones</span><div style="height: 10px; border-radius: 5px; background: #292929"><div style="width: 12%; height: 100%; border-radius: 5px; background: #678398"></div></div><span class="num" style="text-align: right">$890.00</span></div>
+<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 80px; gap: 12px; align-items: center; font-size: 13px"><span>Otros</span><div style="height: 10px; border-radius: 5px; background: #292929"><div style="width: 50%; height: 100%; border-radius: 5px; background: #4f667a"></div></div><span class="num" style="text-align: right">$3,730.50</span></div>
 </div>
 </div>
 </div>
-
 <div class="grid2">
 <div class="card">
-<div style="display: flex; align-items: center; justify-content: space-between"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Próximos pagos</h2><button class="link">Ver tarjetas</button></div>
+<div style="display: flex; align-items: center; justify-content: space-between"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Próximos pagos</h2><button class="link">Ver calendario</button></div>
 <div style="display: flex; flex-direction: column">
-<div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid #292929; font-size: 14px"><span class="mono" style="color: #afbeca">5 oct</span><span>Pago · Tarjeta A ••••1234</span><span class="pill">pago</span></div>
-<div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid #292929; font-size: 14px"><span class="mono" style="color: #afbeca">6 oct</span><span>Pago · Tarjeta B ••••5678</span><span class="pill">pago</span></div>
-<div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid #292929; font-size: 14px"><span class="mono" style="color: #afbeca">15 oct</span><span>Corte · Tarjeta A ••••1234</span><span class="pill pill-soft">corte</span></div>
-<div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; font-size: 14px"><span class="mono" style="color: #afbeca">25 oct</span><span>Corte · Tarjeta B ••••5678</span><span class="pill pill-soft">corte</span></div>
+<div class="prow"><span class="num" style="color: #afbeca">5 oct</span><span>Pago · Tarjeta A</span><span class="num" style="font-size: 12px; color: #839bad">en 5 días</span></div>
+<div class="prow"><span class="num" style="color: #afbeca">6 oct</span><span>Pago · Tarjeta B</span><span class="num" style="font-size: 12px; color: #839bad">en 6 días</span></div>
+<div class="prow"><span class="num" style="color: #afbeca">15 oct</span><span>Pago · Tarjeta C</span><span class="num" style="font-size: 12px; color: #839bad">en 15 días</span></div>
+<div class="prow" style="border-bottom: 0"><span class="num" style="color: #afbeca">21 oct</span><span>Pago · Tarjeta E</span><span class="num" style="font-size: 12px; color: #839bad">en 21 días</span></div>
 </div>
 </div>
 <div class="card">
 <div style="display: flex; align-items: center; justify-content: space-between"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Últimos movimientos</h2><button class="link">Ver todos</button></div>
+<div style="overflow-x: auto">
 <table class="tbl">
 <thead><tr><th>fecha</th><th>concepto</th><th>origen</th><th style="text-align: right">monto</th></tr></thead>
 <tbody>
-<tr><td class="mono">28 sep</td><td>Supermercado</td><td><span class="pill">chat</span></td><td class="mono" style="text-align: right">−$250</td></tr>
-<tr><td class="mono">27 sep</td><td>Transporte por app</td><td><span class="pill">csv</span></td><td class="mono" style="text-align: right">−$142</td></tr>
-<tr><td class="mono">26 sep</td><td>Streaming</td><td><span class="pill">notificación</span></td><td class="mono" style="text-align: right">−$219</td></tr>
-<tr><td class="mono">15 sep</td><td>Sueldo</td><td><span class="pill">manual</span></td><td class="mono" style="text-align: right">+$16,000</td></tr>
+<tr><td class="num">28 sep</td><td>Supermercado</td><td><span class="pill">chat</span></td><td class="num" style="text-align: right">−$250.00</td></tr>
+<tr><td class="num">27 sep</td><td>Transporte por app</td><td><span class="pill">archivo</span></td><td class="num" style="text-align: right">−$142.80</td></tr>
+<tr><td class="num">26 sep</td><td>Streaming</td><td><span class="pill">notificación</span></td><td class="num" style="text-align: right">−$219.00</td></tr>
+<tr><td class="num">15 sep</td><td>Sueldo</td><td><span class="pill">manual</span></td><td class="num" style="text-align: right">+$16,000.00</td></tr>
 </tbody>
 </table>
+</div>
 </div>
 </div>
 </div>
@@ -168,16 +187,16 @@
 
 <div data-tab="gastos" hidden>
 <div style="display: flex; flex-direction: column; gap: 16px">
-<div style="display: flex; gap: 8px; flex-wrap: wrap"><button class="chip">Categoría: todas ▾</button><button class="chip">Tarjeta: todas ▾</button><button class="chip">Origen: todos ▾</button><span style="flex-grow: 1"></span><span class="mono" style="align-self: center; font-size: 13px; color: #afbeca">Total: $18,420 MXN</span></div>
-<div class="card" style="padding: 0; overflow: hidden">
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center"><button class="chip">Categoría: todas ▾</button><button class="chip">Tarjeta: todas ▾</button><button class="chip">Origen: todos ▾</button><span style="flex-grow: 1"></span><span class="num" style="font-size: 13px; color: #afbeca">Total: $18,420.50 MXN</span></div>
+<div class="card" style="padding: 0; overflow-x: auto">
 <table class="tbl">
 <thead><tr><th>fecha</th><th>comercio</th><th>categoría</th><th>tarjeta</th><th>origen</th><th style="text-align: right">monto</th></tr></thead>
 <tbody>
-<tr><td class="mono">28 sep</td><td>Supermercado</td><td>Comida</td><td class="mono">••••5678</td><td><span class="pill">chat</span></td><td class="mono" style="text-align: right">$250</td></tr>
-<tr><td class="mono">27 sep</td><td>Transporte por app</td><td>Transporte</td><td class="mono">••••1234</td><td><span class="pill">csv</span></td><td class="mono" style="text-align: right">$142</td></tr>
-<tr><td class="mono">26 sep</td><td>Streaming</td><td>Suscripciones</td><td class="mono">••••1234</td><td><span class="pill">notificación</span></td><td class="mono" style="text-align: right">$219</td></tr>
-<tr><td class="mono">25 sep</td><td>Farmacia</td><td>Salud</td><td class="mono">—</td><td><span class="pill">manual</span></td><td class="mono" style="text-align: right">$380</td></tr>
-<tr><td class="mono">01 sep</td><td>Renta</td><td>Vivienda</td><td class="mono">—</td><td><span class="pill">manual</span></td><td class="mono" style="text-align: right">$7,500</td></tr>
+<tr><td class="num">28 sep</td><td>Supermercado</td><td>Comida</td><td class="mono">••••5678</td><td><span class="pill">chat</span></td><td class="num" style="text-align: right">$250.00</td></tr>
+<tr><td class="num">27 sep</td><td>Transporte por app</td><td>Transporte</td><td class="mono">••••1234</td><td><span class="pill">archivo</span></td><td class="num" style="text-align: right">$142.80</td></tr>
+<tr><td class="num">26 sep</td><td>Streaming</td><td>Suscripciones</td><td class="mono">••••1234</td><td><span class="pill">notificación</span></td><td class="num" style="text-align: right">$219.00</td></tr>
+<tr><td class="num">25 sep</td><td>Farmacia</td><td>Salud</td><td>—</td><td><span class="pill">manual</span></td><td class="num" style="text-align: right">$380.00</td></tr>
+<tr><td class="num">01 sep</td><td>Renta</td><td>Vivienda</td><td>—</td><td><span class="pill">manual</span></td><td class="num" style="text-align: right">$7,500.00</td></tr>
 </tbody>
 </table>
 </div>
@@ -187,16 +206,16 @@
 <div data-tab="ingresos" hidden>
 <div style="display: flex; flex-direction: column; gap: 16px">
 <div class="grid3">
-<div class="card"><span style="font-size: 13px; color: #afbeca">Ingresos del mes</span><span class="mono" style="font-size: 26px; font-weight: 500">$32,000</span></div>
-<div class="card"><span style="font-size: 13px; color: #afbeca">Comprometido en fijos</span><span class="mono" style="font-size: 26px; font-weight: 500">29%</span><span style="font-size: 12px; color: #839bad">$9,267 de $32,000</span></div>
-<div class="card"><span style="font-size: 13px; color: #afbeca">Promedio 6 meses</span><span class="mono" style="font-size: 26px; font-weight: 500">$32,400</span></div>
+<div class="card"><span style="font-size: 13px; color: #afbeca">Ingresos del mes</span><span class="num" style="font-size: 28px; font-weight: 600">$32,000.00</span></div>
+<div class="card"><span style="font-size: 13px; color: #afbeca">Comprometido en fijos</span><span class="num" style="font-size: 28px; font-weight: 600">29%</span><span class="num" style="font-size: 12px; color: #839bad">$9,267 de $32,000</span></div>
+<div class="card"><span style="font-size: 13px; color: #afbeca">Promedio 6 meses</span><span class="num" style="font-size: 28px; font-weight: 600">$32,400.00</span></div>
 </div>
-<div class="card" style="padding: 0; overflow: hidden">
+<div class="card" style="padding: 0; overflow-x: auto">
 <table class="tbl">
 <thead><tr><th>fecha</th><th>concepto</th><th>categoría</th><th>origen</th><th style="text-align: right">monto</th></tr></thead>
 <tbody>
-<tr><td class="mono">30 sep</td><td>Sueldo · 2da quincena</td><td>Sueldo</td><td><span class="pill">manual</span></td><td class="mono" style="text-align: right">$16,000</td></tr>
-<tr><td class="mono">15 sep</td><td>Sueldo · 1ra quincena</td><td>Sueldo</td><td><span class="pill">manual</span></td><td class="mono" style="text-align: right">$16,000</td></tr>
+<tr><td class="num">30 sep</td><td>Sueldo · 2da quincena</td><td>Sueldo</td><td><span class="pill">manual</span></td><td class="num" style="text-align: right">$16,000.00</td></tr>
+<tr><td class="num">15 sep</td><td>Sueldo · 1ra quincena</td><td>Sueldo</td><td><span class="pill">manual</span></td><td class="num" style="text-align: right">$16,000.00</td></tr>
 </tbody>
 </table>
 </div>
@@ -204,45 +223,91 @@
 </div>
 
 <div data-tab="tarjetas" hidden>
-<div style="display: flex; flex-direction: column; gap: 16px">
-<div class="card" style="padding: 0; overflow: hidden">
-<table class="tbl">
-<thead><tr><th>tarjeta</th><th>últimos 4</th><th>corte</th><th>pago</th><th>MSI anticipado</th><th>activa</th></tr></thead>
-<tbody>
-<tr><td>Tarjeta A</td><td class="mono">••••1234</td><td class="mono">día 15</td><td class="mono">día 5</td><td>No</td><td><button class="switch" role="switch" aria-checked="true" aria-label="Tarjeta A activa"><span></span></button></td></tr>
-<tr><td>Tarjeta B</td><td class="mono">••••5678</td><td class="mono">día 25</td><td class="mono">día 6</td><td>Sí</td><td><button class="switch" role="switch" aria-checked="true" aria-label="Tarjeta B activa"><span></span></button></td></tr>
-<tr><td>Tarjeta C</td><td class="mono">••••9012</td><td class="mono">día 16</td><td class="mono">día 6</td><td>Sí</td><td><button class="switch" role="switch" aria-checked="false" aria-label="Tarjeta C activa"><span></span></button></td></tr>
-</tbody>
-</table>
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Mis tarjetas</h2><span style="font-size: 13px; color: #839bad">4 activas · 1 inactiva</span></div>
+<div class="ctiles">
+<div class="ctile">
+<div class="ctop"><span style="font-weight: 600">Tarjeta A</span><button class="switch" role="switch" aria-checked="true" aria-label="Tarjeta A activa"><span></span></button></div>
+<span class="mono" style="font-size: 15px; color: #e6e6e6; letter-spacing: 0.04em">••••1234</span>
+<div class="cdays"><div><span class="ck">Corte</span><span class="num">día 15</span></div><div><span class="ck">Pago</span><span class="num">día 5</span></div></div>
+<div class="cfoot"><span class="pill pill-hi num">Pago en 5 días</span><span style="font-size: 12px; color: #839bad">MSI: no</span></div>
 </div>
-<div class="card">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">Próximos 30 días</h2>
-<div style="display: flex; flex-direction: column; gap: 14px">
-<div style="display: flex; flex-direction: column; gap: 6px"><span class="mono" style="font-size: 12px; color: #839bad">DOMINGO 5 OCT</span><div style="display: flex; align-items: center; gap: 10px; font-size: 14px"><span class="pill">pago</span>Tarjeta A ••••1234</div></div>
-<div style="display: flex; flex-direction: column; gap: 6px"><span class="mono" style="font-size: 12px; color: #839bad">LUNES 6 OCT</span><div style="display: flex; align-items: center; gap: 10px; font-size: 14px"><span class="pill">pago</span>Tarjeta B ••••5678</div></div>
-<div style="display: flex; flex-direction: column; gap: 6px"><span class="mono" style="font-size: 12px; color: #839bad">MIÉRCOLES 15 OCT</span><div style="display: flex; align-items: center; gap: 10px; font-size: 14px"><span class="pill pill-soft">corte</span>Tarjeta A ••••1234</div></div>
-<div style="display: flex; flex-direction: column; gap: 6px"><span class="mono" style="font-size: 12px; color: #839bad">SÁBADO 25 OCT</span><div style="display: flex; align-items: center; gap: 10px; font-size: 14px"><span class="pill pill-soft">corte</span>Tarjeta B ••••5678</div></div>
+<div class="ctile">
+<div class="ctop"><span style="font-weight: 600">Tarjeta B</span><button class="switch" role="switch" aria-checked="true" aria-label="Tarjeta B activa"><span></span></button></div>
+<span class="mono" style="font-size: 15px; color: #e6e6e6; letter-spacing: 0.04em">••••5678</span>
+<div class="cdays"><div><span class="ck">Corte</span><span class="num">día 25</span></div><div><span class="ck">Pago</span><span class="num">día 6</span></div></div>
+<div class="cfoot"><span class="pill num">Pago en 6 días</span><span style="font-size: 12px; color: #839bad">MSI: sí</span></div>
 </div>
-<p style="margin: 0; font-size: 12px; color: #839bad">Las tarjetas inactivas no aparecen. Fines de semana y feriados: regla pendiente.</p>
+<div class="ctile">
+<div class="ctop"><span style="font-weight: 600">Tarjeta C</span><button class="switch" role="switch" aria-checked="true" aria-label="Tarjeta C activa"><span></span></button></div>
+<span class="mono" style="font-size: 15px; color: #e6e6e6; letter-spacing: 0.04em">••••9012</span>
+<div class="cdays"><div><span class="ck">Corte</span><span class="num">día 25</span></div><div><span class="ck">Pago</span><span class="num">día 15</span></div></div>
+<div class="cfoot"><span class="pill num">Pago en 15 días</span><span style="font-size: 12px; color: #839bad">MSI: no</span></div>
+</div>
+<div class="ctile">
+<div class="ctop"><span style="font-weight: 600">Tarjeta E</span><button class="switch" role="switch" aria-checked="true" aria-label="Tarjeta E activa"><span></span></button></div>
+<span class="mono" style="font-size: 15px; color: #e6e6e6; letter-spacing: 0.04em">••••7890</span>
+<div class="cdays"><div><span class="ck">Corte</span><span class="num">día 1</span></div><div><span class="ck">Pago</span><span class="num">día 21</span></div></div>
+<div class="cfoot"><span class="pill num">Pago en 21 días</span><span style="font-size: 12px; color: #839bad">MSI: sí</span></div>
+</div>
+<div class="ctile ctile-off">
+<div class="ctop"><span style="font-weight: 600">Tarjeta D</span><button class="switch" role="switch" aria-checked="false" aria-label="Tarjeta D activa"><span></span></button></div>
+<span class="mono" style="font-size: 15px; color: #e6e6e6; letter-spacing: 0.04em">••••3456</span>
+<div class="cdays"><div><span class="ck">Corte</span><span class="num">día 16</span></div><div><span class="ck">Pago</span><span class="num">día 6</span></div></div>
+<div class="cfoot"><span class="pill pill-soft">Inactiva</span><span style="font-size: 12px; color: #839bad">fuera del calendario</span></div>
 </div>
 </div>
 </div>
 
-<div data-tab="mx" hidden>
-<div class="card" style="align-items: flex-start; gap: 14px; padding: 32px">
+<div class="card" style="gap: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Octubre 2026</h2>
+<div style="display: flex; gap: 14px; font-size: 12px; color: #afbeca"><span style="display: inline-flex; align-items: center; gap: 6px"><span class="dot"></span>pago</span><span style="display: inline-flex; align-items: center; gap: 6px"><span class="ring"></span>corte</span></div>
+</div>
+<div class="cal" role="grid" aria-label="Octubre 2026">
+<span class="cw">L</span><span class="cw">M</span><span class="cw">M</span><span class="cw">J</span><span class="cw">V</span><span class="cw">S</span><span class="cw">D</span>
+<span></span><span></span><span></span>
+<span class="cd"><b>1</b><i class="ring"></i></span><span class="cd"><b>2</b></span><span class="cd"><b>3</b></span><span class="cd"><b>4</b></span>
+<span class="cd cd-sel"><b>5</b><i class="dot"></i></span><span class="cd"><b>6</b><i class="dot"></i></span><span class="cd"><b>7</b></span><span class="cd"><b>8</b></span><span class="cd"><b>9</b></span><span class="cd"><b>10</b></span><span class="cd"><b>11</b></span>
+<span class="cd"><b>12</b></span><span class="cd"><b>13</b></span><span class="cd"><b>14</b></span><span class="cd"><b>15</b><i class="dot"></i><i class="ring"></i></span><span class="cd"><b>16</b></span><span class="cd"><b>17</b></span><span class="cd"><b>18</b></span>
+<span class="cd"><b>19</b></span><span class="cd"><b>20</b></span><span class="cd"><b>21</b><i class="dot"></i></span><span class="cd"><b>22</b></span><span class="cd"><b>23</b></span><span class="cd"><b>24</b></span><span class="cd"><b>25</b><i class="ring"></i></span>
+<span class="cd"><b>26</b></span><span class="cd"><b>27</b></span><span class="cd"><b>28</b></span><span class="cd"><b>29</b></span><span class="cd"><b>30</b></span><span class="cd"><b>31</b></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 4px; border-top: 1px solid #292929">
+<span class="num" style="font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: #839bad; padding-top: 10px">Lunes 5 oct</span>
+<div style="display: flex; align-items: center; gap: 10px; font-size: 14px; flex-wrap: wrap"><span class="pill">pago</span><span>Tarjeta A <span class="mono" style="color: #afbeca">••••1234</span></span><span class="num" style="font-size: 12px; color: #839bad">en 5 días</span></div>
+</div>
+<p style="margin: 0; font-size: 12px; color: #839bad">Toca un día para ver sus eventos. Las tarjetas inactivas no aparecen. Fines de semana y feriados: regla pendiente.</p>
+</div>
+</div>
+</div>
+
+<div data-tab="inversiones" hidden>
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div role="group" aria-label="Cuenta" style="align-self: flex-start; display: inline-flex; padding: 3px; border: 1px solid #292929; border-radius: 999px">
+<button class="seg" aria-pressed="true">MX · MXN</button>
+<button class="seg" aria-pressed="false">USA · USD</button>
+</div>
+<div data-cuenta="mx" style="display: contents">
+<div class="card" style="align-items: flex-start; gap: 14px; padding: 28px">
 <span class="pill">MXN · solo títulos completos</span>
-<h2 style="margin: 0; font-size: 20px; font-weight: 600">Aún no hay portafolio de Trading MX</h2>
-<p style="margin: 0; max-width: 560px; font-size: 14px; line-height: 1.6; color: #afbeca">Adjunta en el chat el PDF de tu estado de cuenta de inversiones. Finanzas lo lee con código y te muestra la vista previa antes de guardar (FIN-04).</p>
+<h2 style="margin: 0; font-size: 20px; font-weight: 600">Aún no hay portafolio de la cuenta MX</h2>
+<p style="margin: 0; max-width: 560px; font-size: 14px; line-height: 1.6; color: #afbeca">Adjunta en el asistente el PDF de tu estado de cuenta de inversiones. Finanzas lo lee con código y te muestra la vista previa antes de guardar (FIN-04).</p>
 <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: #e6e6e6"><li>Posiciones, costo promedio y peso actual vs objetivo</li><li>Sugerencia de aportación: primero lo que está debajo del objetivo</li><li>Alertas de caída entre −12% y −15% del costo promedio</li></ul>
 </div>
 </div>
-
-<div data-tab="usa" hidden>
-<div class="card" style="align-items: flex-start; gap: 14px; padding: 32px">
+<div data-cuenta="usa" hidden>
+<div class="card" style="align-items: flex-start; gap: 14px; padding: 28px">
 <span class="pill">USD · admite fracciones</span>
-<h2 style="margin: 0; font-size: 20px; font-weight: 600">Aún no hay portafolio de Trading USA</h2>
-<p style="margin: 0; max-width: 560px; font-size: 14px; line-height: 1.6; color: #afbeca">Igual que en MX: adjunta el estado de cuenta en el chat. Los montos en USD nunca se suman con los de MXN.</p>
+<h2 style="margin: 0; font-size: 20px; font-weight: 600">Aún no hay portafolio de la cuenta USA</h2>
+<p style="margin: 0; max-width: 560px; font-size: 14px; line-height: 1.6; color: #afbeca">Igual que en MX: adjunta el estado de cuenta en el asistente. Los montos en USD nunca se suman con los de MXN.</p>
 <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: #e6e6e6"><li>Bloques de crecimiento y defensa con su peso objetivo</li><li>Reparto del efectivo disponible en fracciones</li><li>Efectivo remanente después de cada aportación</li></ul>
+</div>
+</div>
+</div>
+</div>
+
 </div>
 </div>
 </div>
@@ -250,7 +315,7 @@
 <div data-chat="open" style="display: contents">
 <aside aria-label="Asistente de finanzas" style="width: 384px; flex-shrink: 0; height: 100%; display: flex; flex-direction: column; background: #1a1a1a; border-left: 1px solid #292929">
 <header style="display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 60px; padding: 0 12px 0 18px; border-bottom: 1px solid #292929; flex-shrink: 0">
-<div style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 15px; font-weight: 600">Asistente de finanzas</span><span class="mono" style="font-size: 11px; color: #839bad">agente finanzas · confirma antes de guardar</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 15px; font-weight: 600">Asistente de finanzas</span><span style="font-size: 12px; color: #839bad">Confirma antes de guardar</span></div>
 <button class="icon" aria-label="Cerrar asistente"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
 </header>
 <div style="flex-grow: 1; min-height: 0; overflow: auto; padding: 18px; display: flex; flex-direction: column; gap: 16px">
@@ -261,19 +326,19 @@
 <table class="tbl" style="font-size: 12px">
 <thead><tr><th>tarjeta</th><th>••••</th><th>corte</th><th>pago</th></tr></thead>
 <tbody>
-<tr><td>Tarjeta A</td><td class="mono">1234</td><td class="mono">15</td><td class="mono">5</td></tr>
-<tr><td>Tarjeta B</td><td class="mono">5678</td><td class="mono">25</td><td class="mono">6</td></tr>
+<tr><td>Tarjeta A</td><td class="mono">1234</td><td class="num">15</td><td class="num">5</td></tr>
+<tr><td>Tarjeta B</td><td class="mono">5678</td><td class="num">25</td><td class="num">6</td></tr>
 </tbody>
 </table>
 </div>
 <div style="display: flex; gap: 8px"><button class="primary" style="min-height: 36px">Confirmar las 2</button><button class="chip" style="min-height: 36px">Corregir</button></div>
 </div>
 <div style="align-self: flex-end; max-width: 88%; display: flex; flex-direction: column; align-items: flex-end; gap: 6px">
-<div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #292929; border-radius: 10px; background: #14171b; font-size: 13px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#afbeca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path></svg><span class="mono">movimientos-sep.csv</span></div>
+<div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #292929; border-radius: 10px; background: #14171b; font-size: 13px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#afbeca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path></svg><span>movimientos-sep.csv</span></div>
 <div style="padding: 10px 14px; border-radius: 14px; background: #292929; font-size: 14px; line-height: 1.5">Importa estos movimientos.</div>
 </div>
 <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.55">
-<p style="margin: 0">Finanzas leyó <span class="mono">12</span> movimientos del archivo, sin pasarlo por el modelo: 11 gastos y 1 ingreso, todos en MXN.</p>
+<p style="margin: 0">Finanzas leyó <span class="num">12</span> movimientos del archivo, sin pasarlo por el modelo: 11 gastos y 1 ingreso, todos en MXN.</p>
 <div style="display: flex; gap: 8px"><button class="primary" style="min-height: 36px">Ver vista previa</button></div>
 </div>
 </div>
@@ -283,7 +348,7 @@
 <textarea id="fmsg" class="field" rows="2" placeholder="Pregunta, registra un gasto o adjunta un archivo…" style="font-size: 14px"></textarea>
 <div style="display: flex; align-items: center; gap: 6px">
 <button class="icon" aria-label="Adjuntar archivo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 11-8.5 8.5a5 5 0 0 1-7-7L13 4a3.3 3.3 0 0 1 4.7 4.7L9.2 17.2a1.7 1.7 0 0 1-2.4-2.4L14.5 7"></path></svg></button>
-<span style="flex-grow: 1; font-size: 11px; color: #839bad">CSV, Excel, PDF · se procesan en finanzas</span>
+<span style="flex-grow: 1; font-size: 11px; color: #839bad">CSV · se procesa en finanzas</span>
 <button class="send" aria-label="Enviar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"></path></svg></button>
 </div>
 </div>

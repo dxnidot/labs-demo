@@ -15,3 +15,4 @@ Sigue las reglas del repo:
 - Antes de construir una pantalla lee su PNG de docs/design/lara/png/ y compara el resultado contra él; lista las diferencias.
 - Capturas de la app en ejecución: .capturas/<nombre>.png (ignorado por git).
 - Tokens solo desde agents-ui/src/index.css; nunca colores sueltos en componentes.
+- localStorage: prohibido, con una única excepción: la clave "lara.fuente" (fuente elegida en Apariencia; preferencia visual no sensible), siempre con try/catch y valor por defecto IBM Plex Mono. Nada más puede ir a localStorage.

@@ -65,6 +65,8 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [ ] 🔄 UI-04 · En curso: shell e historial; Recientes corregido; demás vistas pendientes
 - [ ] ⏳ UI-06 · Eliminar y renombrar chats en Recientes (Media; depende de UI-04)
 - [ ] 🔄 UI-07 · En curso: todas las vistas 01–14, login propio e íconos
+- [ ] 🔄 UI-08 · En curso: responsive y layout de página único
+- [ ] ⏳ QA-01 · Capturas automáticas con Playwright para ui-reviewer (Baja; depende de UI-08)
 - [ ] 🔄 FE-01 · En curso: menú por rol implementado en Lara; retiro de kc-front pendiente — Track de identidad: solo para pruebas
 
 ## Finanzas personales
@@ -81,3 +83,4 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ FIN-13 · Hecho: autenticación del agente hacia finanzas
 - [x] ✅ FIN-14 · Hecho: agente ADK de finanzas
 - [x] ✅ FIN-15 · Hecho: chat de Finanzas e importación CSV (depende de FIN-14, FIN-12)
+- [ ] ⏳ FIN-17 · Totales mensuales, serie de 6 meses y calendario con ultimos4 y diasRestantes (Media)

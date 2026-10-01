@@ -1,0 +1,24 @@
+# FIN-17 · Totales mensuales, serie de 6 meses y calendario enriquecido
+
+- Estado: Pendiente
+- Prioridad: Media
+- Parte del lab: FIN
+- Depende de: FIN-11, FIN-10
+- Fecha: 2026-09-30
+- Contexto: La vista Finanzas de Lara no puede calcular importes en la UI. Hoy faltan en el servicio finanzas los totales y series que el diseño muestra, y el calendario no trae los datos para identificar la tarjeta ni los días restantes, así que Lara los deja en aviso o los deriva solo para mostrar.
+- Criterio de aceptación:
+  - Totales mensuales por tipo y moneda: ingresos, gastos, "te queda" y su porcentaje del ingreso, para un periodo dado.
+  - Serie mensual de ingresos y gastos de los últimos 6 meses, por moneda.
+  - `/api/finanzas/calendario` devuelve en cada evento `ultimos4` y `diasRestantes`.
+  - Origen `CHAT` para los movimientos registrados por el agente.
+  - Total del periodo por moneda para la pestaña Gastos.
+  - Las pruebas del servicio cubren cada cálculo; las monedas nunca se suman entre sí.
+- Archivos relevantes:
+  - finanzas/src/main/java/com/example/finanzas/
+  - agents-ui/src/ui/FinanzasResumenTab.tsx
+  - agents-ui/src/ui/FinanzasTarjetasTab.tsx
+- Notas:
+  - Confirmado: agente a cargo: `java-spring`.
+  - Confirmado: fuera de alcance el desglose fijos vs variables y "comprometido en fijos"; dependen de FIN-03.
+  - Pendiente: mientras no exista `diasRestantes`, Lara calcula "en N días" como diferencia de fechas solo para mostrar (UI-08); al cerrar esta historia la UI debe usar el valor del servicio.
+  - Pendiente: mientras no existan los totales, el Resumen muestra un solo aviso con esta historia en lugar de KPIs.

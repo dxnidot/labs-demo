@@ -74,8 +74,10 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 
 ### Tipografía
 
-- Texto: **IBM Plex Sans** 400/500/600.
-- Datos técnicos (puertos, ids, SQL, tokens, montos en tablas): **IBM Plex Mono** 400/500.
+- Fuente de la interfaz: a elegir entre **IBM Plex Mono** (por defecto), **Lato** y **NTR** desde el diálogo "Apariencia". Se aplica con el atributo `data-font` en `<html>`, que cambia `--font-sans`.
+- Datos técnicos (••••, puertos, ids, tokens, SQL, nombres de tools): siempre **IBM Plex Mono** vía `--font-mono`, con cualquiera de las tres fuentes.
+- Fechas, montos y porcentajes: fuente de la interfaz con cifras tabulares (`font-variant-numeric: tabular-nums`, utilidad `num`). No usan mono.
+- Las fuentes se sirven desde el repo con Fontsource; no se carga Google Fonts en ejecución.
 - Tamaños: título de pantalla 26px/600 · subtítulo 14px muted · cuerpo del chat 15px/1.6 · tablas 13px · etiquetas de sección 11px mono con `letter-spacing: .08em`.
 
 ### Medidas
@@ -206,12 +208,13 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 
 ![Finanzas](png/12-finanzas.png)
 
-- Encabezado con selector de periodo y alternador MXN/USD.
-- Tabs **Resumen · Gastos · Ingresos · Tarjetas y pagos · Trading MX · Trading USA**. La pestaña activa se refleja en la URL, por ejemplo `/finanzas/gastos`.
-- Resumen: 4 KPIs (con **próximo pago** destacado), ingresos vs. gastos de 6 meses, gastos por categoría, próximos pagos y últimos movimientos con su origen (chat, CSV, notificación o manual).
+- Encabezado: título y "Actualizado hace N min"; a la derecha, periodo con botones ◀ ▶ ("Mes anterior" / "Mes siguiente"), alternador MXN/USD y botón **Asistente** cuando el panel está cerrado. Contenido con ancho máximo de ~1180px.
+- 5 pestañas con ícono: **Resumen · Gastos · Ingresos · Tarjetas y pagos · Inversiones**. La activa lleva texto en 600 y una línea inferior de 2px; se refleja en la URL, por ejemplo `/finanzas/gastos`. **Inversiones** (`/finanzas/inversiones`) tiene un selector MX | USA; las rutas anteriores `/finanzas/trading-mx` y `/finanzas/trading-usa` redirigen ahí.
+- Bloque **Próximo pago** destacado arriba de Resumen y de Tarjetas y pagos: alias, ••••, fecha y "en N días", con el botón "Ver calendario".
+- Resumen: 3 KPIs (ingresos del mes, gastos del mes, te queda), ingresos vs. gastos de 6 meses, gastos por categoría, próximos pagos y últimos movimientos con su origen (chat, archivo, notificación o manual). Si faltan los totales mensuales se muestra un solo aviso con su historia, no KPIs vacíos.
 - Panel derecho **Asistente de finanzas** (~384px), plegable y como drawer en pantallas estrechas. Renderiza Markdown con `react-markdown`, incluidas tablas.
 - Para varias transacciones, muestra un preview y una confirmación para el conjunto (**Confirmar las N**). El botón para adjuntar archivos va dentro del composer; finanzas procesa los archivos, nunca se envían al LLM.
-- No hay una caja separada de **Importar CSV**. Trading MX y Trading USA muestran un estado vacío hasta FIN-04.
+- No hay una caja separada de **Importar CSV**. Inversiones (MX y USA) muestra un estado vacío hasta FIN-04.
 - Diferencia pendiente: los filtros de la pestaña **Gastos** quedan fuera de esta pasada.
 
 ### 13 · Gastos fijos (a futuro)
@@ -226,14 +229,15 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 
 ![Tarjetas y pagos](png/14-finanzas-tarjetas.png)
 
-- Tabla de tarjetas con solo un toggle para activarlas o desactivarlas.
-- Próximos 30 días agrupados por fecha; las tarjetas inactivas no se muestran.
+- Bloque **Próximo pago** arriba, igual que en Resumen.
+- **Mis tarjetas** como tiles: alias, ••••, día de corte, día de pago, "Pago en N días", MSI y un toggle para activarla o desactivarla. La inactiva va atenuada, con la etiqueta "Inactiva" y "fuera del calendario". Contador "N activas · N inactivas".
+- Calendario del mes en cuadrícula de 7 columnas: ● pago, ○ corte. El día es seleccionable y su detalle aparece debajo; se navega con teclado (`role="grid"`). Las tarjetas inactivas no se muestran.
 - La entrada lateral anterior `/finanzas/pagos` ahora es esta pestaña.
 
 ## Reglas para implementar
 
 - Arquitectura hexagonal ligera: `AuthPort`, `AgentePort` y un puerto por fuente de datos de cada vista.
-- Tokens solo en memoria. Nada en `localStorage`.
+- Tokens solo en memoria. Nada en `localStorage`, con una única excepción: la clave `lara.fuente` guarda la fuente elegida en "Apariencia" (preferencia visual, no sensible). Ningún otro dato puede ir a `localStorage`.
 - Vistas de administración (BD, usuarios, BPM, herramientas) **solo lectura** desde Lara.
 - Finanzas: datos en el servicio finanzas (Postgres local); al LLM solo le llegan resultados calculados.
 - Botones reales (`<button>`, `<a>`), `aria-label` en botones de solo ícono, contraste AA.
