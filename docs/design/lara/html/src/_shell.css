@@ -1,0 +1,51 @@
+/*
+  CSS compartido del shell de Lara, extraído tal cual de lara-canvas.html.
+  Incluye la regla que oculta las barras de desplazamiento en todas las áreas con scroll.
+  Lo enlazan todas las pantallas de esta carpeta (01-login.html … 14-finanzas-tarjetas.html).
+*/
+*{scrollbar-width:none}*::-webkit-scrollbar{display:none}
+body{margin:0;background:#14171b}
+a{color:#afbeca}a:hover{color:#d4dce3}
+.nav{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#e6e6e6;font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.nav:hover{background:#292929;color:#fafafa}
+.nav[aria-current="page"]{background:#292929;color:#fafafa}
+.recent{display:block;width:100%;min-height:36px;padding:8px 12px;border:0;border-radius:8px;background:transparent;color:#afbeca;font:inherit;font-size:13px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.recent:hover{background:#292929;color:#fafafa}
+.icon{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:8px;background:transparent;color:#afbeca;cursor:pointer;text-decoration:none}
+.icon:hover{background:#292929;color:#fafafa}
+.newchat{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 14px;border:0;border-radius:10px;background:#afbeca;color:#212830;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.newchat:hover{background:#d4dce3}
+.primary{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;border:0;border-radius:10px;background:#afbeca;color:#212830;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.primary:hover{background:#d4dce3}
+.send{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:10px;background:#afbeca;color:#212830;cursor:pointer}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:32px;padding:0 12px;border:1px solid #292929;border-radius:999px;background:transparent;color:#e6e6e6;font:inherit;font-size:13px;cursor:pointer}
+.chip:hover{background:#292929}
+.sugg{display:flex;flex-direction:column;gap:6px;padding:16px;border:1px solid #292929;border-radius:12px;background:#1a1a1a;color:#fafafa;font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.sugg:hover{background:#292929;border-color:#434343}
+.tab{min-height:36px;padding:0 14px;border:0;border-radius:8px;background:transparent;color:#afbeca;font-family:'IBM Plex Mono',monospace;font-size:13px;cursor:pointer}
+.tab[aria-selected="true"]{background:#292929;color:#fafafa}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:10px 14px;color:#afbeca;font-weight:500;border-bottom:1px solid #292929;background:#1a1a1a}
+.tbl td{padding:12px 14px;border-bottom:1px solid #292929;color:#e6e6e6}
+.mono{font-family:'IBM Plex Mono',monospace}
+.field{width:100%;box-sizing:border-box;border:0;background:transparent;color:#fafafa;font:inherit;font-size:15px;resize:none;outline:none}
+.field::placeholder{color:#839bad}
+.card{display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid #292929;border-radius:14px;background:#1a1a1a}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.ftab{min-height:40px;padding:0 14px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:#afbeca;font:inherit;font-size:14px;white-space:nowrap;cursor:pointer}
+.ftab:hover{color:#fafafa}
+.ftab[aria-selected="true"]{color:#fafafa;border-bottom-color:#afbeca}
+.seg{min-height:30px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:#afbeca;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer}
+.seg[aria-pressed="true"]{background:#afbeca;color:#212830}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;background:#292929;color:#d4dce3;font-size:12px;white-space:nowrap}
+.pill-soft{background:transparent;border:1px solid #292929;color:#afbeca}
+.link{border:0;padding:0;background:transparent;color:#afbeca;font:inherit;font-size:13px;cursor:pointer;text-decoration:underline}
+.link:hover{color:#d4dce3}
+.switch{position:relative;width:40px;height:24px;border:0;border-radius:999px;background:#434343;cursor:pointer;padding:0}
+.switch span{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fafafa}
+.switch[aria-checked="true"]{background:#afbeca}
+.switch[aria-checked="true"] span{left:19px;background:#212830}
+@media (max-width:980px){.side{display:none}.grid3,.grid2,.grid4{grid-template-columns:minmax(0,1fr)}}

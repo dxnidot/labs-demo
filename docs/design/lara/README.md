@@ -5,7 +5,7 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 
 > Todos los datos de las pantallas son de ejemplo. Nada de esto es información real.
 
-**Exact values:** para spacing, tamaños y estructura exactos, consulta `html/lara-canvas.html`; los PNG muestran el aspecto. El HTML es el canvas completo: todas las pantallas comparten un shell y cambian por vista; Finanzas corresponde al bloque de la vista `finanzas` y sus tabs. Si discrepan, el PNG manda para el aspecto y el HTML para las medidas.
+**Exact values:** para spacing, tamaños y estructura exactos, consulta `html/src/<NN>-<pantalla>.html` (mismo número y nombre que el PNG) y `html/src/_shell.css` (CSS compartido del shell); los PNG muestran el aspecto. Cada archivo es la fuente legible de una pantalla: barra lateral más la vista, en HTML y CSS planos; `12-finanzas.html` y `14-finanzas-tarjetas.html` incluyen todas las tabs, con las no activas en `hidden`. `html/lara-canvas.html` es el canvas original con todas las pantallas, pero va empaquetado (gzip + base64) y no se puede leer directamente. Si discrepan, el PNG manda para el aspecto y el HTML para las medidas.
 
 ## Cómo usar esta guía con Copilot
 
@@ -212,6 +212,7 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 - Panel derecho **Asistente de finanzas** (~384px), plegable y como drawer en pantallas estrechas. Renderiza Markdown con `react-markdown`, incluidas tablas.
 - Para varias transacciones, muestra un preview y una confirmación para el conjunto (**Confirmar las N**). El botón para adjuntar archivos va dentro del composer; finanzas procesa los archivos, nunca se envían al LLM.
 - No hay una caja separada de **Importar CSV**. Trading MX y Trading USA muestran un estado vacío hasta FIN-04.
+- Diferencia pendiente: los filtros de la pestaña **Gastos** quedan fuera de esta pasada.
 
 ### 13 · Gastos fijos (a futuro)
 

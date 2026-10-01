@@ -36,3 +36,9 @@ docs/private/
 *.iml
 .DS_Store
 Thumbs.db
+
+# Capturas de la app en ejecución (pueden contener datos reales)
+.capturas/
+
+# Notas de traspaso entre sesiones de Claude Code
+.claude/handoff/
