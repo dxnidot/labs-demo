@@ -14,9 +14,7 @@ const agente = new AdkAgenteAdapter(keycloakAuthAdapter);
 
 interface ChatSessionsValue {
   activeSessionId: string | null;
-  createSession: () => Promise<string>;
   historyError: string | null;
-  isCreatingSession: boolean;
   isLoadingHistory: boolean;
   refreshSessions: () => Promise<void>;
   selectSession: (sessionId: string) => void;
@@ -32,15 +30,15 @@ interface ChatSessionsProviderProps {
 const ChatSessionsContext = createContext<ChatSessionsValue | null>(null);
 
 /**
- * Comparte las sesiones recientes entre el shell lateral y el chat.
+ * Comparte el historial y la sesión activa entre el shell lateral y el chat.
  * @author Daniel
  * @since 2026-09-30
+ * @modified Daniel 2026-09-30 Crea la sesión al enviar el primer mensaje.
  */
 export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderProps) {
   const [sessions, setSessions] = useState<SesionChat[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [isCreatingSession, setIsCreatingSession] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
 
   const refreshSessions = useCallback(async () => {
@@ -55,17 +53,6 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
       throw reason;
     } finally {
       setIsLoadingHistory(false);
-    }
-  }, [userId]);
-
-  const createSession = useCallback(async () => {
-    setIsCreatingSession(true);
-    try {
-      const sessionId = await agente.crearSesion(userId);
-      setActiveSessionId(sessionId);
-      return sessionId;
-    } finally {
-      setIsCreatingSession(false);
     }
   }, [userId]);
 
@@ -85,9 +72,7 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
     <ChatSessionsContext.Provider
       value={{
         activeSessionId,
-        createSession,
         historyError,
-        isCreatingSession,
         isLoadingHistory,
         refreshSessions,
         selectSession,
@@ -104,6 +89,7 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
  * Accede al historial compartido entre las vistas de chat y menú.
  * @author Daniel
  * @since 2026-09-30
+ * @modified Daniel 2026-09-30 Comparte el inicio diferido de sesiones.
  */
 export function useChatSessions(): ChatSessionsValue {
   const context = useContext(ChatSessionsContext);

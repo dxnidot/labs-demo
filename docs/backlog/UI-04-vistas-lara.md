@@ -1,6 +1,6 @@
 # UI-04 · Vistas de Lara (C.5)
 
-- Estado: En curso
+- Estado: En curso (Recientes corregido; demás vistas pendientes)
 - Prioridad: Media
 - Parte del lab: C.5
 - Depende de: UI-02, UI-03

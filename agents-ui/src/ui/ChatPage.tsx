@@ -75,7 +75,7 @@ const colorEtiqueta = {
  * Presenta la conversación de Lara y su respuesta en streaming.
  * @author Daniel
  * @since 2026-09-30
- * @modified Daniel 2026-09-30 Mueve navegación e historial al shell.
+ * @modified Daniel 2026-09-30 Mueve navegación al shell y titula la sesión inicial.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {

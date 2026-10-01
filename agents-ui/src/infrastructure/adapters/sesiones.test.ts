@@ -51,40 +51,43 @@ describe("mapearEventosSesion", () => {
 });
 
 describe("mapearSesiones", () => {
-  it("omits sessions without user messages and sorts newest first", () => {
+  it("usa state.titulo y conserva sesiones sin título ni eventos", () => {
     const sesiones = mapearSesiones([
       {
-        id: "old",
+        id: "con-titulo",
         lastUpdateTime: 10,
-        events: [{ author: "user", content: { parts: [{ text: "Anterior" }] } }],
+        state: { titulo: "  Primer mensaje  " },
+        events: [],
       },
       {
-        id: "empty",
+        id: "sin-titulo",
         lastUpdateTime: 30,
-        events: [{ author: "agent", content: { parts: [{ text: "Solo agente" }] } }],
-      },
-      {
-        id: "new",
-        lastUpdateTime: 20,
-        events: [{ author: "user", content: { parts: [{ text: "Más reciente" }] } }],
+        events: [],
       },
     ]);
 
     expect(sesiones.map(({ id, titulo }) => ({ id, titulo }))).toEqual([
-      { id: "new", titulo: "Más reciente" },
-      { id: "old", titulo: "Anterior" },
+      { id: "sin-titulo", titulo: "Chat sin título" },
+      { id: "con-titulo", titulo: "Primer mensaje" },
     ]);
   });
 
-  it("truncates the first user message for the session title", () => {
+  it("convierte lastUpdateTime decimal en segundos a milisegundos antes de ordenar", () => {
     const sesiones = mapearSesiones([
       {
-        id: "session",
-        lastUpdateTime: 1,
-        events: [{ author: "user", content: { parts: [{ text: "a".repeat(80) }] } }],
+        id: "older",
+        lastUpdateTime: 1.25,
+        state: { titulo: "Anterior" },
+      },
+      {
+        id: "newer",
+        lastUpdateTime: 1.75,
+        state: { titulo: "Más reciente" },
       },
     ]);
 
-    expect(sesiones[0]?.titulo).toBe(`${"a".repeat(61)}…`);
+    expect(sesiones.map(({ id }) => id)).toEqual(["newer", "older"]);
+    expect(sesiones[0]?.actualizado).toEqual(new Date(1750));
+    expect(sesiones[1]?.actualizado).toEqual(new Date(1250));
   });
 });

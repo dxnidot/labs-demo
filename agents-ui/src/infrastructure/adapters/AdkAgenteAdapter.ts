@@ -26,7 +26,7 @@ async function* decodificarChunks(
  * Adapta las sesiones ADK y su flujo SSE al puerto del agente.
  * @author Daniel
  * @since 2026-09-30
- * @modified Daniel 2026-09-30 Añade consultas de historial ADK.
+ * @modified Daniel 2026-09-30 Añade consultas de historial ADK y título de sesión.
  */
 export class AdkAgenteAdapter implements AgentePort {
   constructor(private readonly auth: AuthPort) {}
@@ -52,7 +52,7 @@ export class AdkAgenteAdapter implements AgentePort {
     return mapearEventosSesion(session.events, lastUpdateTime);
   }
 
-  async crearSesion(userId: string): Promise<string> {
+  async crearSesion(userId: string, titulo: string): Promise<string> {
     const token = await this.auth.updateToken();
     const response = await fetch(
       `/adk/apps/orquestador/users/${encodeURIComponent(userId)}/sessions`,
@@ -63,7 +63,7 @@ export class AdkAgenteAdapter implements AgentePort {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: "{}",
+        body: JSON.stringify({ state: { titulo } }),
       },
     );
     if (!response.ok) {

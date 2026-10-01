@@ -60,8 +60,8 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ UI-01 · API server de ADK (8010)
 - [x] ✅ UI-02 · Chat con login de Keycloak y streaming — login Keycloak, run_sse, Enter, razonamiento oculto y Markdown seguro
 - [x] ✅ UI-03 · Design system de Lara — tokens Tailwind v4 y componentes base
-- [ ] 🔄 UI-04 · En curso: shell del chat e historial; demás vistas pendientes
-- [ ] 🔄 FE-01 · En curso: menú por rol en Lara; retiro de kc-front pendiente de validación — Track de identidad: solo para pruebas
+- [ ] 🔄 UI-04 · En curso: shell e historial; Recientes corregido; demás vistas pendientes
+- [ ] 🔄 FE-01 · En curso: menú por rol implementado en Lara; retiro de kc-front pendiente — Track de identidad: solo para pruebas
 
 ## Finanzas personales
 

@@ -1,6 +1,6 @@
 # FE-01 · Menú por rol dentro de Lara y retiro de kc-front Angular
 
-- Estado: En curso
+- Estado: En curso (menú integrado en Lara; retiro de kc-front pendiente)
 - Prioridad: Media
 - Parte del lab: Frontend
 - Depende de: UI-04

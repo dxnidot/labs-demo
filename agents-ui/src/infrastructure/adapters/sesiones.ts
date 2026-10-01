@@ -100,15 +100,11 @@ export function mapearEventosSesion(
   return mensajes;
 }
 
-function truncarTitulo(text: string): string {
-  const normalized = text.replace(/\s+/g, " ").trim();
-  return normalized.length > 64 ? `${normalized.slice(0, 61)}…` : normalized;
-}
-
 /**
- * Mapea, filtra y ordena las sesiones ADK que tienen un mensaje del usuario.
+ * Mapea y ordena las sesiones ADK usando el título guardado en su estado.
  * @author Daniel
  * @since 2026-09-30
+ * @modified Daniel 2026-09-30 Conserva sesiones sin eventos y aplica título alternativo.
  */
 export function mapearSesiones(value: unknown): SesionChat[] {
   if (!Array.isArray(value)) {
@@ -122,21 +118,17 @@ export function mapearSesiones(value: unknown): SesionChat[] {
         return [];
       }
 
-      const eventos = mapearEventosSesion(session.events, numberOrZero(session.lastUpdateTime));
-      const primerMensaje = eventos.find((mensaje) => mensaje.rol === "usuario");
-      if (!primerMensaje) {
-        return [];
-      }
+      const state = esRegistro(session.state) ? session.state : {};
+      const titulo =
+        typeof state.titulo === "string" && state.titulo.trim().length > 0
+          ? state.titulo.trim()
+          : "Chat sin título";
 
       return [{
         id: session.id,
-        titulo: truncarTitulo(primerMensaje.texto),
+        titulo,
         actualizado: leerFecha(session.lastUpdateTime, 0),
       }];
     })
     .sort((first, second) => second.actualizado.getTime() - first.actualizado.getTime());
-}
-
-function numberOrZero(value: unknown): number {
-  return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }

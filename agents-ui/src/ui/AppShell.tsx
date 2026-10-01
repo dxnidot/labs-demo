@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router";
 import type { Usuario } from "../domain/Usuario";
+import type { MenuOpcion } from "../domain/MenuOpcion";
 import { ObtenerMenu } from "../application/use-cases/ObtenerMenu";
 import { IniciarSesion } from "../application/use-cases/IniciarSesion";
 import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
@@ -11,7 +12,7 @@ import { IconButton } from "./components/IconButton";
 import { Sidebar } from "./components/Sidebar";
 import { SidebarItem } from "./components/SidebarItem";
 import { ChatPage } from "./ChatPage";
-import { MenuPorRolPage } from "./MenuPorRolPage";
+import { MenuOpcionPage } from "./MenuOpcionPage";
 import { ChatSessionsProvider, useChatSessions } from "./useChatSessions";
 
 const iniciarSesion = new IniciarSesion(keycloakAuthAdapter);
@@ -19,12 +20,13 @@ const apiHttpClient = new ApiHttpClient(keycloakAuthAdapter);
 const menuPort = new HttpMenuAdapter(apiHttpClient);
 const obtenerMenu = new ObtenerMenu(menuPort);
 const cargarMenu = () => obtenerMenu.ejecutar();
+const rutasFijasLara = new Set(["/", "/chat"]);
 
 /**
  * Autentica al usuario y compone el shell persistente con sus vistas.
  * @author Daniel
  * @since 2026-09-30
- * @modified Daniel 2026-09-30 elimina integraciones de aclaraciones.
+ * @modified Daniel 2026-09-30 Integra menú dinámico y conserva rutas fijas.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -78,25 +80,51 @@ interface AppShellLayoutProps {
 function AppShellLayout({ usuario }: AppShellLayoutProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const menuRequest = useRef<Promise<MenuOpcion[]> | null>(null);
   const {
     activeSessionId,
-    createSession,
     historyError,
-    isCreatingSession,
     isLoadingHistory,
     selectSession,
     sessions,
+    setActiveSessionId,
   } = useChatSessions();
+  const [menu, setMenu] = useState<MenuOpcion[]>([]);
+  const [menuCargando, setMenuCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function iniciarChatNuevo() {
+  useEffect(() => {
+    let active = true;
+    menuRequest.current ??= cargarMenu()
+      .then((opciones) =>
+        opciones.filter((opcion) => {
+          if (!rutasFijasLara.has(normalizarRuta(opcion.ruta))) {
+            return true;
+          }
+          console.warn("Se omitió una ruta del menú que coincide con una ruta fija de Lara.");
+          return false;
+        }),
+      )
+      .catch((reason: unknown) => {
+        console.error("No se pudo cargar el menú de Lara.", reason);
+        return [];
+      });
+
+    void menuRequest.current.then((opciones) => {
+      if (active) {
+        setMenu(opciones);
+        setMenuCargando(false);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  function iniciarChatNuevo() {
     setError(null);
-    try {
-      await createSession();
-      navigate("/chat");
-    } catch (reason: unknown) {
-      setError(reason instanceof Error ? reason.message : "No se pudo crear una sesión.");
-    }
+    setActiveSessionId(null);
+    navigate("/chat");
   }
 
   async function cerrarSesion() {
@@ -118,7 +146,6 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
         <div className="pt-5">
           <Button
             className="w-full justify-start"
-            disabled={isCreatingSession}
             onClick={() => void iniciarChatNuevo()}
             variant="primary"
           >
@@ -129,8 +156,26 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
 
         <nav aria-label="Vistas" className="mt-4 space-y-1">
           <SidebarItem active={pathname === "/chat"} to="/chat">Chat</SidebarItem>
-          <SidebarItem active={pathname === "/menu"} to="/menu">Menú por rol</SidebarItem>
         </nav>
+
+        {menu.length > 0 && (
+          <section aria-label="MENÚ" className="mt-6">
+            <h2 className="mb-2 px-3 font-mono text-[11px] uppercase tracking-[0.08em] text-faint">
+              MENÚ
+            </h2>
+            <nav aria-label="Opciones de menú" className="space-y-1">
+              {menu.map((opcion) => (
+                <SidebarItem
+                  active={pathname === opcion.ruta}
+                  key={opcion.clave}
+                  to={opcion.ruta}
+                >
+                  {opcion.titulo}
+                </SidebarItem>
+              ))}
+            </nav>
+          </section>
+        )}
 
         <section aria-label="Recientes" className="mt-7 min-h-0 flex-1 overflow-y-auto">
           <div className="mb-2 flex items-center justify-between px-3">
@@ -166,7 +211,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium">{usuario.username}</p>
             <p className="truncate font-mono text-xs text-muted">
-              {usuario.roles[0] ?? "LOCAL"} · LOCAL
+              {usuario.chatApiRoles.length > 0 ? usuario.chatApiRoles.join(", ") : "Sin roles"}
             </p>
           </div>
           <IconButton aria-label="Cerrar sesión" onClick={() => void cerrarSesion()}>
@@ -184,10 +229,30 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
         <Routes>
           <Route path="/" element={<Navigate replace to="/chat" />} />
           <Route path="/chat" element={<ChatPage usuario={usuario} />} />
-          <Route path="/menu" element={<MenuPorRolPage obtenerMenu={cargarMenu} />} />
-          <Route path="*" element={<Navigate replace to="/chat" />} />
+          {menu.map((opcion) => (
+            <Route
+              element={<MenuOpcionPage opcion={opcion} />}
+              key={opcion.clave}
+              path={opcion.ruta}
+            />
+          ))}
+          <Route
+            path="*"
+            element={
+              menuCargando ? (
+                <p className="p-8 text-sm text-muted" role="status">Cargando menú…</p>
+              ) : (
+                <Navigate replace to="/chat" />
+              )
+            }
+          />
         </Routes>
       </section>
     </main>
   );
+}
+
+function normalizarRuta(ruta: string): string {
+  const rutaNormalizada = ruta.replace(/\/+$/, "").toLowerCase();
+  return rutaNormalizada || "/";
 }
