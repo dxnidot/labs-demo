@@ -44,6 +44,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 
 - [x] ✅ CP-01 · Instrucciones, agentes y skills por lenguaje
 - [ ] ⏳ CP-02 · Probar `test-engineer`, `keycloak-security` y la skill `keycloak-lab`
+- [x] ✅ CP-03 · Skill de dominio `finanzas-dominio` para Copilot
 
 ## agents (ADK)
 
@@ -54,6 +55,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [ ] ⏳ AG-04 · Delegación A2A a cálculos financieros y traductor
 - [ ] ⏳ AG-05 · Sesión persistente en SQLite
 - [ ] ⏳ AG-06 · MCP filesystem de solo lectura (opcional)
+- [ ] ⏳ AG-08 · Subagente inversiones en Python con tools conectadas a finanzas (Media; depende de FIN-10 y FIN-04)
 
 ## agents-ui / Lara (React, puerto 5173)
 
@@ -71,3 +73,5 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [ ] ⏳ FIN-03 · D.3: detección de fijos y proyección (Media)
 - [ ] ⏳ FIN-06 · Registro de ingresos (sueldo) y porcentaje comprometido en gastos fijos
 - [ ] ⏳ FIN-07 · Recomendación educativa: pago total vs mínimo, intereses y fechas
+- [ ] ⏳ FIN-09 · Vista Próximos pagos en Lara (Media; depende de FIN-10)
+- [ ] 🔄 FIN-10 · En curso: microservicio de tarjetas y calendario financiero

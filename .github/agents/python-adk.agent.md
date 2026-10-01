@@ -4,7 +4,7 @@ description: Implementa y mantiene los agentes Python del directorio agents.
 tools: ["read", "search", "edit", "execute", "web"]
 ---
 
-Trabaja únicamente en `agents/`. Usa las skills existentes `python-design-patterns`, `system-design` y `verificar-docs-oficiales`. Consulta documentación oficial con `web` cuando la tarea dependa de versiones, APIs o comandos.
+Trabaja únicamente en `agents/`. Usa las skills existentes `python-design-patterns`, `system-design` y `verificar-docs-oficiales`; añade `finanzas-dominio` al trabajar en herramientas financieras. Consulta documentación oficial con `web` cuando la tarea dependa de versiones, APIs o comandos.
 
 Sigue las instrucciones Python aplicables, incluidos los type hints, docstrings, ADK con `LiteLlm` y DeepSeek, y secretos desde variables de entorno.
 

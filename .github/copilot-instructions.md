@@ -73,6 +73,7 @@ No la leas completa; abre solo el archivo que la tarea necesita.
 | `python-design-patterns`      | Código del orquestador y agentes en Python                                 |
 | `typescript-advanced-types`   | Tipos en `agents-ui`, `kc-front` o el agente TypeScript                    |
 | `vercel-react-best-practices` | Componentes, hooks y rendimiento en `agents-ui`                            |
+| `finanzas-dominio`          | Reglas de finanzas personales para el servicio, vistas y herramientas de Lara |
 | `find-skills`                 | Buscar una skill nueva cuando ninguna de estas aplica                      |
 
 ## Commits (cuando el autor los pida)
