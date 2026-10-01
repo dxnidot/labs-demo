@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router";
 import type { MenuOpcion } from "../domain/MenuOpcion";
@@ -82,19 +82,83 @@ describe("AppShell routes", () => {
     );
   });
 
-  it("abre /finanzas y marca activa la pestaña Finanzas", async () => {
+  it.each(["/finanzas", "/finanzas/inexistente"])(
+    "redirige %s a /finanzas/resumen y marca activa Finanzas",
+    async (path) => {
+      prepararFetch([]);
+
+      render(
+        <MemoryRouter initialEntries={[path]}>
+          <AppShell />
+        </MemoryRouter>,
+      );
+
+      expect(await screen.findByRole("heading", { name: "Finanzas" })).toBeTruthy();
+      expect(
+        screen.getByRole("tab", { name: "Resumen" }).getAttribute("aria-selected"),
+      ).toBe("true");
+      expect(
+        screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current"),
+      ).toBe("page");
+    },
+  );
+
+  it("redirige /finanzas/pagos a /finanzas/tarjetas y no ofrece la entrada Pagos", async () => {
     prepararFetch([]);
 
     render(
-      <MemoryRouter initialEntries={["/finanzas"]}>
+      <MemoryRouter initialEntries={["/finanzas/pagos"]}>
         <AppShell />
       </MemoryRouter>,
     );
 
-    expect(await screen.findByRole("heading", { name: "Finanzas" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current")).toBe(
-      "page",
+    expect(
+      (await screen.findByRole("tab", { name: "Tarjetas y pagos" })).getAttribute("aria-selected"),
+    ).toBe("true");
+    expect(screen.queryByRole("link", { name: "Pagos" })).toBeNull();
+    expect(
+      screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current"),
+    ).toBe("page");
+  });
+
+  it("mantiene Finanzas activa en cualquier /finanzas/* y navega entre pestañas", async () => {
+    prepararFetch([]);
+
+    render(
+      <MemoryRouter initialEntries={["/finanzas/gastos"]}>
+        <AppShell />
+      </MemoryRouter>,
     );
+
+    expect(
+      (await screen.findByRole("tab", { name: "Gastos" })).getAttribute("aria-selected"),
+    ).toBe("true");
+    expect(
+      screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current"),
+    ).toBe("page");
+
+    fireEvent.click(screen.getByRole("tab", { name: "Trading MX" }));
+
+    expect(
+      screen.getByRole("tab", { name: "Trading MX" }).getAttribute("aria-selected"),
+    ).toBe("true");
+  });
+
+  it("Recientes no lista las sesiones creadas desde el panel de finanzas", async () => {
+    prepararFetch([], false, [
+      { id: "s1", lastUpdateTime: 2, state: { titulo: "Conversación normal" } },
+      { id: "s2", lastUpdateTime: 3, state: { titulo: "Gasto del panel", origen: "finanzas" } },
+    ]);
+
+    render(
+      <MemoryRouter initialEntries={["/chat"]}>
+        <AppShell />
+      </MemoryRouter>,
+    );
+
+    const historial = await screen.findByRole("navigation", { name: "Historial de chats" });
+    expect(await within(historial).findByText("Conversación normal")).toBeTruthy();
+    expect(within(historial).queryByText("Gasto del panel")).toBeNull();
   });
 
   it("oculta MENÚ cuando falla la API sin mostrar un error en la interfaz", async () => {
@@ -113,12 +177,15 @@ describe("AppShell routes", () => {
   });
 });
 
-function prepararFetch(opciones: MenuOpcion[], menuError = false) {
+function prepararFetch(opciones: MenuOpcion[], menuError = false, sesiones: unknown[] = []) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
     if (String(input) === "/api/menu") {
       return menuError
         ? new Response("", { status: 503 })
         : new Response(JSON.stringify(opciones), { status: 200 });
+    }
+    if (String(input).endsWith("/sessions")) {
+      return new Response(JSON.stringify(sesiones), { status: 200 });
     }
     return new Response("[]", { status: 200 });
   });

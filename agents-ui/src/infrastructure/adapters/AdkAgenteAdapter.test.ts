@@ -33,4 +33,25 @@ describe("AdkAgenteAdapter", () => {
       state: { titulo: "Primer mensaje" },
     });
   });
+
+  it("marca origen finanzas en el estado de la sesión del panel", async () => {
+    const auth: AuthPort = {
+      init: async () => ({ id: "usuario-1", username: "ana", roles: [], chatApiRoles: [] }),
+      usuarioActual: () => null,
+      token: () => null,
+      updateToken: async () => "test-token",
+      logout: async () => {},
+    };
+    const fetchMock = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) =>
+        new Response(JSON.stringify({ id: "sesion-2" })),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await new AdkAgenteAdapter(auth).crearSesion("usuario-1", "Mi gasto", "finanzas");
+
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
+      state: { titulo: "Mi gasto", origen: "finanzas" },
+    });
+  });
 });

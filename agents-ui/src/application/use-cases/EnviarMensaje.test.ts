@@ -28,6 +28,31 @@ describe("EnviarMensaje", () => {
 
     await enviarMensaje.ejecutar(`  ${"a".repeat(65)}  `, null, () => {});
 
-    expect(agente.crearSesion).toHaveBeenCalledWith("usuario-1", "a".repeat(60));
+    expect(agente.crearSesion).toHaveBeenCalledWith(
+      "usuario-1",
+      "a".repeat(60),
+      undefined,
+    );
+  });
+
+  it("propaga el origen finanzas al crear la sesión", async () => {
+    const usuario = { id: "usuario-1", username: "ana", roles: [], chatApiRoles: [] };
+    const auth: AuthPort = {
+      init: async () => usuario,
+      usuarioActual: () => usuario,
+      token: () => null,
+      updateToken: async () => "test-token",
+      logout: async () => {},
+    };
+    const agente: AgentePort = {
+      crearSesion: vi.fn(async () => "sesion-2"),
+      listarSesiones: async () => [],
+      obtenerSesion: async () => [],
+      enviarMensaje: async () => {},
+    };
+
+    await new EnviarMensaje(auth, agente).ejecutar("Hola", null, () => {}, "finanzas");
+
+    expect(agente.crearSesion).toHaveBeenCalledWith("usuario-1", "Hola", "finanzas");
   });
 });

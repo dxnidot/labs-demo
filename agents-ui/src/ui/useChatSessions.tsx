@@ -3,10 +3,11 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
-import type { SesionChat } from "../domain/SesionChat";
+import type { OrigenSesion, SesionChat } from "../domain/SesionChat";
 import type { Mensaje } from "../domain/Mensaje";
 import type { ActualizacionStreaming } from "../application/ports/AgentePort";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
@@ -18,17 +19,20 @@ const casoEnviarMensaje = new EnviarMensaje(keycloakAuthAdapter, agente);
 
 interface ChatSessionsValue {
   activeSessionId: string | null;
+  finanzasSessionId: string | null;
   historyError: string | null;
   isLoadingHistory: boolean;
   refreshSessions: () => Promise<void>;
   selectSession: (sessionId: string) => void;
   sessions: SesionChat[];
   setActiveSessionId: (sessionId: string | null) => void;
+  setFinanzasSessionId: (sessionId: string | null) => void;
   obtenerSesion: (sessionId: string) => Promise<Mensaje[]>;
   enviarMensaje: (
     texto: string,
     sessionId: string | null,
     onUpdate: (update: ActualizacionStreaming) => void,
+    origen?: OrigenSesion,
   ) => Promise<string>;
 }
 
@@ -44,10 +48,12 @@ const ChatSessionsContext = createContext<ChatSessionsValue | null>(null);
  * @author Daniel
  * @since 2026-09-30
  * @modified Daniel 2026-09-30 Comparte el puerto y caso de uso de chat embebido.
+ * @modified Daniel Tovar 2026-09-30 Separa la sesión del panel de finanzas y la oculta de Recientes.
  */
 export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderProps) {
-  const [sessions, setSessions] = useState<SesionChat[]>([]);
+  const [todasLasSesiones, setTodasLasSesiones] = useState<SesionChat[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [finanzasSessionId, setFinanzasSessionId] = useState<string | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
 
@@ -55,7 +61,10 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
     setIsLoadingHistory(true);
     setHistoryError(null);
     try {
-      setSessions(await agente.listarSesiones(userId));
+      const listadas = await agente.listarSesiones(userId);
+      setTodasLasSesiones(listadas);
+      const ultimaDeFinanzas = listadas.find((sesion) => sesion.origen === "finanzas");
+      setFinanzasSessionId((actual) => actual ?? ultimaDeFinanzas?.id ?? null);
     } catch (reason: unknown) {
       const message =
         reason instanceof Error ? reason.message : "No se pudo cargar el historial.";
@@ -78,8 +87,13 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
       texto: string,
       sessionId: string | null,
       onUpdate: (update: ActualizacionStreaming) => void,
-    ) => casoEnviarMensaje.ejecutar(texto, sessionId, onUpdate),
+      origen?: OrigenSesion,
+    ) => casoEnviarMensaje.ejecutar(texto, sessionId, onUpdate, origen),
     [],
+  );
+  const sessions = useMemo(
+    () => todasLasSesiones.filter((sesion) => sesion.origen !== "finanzas"),
+    [todasLasSesiones],
   );
 
   useEffect(() => {
@@ -94,6 +108,7 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
     <ChatSessionsContext.Provider
       value={{
         activeSessionId,
+        finanzasSessionId,
         historyError,
         isLoadingHistory,
         obtenerSesion,
@@ -102,6 +117,7 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
         selectSession,
         sessions,
         setActiveSessionId,
+        setFinanzasSessionId,
       }}
     >
       {children}

@@ -105,6 +105,7 @@ export function mapearEventosSesion(
  * @author Daniel
  * @since 2026-09-30
  * @modified Daniel 2026-09-30 Conserva sesiones sin eventos y aplica título alternativo.
+ * @modified Daniel Tovar 2026-09-30 Lee state.origen; cualquier otro valor cuenta como "chat".
  */
 export function mapearSesiones(value: unknown): SesionChat[] {
   if (!Array.isArray(value)) {
@@ -128,6 +129,7 @@ export function mapearSesiones(value: unknown): SesionChat[] {
         id: session.id,
         titulo,
         actualizado: leerFecha(session.lastUpdateTime, 0),
+        origen: state.origen === "finanzas" ? "finanzas" : "chat",
       }];
     })
     .sort((first, second) => second.actualizado.getTime() - first.actualizado.getTime());

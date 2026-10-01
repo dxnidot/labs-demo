@@ -72,6 +72,22 @@ describe("mapearSesiones", () => {
     ]);
   });
 
+  it("marca origen finanzas solo con state.origen finanzas; lo demás es chat", () => {
+    const sesiones = mapearSesiones([
+      { id: "a", lastUpdateTime: 4, state: { titulo: "A", origen: "finanzas" } },
+      { id: "b", lastUpdateTime: 3, state: { titulo: "B" } },
+      { id: "c", lastUpdateTime: 2, state: { titulo: "C", origen: "otro" } },
+      { id: "d", lastUpdateTime: 1 },
+    ]);
+
+    expect(sesiones.map(({ id, origen }) => ({ id, origen }))).toEqual([
+      { id: "a", origen: "finanzas" },
+      { id: "b", origen: "chat" },
+      { id: "c", origen: "chat" },
+      { id: "d", origen: "chat" },
+    ]);
+  });
+
   it("convierte lastUpdateTime decimal en segundos a milisegundos antes de ordenar", () => {
     const sesiones = mapearSesiones([
       {

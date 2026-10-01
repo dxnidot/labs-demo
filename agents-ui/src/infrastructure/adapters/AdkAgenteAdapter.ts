@@ -1,7 +1,7 @@
 import type { AuthPort } from "../../application/ports/AuthPort";
 import type { AgentePort, ActualizacionStreaming } from "../../application/ports/AgentePort";
 import type { Mensaje } from "../../domain/Mensaje";
-import type { SesionChat } from "../../domain/SesionChat";
+import type { OrigenSesion, SesionChat } from "../../domain/SesionChat";
 import { mapearEventosSesion, mapearSesiones } from "./sesiones";
 import { procesarStreamSse } from "./sse";
 
@@ -27,6 +27,7 @@ async function* decodificarChunks(
  * @author Daniel
  * @since 2026-09-30
  * @modified Daniel 2026-09-30 Añade consultas de historial ADK y título de sesión.
+ * @modified Daniel Tovar 2026-09-30 Marca con origen las sesiones creadas desde el panel de finanzas.
  */
 export class AdkAgenteAdapter implements AgentePort {
   constructor(private readonly auth: AuthPort) {}
@@ -52,7 +53,7 @@ export class AdkAgenteAdapter implements AgentePort {
     return mapearEventosSesion(session.events, lastUpdateTime);
   }
 
-  async crearSesion(userId: string, titulo: string): Promise<string> {
+  async crearSesion(userId: string, titulo: string, origen?: OrigenSesion): Promise<string> {
     const token = await this.auth.updateToken();
     const response = await fetch(
       `/adk/apps/orquestador/users/${encodeURIComponent(userId)}/sessions`,
@@ -63,7 +64,9 @@ export class AdkAgenteAdapter implements AgentePort {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify({ state: { titulo } }),
+        body: JSON.stringify({
+          state: origen === "finanzas" ? { titulo, origen } : { titulo },
+        }),
       },
     );
     if (!response.ok) {

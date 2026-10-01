@@ -1,104 +1,162 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { MessageCircle, RefreshCw } from "lucide-react";
+import { Link, Navigate, useParams } from "react-router";
 import {
   ObtenerResumenFinanciero,
   type ResumenFinanciero,
 } from "../application/use-cases/ObtenerResumenFinanciero";
-import type {
-  Moneda,
-  MovimientoFinanciero,
-  TipoMovimiento,
-} from "../domain/MovimientoFinanciero";
+import type { Moneda } from "../domain/MovimientoFinanciero";
+import type { Tarjeta } from "../domain/Tarjeta";
 import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
 import { HttpFinanzasAdapter } from "../infrastructure/adapters/HttpFinanzasAdapter";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { Button } from "./components/Button";
+import { claseFoco } from "./components/foco";
 import { FinanzasChatPanel } from "./FinanzasChatPanel";
+import { fechaLocalActual, periodoActual } from "./finanzasFormato";
+import { FinanzasMovimientosTab } from "./FinanzasMovimientosTab";
+import { FinanzasResumenTab } from "./FinanzasResumenTab";
+import { FinanzasTarjetasTab } from "./FinanzasTarjetasTab";
+import { FinanzasTradingTab } from "./FinanzasTradingTab";
+import { useVistaEstrecha } from "./useVistaEstrecha";
 
-const FinanzasCharts = lazy(() =>
-  import("./FinanzasCharts").then((module) => ({ default: module.FinanzasCharts })),
-);
 const finanzasPort = new HttpFinanzasAdapter(new ApiHttpClient(keycloakAuthAdapter));
 const obtenerResumenFinanciero = new ObtenerResumenFinanciero(finanzasPort);
 const monedas: readonly Moneda[] = ["MXN", "USD"];
 const periodoValido = /^\d{4}-\d{2}$/;
-const formatoMoneda: Record<Moneda, Intl.NumberFormat> = {
-  MXN: new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }),
-  USD: new Intl.NumberFormat("es-MX", { style: "currency", currency: "USD" }),
-};
-const formatoFecha = new Intl.DateTimeFormat("es-MX", {
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-  year: "numeric",
-});
+const idBotonAsistente = "abrir-asistente-finanzas";
+const idPanelPestanas = "panel-finanzas";
+
+function idPestana(id: string): string {
+  return `pestana-finanzas-${id}`;
+}
+
+const pestanas = [
+  { id: "resumen", etiqueta: "Resumen" },
+  { id: "gastos", etiqueta: "Gastos" },
+  { id: "ingresos", etiqueta: "Ingresos" },
+  { id: "tarjetas", etiqueta: "Tarjetas y pagos" },
+  { id: "trading-mx", etiqueta: "Trading MX" },
+  { id: "trading-usa", etiqueta: "Trading USA" },
+] as const;
+
+type PestanaId = (typeof pestanas)[number]["id"];
+
+function esPestana(valor: string | undefined): valor is PestanaId {
+  return pestanas.some((pestana) => pestana.id === valor);
+}
 
 /**
- * Presenta movimientos y tarjetas junto con el resumen mensual de finanzas.
+ * Vista de Finanzas: encabezado, pestañas por ruta y panel del asistente plegable.
  * @author Daniel
  * @since 2026-09-30
  * @modified Daniel 2026-09-30 Integra chat e importación CSV con confirmación.
+ * @modified Daniel Tovar 2026-09-30 Rediseño con pestañas como rutas, alternador de moneda y panel derecho.
+ * @modified Daniel Tovar 2026-09-30 ARIA completo de pestañas, foco visible y retorno de foco del asistente.
  */
 export function FinanzasPage() {
+  const { tab } = useParams();
+  const estrecha = useVistaEstrecha();
   const [periodo, setPeriodo] = useState(periodoActual);
+  const [moneda, setMoneda] = useState<Moneda>("MXN");
   const [datos, setDatos] = useState<ResumenFinanciero | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [recarga, setRecarga] = useState(0);
+  const [asistenteAbierto, setAsistenteAbierto] = useState(!estrecha);
+
+  const panelAsistente = useRef<HTMLDivElement | null>(null);
+  const destinoFoco = useRef<"boton" | "panel" | null>(null);
 
   useEffect(() => {
-    let activa = true;
-    setDatos(null);
-    setCargando(true);
+    setAsistenteAbierto(!estrecha);
+  }, [estrecha]);
+
+  useEffect(() => {
+    const destino = destinoFoco.current;
+    destinoFoco.current = null;
+    if (destino === "panel") {
+      panelAsistente.current?.focus();
+    } else if (destino === "boton") {
+      document.getElementById(idBotonAsistente)?.focus();
+    }
+  }, [asistenteAbierto]);
+
+  const abrirAsistente = useCallback(() => {
+    destinoFoco.current = "panel";
+    setAsistenteAbierto(true);
+  }, []);
+
+  const cerrarAsistente = useCallback(() => {
+    destinoFoco.current = "boton";
+    setAsistenteAbierto(false);
+  }, []);
+
+  const peticion = useRef(0);
+  const cargar = useCallback(async (periodoConsulta: string, silencioso: boolean) => {
+    const actual = ++peticion.current;
+    if (!silencioso) {
+      setDatos(null);
+      setCargando(true);
+    }
     setError(null);
+    try {
+      const resultado = await obtenerResumenFinanciero.ejecutar(
+        periodoConsulta,
+        fechaLocalActual(),
+      );
+      if (actual === peticion.current) {
+        setDatos(resultado);
+      }
+    } catch (reason: unknown) {
+      if (actual === peticion.current) {
+        setError(
+          reason instanceof Error ? reason.message : "No se pudo cargar el resumen financiero.",
+        );
+      }
+    } finally {
+      if (actual === peticion.current) {
+        setCargando(false);
+      }
+    }
+  }, []);
 
-    void obtenerResumenFinanciero
-      .ejecutar(periodo)
-      .then((resultado) => {
-        if (activa) {
-          setDatos(resultado);
-        }
-      })
-      .catch((reason: unknown) => {
-        if (activa) {
-          setError(
-            reason instanceof Error
-              ? reason.message
-              : "No se pudo cargar el resumen financiero.",
-          );
-        }
-      })
-      .finally(() => {
-        if (activa) {
-          setCargando(false);
-        }
-      });
+  useEffect(() => {
+    void cargar(periodo, false);
+  }, [cargar, periodo]);
 
-    return () => {
-      activa = false;
-    };
-  }, [periodo, recarga]);
+  if (!esPestana(tab)) {
+    return <Navigate replace to="/finanzas/resumen" />;
+  }
 
-  const movimientosDelPeriodo =
-    datos?.movimientos.filter((movimiento) => movimiento.fecha.startsWith(periodo)) ?? [];
-  const gastos = movimientosDelPeriodo.filter((movimiento) => movimiento.tipo === "GASTO");
-  const ingresos = movimientosDelPeriodo.filter((movimiento) => movimiento.tipo === "INGRESO");
+  function alActualizarTarjeta(actualizada: Tarjeta) {
+    setDatos((actual) =>
+      actual
+        ? {
+            ...actual,
+            tarjetas: actual.tarjetas.map((tarjeta) =>
+              tarjeta.id === actualizada.id ? actualizada : tarjeta,
+            ),
+          }
+        : actual,
+    );
+    void cargar(periodo, true);
+  }
 
   return (
-    <section className="min-h-0 flex-1 overflow-y-auto px-5 py-6 min-[640px]:px-8 min-[640px]:py-8">
-      <div className="mx-auto w-full max-w-[1200px]">
-        <header className="mb-7 flex flex-col gap-4 min-[700px]:flex-row min-[700px]:items-end min-[700px]:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Finanzas</h1>
-            <p className="mt-2 text-sm text-muted">
-              Movimientos y resúmenes calculados por finanzas, por periodo y moneda.
+    <div className="flex min-h-0 flex-1">
+      <div className="flex min-w-0 flex-1 flex-col gap-5 overflow-y-auto px-8 py-7">
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div className="flex flex-col gap-1.5">
+            <h1 className="m-0 text-[26px] font-semibold">Finanzas</h1>
+            <p className="m-0 text-sm text-muted">
+              Calculado por el servicio finanzas · solo en tu PC.
             </p>
           </div>
-          <label className="flex min-h-11 items-center gap-3 text-sm text-text-2">
-            <span>Periodo</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="sr-only" htmlFor="periodo-finanzas">Periodo</label>
             <input
-              aria-label="Periodo de consulta"
-              className="min-h-11 rounded-button border border-border bg-surface px-3 text-text [color-scheme:dark]"
+              className="min-h-8 rounded-pill border border-border bg-transparent px-3 text-[13px] text-text-2 scheme-dark"
+              id="periodo-finanzas"
               onChange={(event) => {
                 const nuevoPeriodo = event.currentTarget.value;
                 if (periodoValido.test(nuevoPeriodo)) {
@@ -108,195 +166,122 @@ export function FinanzasPage() {
               type="month"
               value={periodo}
             />
-          </label>
+            <div
+              aria-label="Moneda"
+              className="inline-flex rounded-pill border border-border p-0.75"
+              role="group"
+            >
+              {monedas.map((opcion) => (
+                <button
+                  aria-pressed={moneda === opcion}
+                  className={`min-h-7.5 rounded-pill px-3 font-mono text-xs ${claseFoco} ${
+                    moneda === opcion ? "bg-accent text-accent-ink" : "text-muted"
+                  }`}
+                  key={opcion}
+                  onClick={() => setMoneda(opcion)}
+                  type="button"
+                >
+                  {opcion}
+                </button>
+              ))}
+            </div>
+            {!asistenteAbierto && (
+              <Button
+                className={claseFoco}
+                id={idBotonAsistente}
+                onClick={abrirAsistente}
+                variant="primary"
+              >
+                <MessageCircle aria-hidden="true" className="size-4" />
+                Asistente
+              </Button>
+            )}
+          </div>
         </header>
 
-        <FinanzasChatPanel
-          finanzas={finanzasPort}
-          onImportConfirmed={() => setRecarga((actual) => actual + 1)}
-        />
-
-        {cargando && (
-          <p className="mb-6 rounded-card border border-border bg-surface p-5 text-sm text-muted" role="status">
-            Cargando movimientos, resumen y tarjetas…
-          </p>
-        )}
-        {!cargando && error && (
-          <div className="mb-6 flex flex-col gap-3 rounded-card border border-pink/30 bg-pill-pink p-5 min-[600px]:flex-row min-[600px]:items-center min-[600px]:justify-between">
-            <p className="text-sm text-pink" role="alert">{error}</p>
-            <Button
-              className="shrink-0"
-              onClick={() => setRecarga((actual) => actual + 1)}
-              variant="ghost"
+        <div
+          aria-label="Secciones de finanzas"
+          className="flex gap-1 overflow-x-auto border-b border-border pb-0.5"
+          role="tablist"
+        >
+          {pestanas.map((pestana) => (
+            <Link
+              aria-controls={idPanelPestanas}
+              aria-selected={pestana.id === tab}
+              className={`inline-flex min-h-10 items-center whitespace-nowrap border-b-2 px-3.5 text-sm hover:text-text ${claseFoco} ${
+                pestana.id === tab ? "border-accent text-text" : "border-transparent text-muted"
+              }`}
+              id={idPestana(pestana.id)}
+              key={pestana.id}
+              role="tab"
+              to={`/finanzas/${pestana.id}`}
             >
-              <RefreshCw aria-hidden="true" className="size-4" />
-              Reintentar
-            </Button>
-          </div>
-        )}
-
-        {!cargando && datos && (
-          <div className="space-y-8">
-            <section aria-label="Resúmenes por categoría" className="grid grid-cols-1 gap-4 min-[1000px]:grid-cols-2">
-              <Suspense fallback={<p className="text-sm text-muted" role="status">Cargando gráficas…</p>}>
-                <FinanzasCharts resumen={datos.resumen} tipo="GASTO" />
-                <FinanzasCharts resumen={datos.resumen} tipo="INGRESO" />
-              </Suspense>
-            </section>
-
-            <section aria-labelledby="gastos-titulo">
-              <h2 className="mb-4 text-lg font-semibold" id="gastos-titulo">Gastos</h2>
-              <TablaMovimientos movimientos={gastos} tipo="GASTO" />
-            </section>
-
-            <section aria-labelledby="ingresos-titulo">
-              <h2 className="mb-4 text-lg font-semibold" id="ingresos-titulo">Ingresos</h2>
-              <TablaMovimientos movimientos={ingresos} tipo="INGRESO" />
-            </section>
-
-            <section aria-labelledby="tarjetas-titulo">
-              <h2 className="mb-4 text-lg font-semibold" id="tarjetas-titulo">Tarjetas</h2>
-              {datos.tarjetas.length === 0 ? (
-                <p className="rounded-card border border-border bg-surface p-5 text-sm text-muted">
-                  No hay tarjetas registradas.
-                </p>
-              ) : (
-                <div className="overflow-x-auto rounded-card border border-border bg-surface">
-                  <table className="w-full min-w-[620px] border-collapse text-left text-[13px]">
-                    <caption className="sr-only">Tarjetas registradas</caption>
-                    <thead className="text-muted">
-                      <tr className="border-b border-divider">
-                        <th className="px-4 py-3 font-medium" scope="col">Tarjeta</th>
-                        <th className="px-4 py-3 font-medium" scope="col">Últimos 4</th>
-                        <th className="px-4 py-3 font-medium" scope="col">Corte</th>
-                        <th className="px-4 py-3 font-medium" scope="col">Pago</th>
-                        <th className="px-4 py-3 font-medium" scope="col">Estado</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {datos.tarjetas.map((tarjeta) => (
-                        <tr className="border-b border-divider last:border-0" key={tarjeta.id}>
-                          <th className="px-4 py-3 font-medium text-text-2" scope="row">{tarjeta.alias}</th>
-                          <td className="px-4 py-3 font-mono text-text-2">•••• {tarjeta.ultimos4}</td>
-                          <td className="px-4 py-3 text-text-2">Día {tarjeta.diaCorte}</td>
-                          <td className="px-4 py-3 text-text-2">Día {tarjeta.diaPago}</td>
-                          <td className="px-4 py-3 text-text-2">{tarjeta.activa ? "Activa" : "Inactiva"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
-interface TablaMovimientosProps {
-  movimientos: MovimientoFinanciero[];
-  tipo: TipoMovimiento;
-}
-
-function TablaMovimientos({ movimientos, tipo }: TablaMovimientosProps) {
-  if (movimientos.length === 0) {
-    return (
-      <p className="rounded-card border border-border bg-surface p-5 text-sm text-muted">
-        No hay {tipo === "GASTO" ? "gastos" : "ingresos"} para este periodo.
-      </p>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      {monedas.map((moneda) => {
-        const movimientosEnMoneda = movimientos.filter(
-          (movimiento) => movimiento.moneda === moneda,
-        );
-        if (movimientosEnMoneda.length === 0) {
-          return null;
-        }
-        const idTabla = `movimientos-${tipo}-${moneda.toLowerCase()}`;
-
-        return (
-          <section aria-labelledby={idTabla} key={moneda}>
-            <h3 className="mb-3 text-sm font-medium text-text-2" id={idTabla}>
-              {tipo === "GASTO" ? "Gastos" : "Ingresos"} · {moneda}
-            </h3>
-            <TablaMovimientosMoneda
-              moneda={moneda}
-              movimientos={movimientosEnMoneda}
-              tipo={tipo}
-            />
-          </section>
-        );
-      })}
-    </div>
-  );
-}
-
-interface TablaMovimientosMonedaProps {
-  moneda: Moneda;
-  movimientos: MovimientoFinanciero[];
-  tipo: TipoMovimiento;
-}
-
-function TablaMovimientosMoneda({
-  moneda,
-  movimientos,
-  tipo,
-}: TablaMovimientosMonedaProps) {
-  return (
-    <div className="overflow-x-auto rounded-card border border-border bg-surface">
-      <table className="w-full min-w-[680px] border-collapse text-left text-[13px]">
-        <caption className="sr-only">
-          {tipo === "GASTO" ? "Gastos" : "Ingresos"} del periodo en {moneda}
-        </caption>
-        <thead className="text-muted">
-          <tr className="border-b border-divider">
-            <th className="px-4 py-3 font-medium" scope="col">Fecha</th>
-            <th className="px-4 py-3 font-medium" scope="col">Comercio</th>
-            <th className="px-4 py-3 font-medium" scope="col">Categoría</th>
-            <th className="px-4 py-3 font-medium" scope="col">Origen</th>
-            <th className="px-4 py-3 text-right font-medium" scope="col">Importe</th>
-          </tr>
-        </thead>
-        <tbody>
-          {movimientos.map((movimiento) => (
-            <tr className="border-b border-divider last:border-0" key={movimiento.id}>
-              <td className="px-4 py-3 text-text-2">
-                {formatoFecha.format(new Date(`${movimiento.fecha}T00:00:00.000Z`))}
-              </td>
-              <th className="max-w-[260px] truncate px-4 py-3 font-medium text-text-2" scope="row">
-                {movimiento.comercio}
-              </th>
-              <td className="px-4 py-3 text-text-2">{movimiento.categoria}</td>
-              <td className="px-4 py-3 text-text-2">{etiquetaOrigen(movimiento)}</td>
-              <td className="whitespace-nowrap px-4 py-3 text-right font-mono text-text-2">
-                {formatoMoneda[movimiento.moneda].format(movimiento.monto)}
-              </td>
-            </tr>
+              {pestana.etiqueta}
+            </Link>
           ))}
-        </tbody>
-      </table>
+        </div>
+
+        <div aria-labelledby={idPestana(tab)} id={idPanelPestanas} role="tabpanel">
+          {cargando && (
+            <p className="m-0 rounded-card border border-border bg-surface p-5 text-sm text-muted" role="status">
+              Cargando movimientos, resumen y tarjetas…
+            </p>
+          )}
+          {!cargando && error && (
+            <div className="flex flex-col gap-3 rounded-card border border-border bg-surface-active p-5 min-[600px]:flex-row min-[600px]:items-center min-[600px]:justify-between">
+              <p className="m-0 text-sm text-danger" role="alert">{error}</p>
+              <Button
+                className={`shrink-0 ${claseFoco}`}
+                onClick={() => void cargar(periodo, false)}
+                variant="ghost"
+              >
+                <RefreshCw aria-hidden="true" className="size-4" />
+                Reintentar
+              </Button>
+            </div>
+          )}
+          {datos && tab === "resumen" && (
+            <FinanzasResumenTab datos={datos} moneda={moneda} periodo={periodo} />
+          )}
+          {datos && tab === "gastos" && (
+            <FinanzasMovimientosTab
+              moneda={moneda}
+              movimientos={datos.movimientos}
+              periodo={periodo}
+              tarjetas={datos.tarjetas}
+              tipo="GASTO"
+            />
+          )}
+          {datos && tab === "ingresos" && (
+            <FinanzasMovimientosTab
+              moneda={moneda}
+              movimientos={datos.movimientos}
+              periodo={periodo}
+              tarjetas={datos.tarjetas}
+              tipo="INGRESO"
+            />
+          )}
+          {datos && tab === "tarjetas" && (
+            <FinanzasTarjetasTab
+              eventos={datos.eventos}
+              finanzas={finanzasPort}
+              onTarjetaActualizada={alActualizarTarjeta}
+              tarjetas={datos.tarjetas}
+            />
+          )}
+          {datos && tab === "trading-mx" && <FinanzasTradingTab mercado="mx" />}
+          {datos && tab === "trading-usa" && <FinanzasTradingTab mercado="usa" />}
+        </div>
+      </div>
+
+      <FinanzasChatPanel
+        abierto={asistenteAbierto}
+        drawer={estrecha}
+        finanzas={finanzasPort}
+        panelRef={panelAsistente}
+        onCerrar={cerrarAsistente}
+        onImportConfirmed={() => void cargar(periodo, true)}
+      />
     </div>
   );
-}
-
-function etiquetaOrigen(movimiento: MovimientoFinanciero): string {
-  switch (movimiento.origen) {
-    case "IMPORT":
-      return "Importación";
-    case "MANUAL":
-      return "Manual";
-    case "NOTIFICACION":
-      return "Notificación";
-  }
-}
-
-function periodoActual(): string {
-  const hoy = new Date();
-  return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}`;
 }
