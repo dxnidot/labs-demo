@@ -16,29 +16,57 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 
 ### Colores
 
-| Token            | Hex       | Uso                                      |
-| ---------------- | --------- | ---------------------------------------- |
-| `bg`             | `#111316` | Fondo de la app                          |
-| `sidebar`        | `#15181C` | Barra lateral                            |
-| `surface`        | `#1A1E23` | Tarjetas, composer, tablas               |
-| `surface-hover`  | `#20252B` | Hover de botones y filas                 |
-| `surface-active` | `#252B33` | Item activo, burbuja del usuario         |
-| `border`         | `#2B3139` | Bordes                                   |
-| `divider`        | `#22272E` | Separadores finos                        |
-| `text`           | `#E6E9ED` | Texto principal                          |
-| `text-2`         | `#C5CCD4` | Texto secundario en controles            |
-| `muted`          | `#A7AFB9` | Descripciones                            |
-| `faint`          | `#8B94A0` | Notas y etiquetas de sección             |
-| `accent`         | `#7CC4F2` | Azul cielo: botón principal, links, logo |
-| `accent-ink`     | `#0A1A26` | Texto sobre el azul cielo                |
-| `mint`           | `#A8E6CF` | OK, arriba, permitida, confirmado        |
-| `butter`         | `#F2E3A0` | A medias, solo lectura, dry-run          |
-| `pink`           | `#F4B6C9` | Pendiente, bloqueada, huérfana           |
-| `lavender`       | `#C9B8F2` | Roles elevados (autorizar), agente menu  |
-| `peach`          | `#F7C8A0` | Gastos variables, picos en proyección    |
+| Escala/token       | Hex       | Uso                                      |
+| ------------------ | --------- | ---------------------------------------- |
+| `neutral-50`       | `#FAFAFA` | Texto principal                          |
+| `neutral-100`      | `#F5F5F5` | Neutro claro                             |
+| `neutral-200`      | `#E6E6E6` | Texto secundario                         |
+| `neutral-300`      | `#D6D6D6` | Estado danger                            |
+| `neutral-400`      | `#A5A5A5` | Estado warn                              |
+| `neutral-500`      | `#767676` | Neutro medio                             |
+| `neutral-600`      | `#575757` | Neutro medio oscuro                      |
+| `neutral-700`      | `#434343` | Neutro oscuro                            |
+| `neutral-800`      | `#292929` | Hover, activo, bordes, divisores y pills |
+| `neutral-900`      | `#1A1A1A` | Sidebar y superficies                   |
+| `neutral-950`      | `#000000` | Fondo de la app                          |
+| `hoki-50`          | `#F6F7F9` | Hoki claro                               |
+| `hoki-100`         | `#ECEFF2` | Hoki claro                               |
+| `hoki-200`         | `#D4DCE3` | Accent hover, highlight, gráfico 1       |
+| `hoki-300`         | `#AFBECA` | Muted, accent, gráfico 2                 |
+| `hoki-400`         | `#839BAD` | Faint, estado ok, gráfico 3              |
+| `hoki-500`         | `#678398` | Gráfico 4                                |
+| `hoki-600`         | `#4F667A` | Hoki oscuro                              |
+| `hoki-700`         | `#415363` | Hoki oscuro                              |
+| `hoki-800`         | `#384754` | Hoki oscuro                              |
+| `hoki-900`         | `#323D48` | Hoki oscuro                              |
+| `hoki-950`         | `#212830` | Tinta sobre accent/highlight             |
+| `bg`               | `#000000` | Fondo                                   |
+| `sidebar`, `surface` | `#1A1A1A` | Barra lateral, tarjetas y composer       |
+| `surface-hover`, `surface-active`, `border`, `divider` | `#292929` | Estados y separadores |
+| `text`              | `#FAFAFA` | Texto principal                           |
+| `text-2`            | `#E6E6E6` | Texto secundario                          |
+| `muted`             | `#AFBECA` | Descripciones                             |
+| `faint`              | `#839BAD` | Notas y etiquetas                         |
+| `accent`             | `#AFBECA` | Acciones principales, links e iconos      |
+| `accent-hover`, `highlight` | `#D4DCE3` | Hover; fondo de tarjeta destacada |
+| `accent-ink`, `highlight-ink` | `#212830` | Texto sobre accent/highlight |
 
-Pastel sobre fondo oscuro para "pills": fondo tenue + texto pastel
-(`#1E2A33`/azul, `#1F3029`/menta, `#2A2536`/lavanda, `#33242A`/rosa, `#332E1E`/mantequilla, `#33291F`/durazno).
+#### Series de gráficas
+
+| Token      | Hex       |
+| ---------- | --------- |
+| `chart-1`  | `#D4DCE3` |
+| `chart-2`  | `#AFBECA` |
+| `chart-3`  | `#839BAD` |
+| `chart-4`  | `#678398` |
+
+#### Estados
+
+| Token      | Hex       | Uso                                      |
+| ---------- | --------- | ---------------------------------------- |
+| `ok`       | `#839BAD` | Correcto, arriba, permitido              |
+| `warn`     | `#A5A5A5` | Pendiente, parcial, solo lectura         |
+| `danger`   | `#D6D6D6` | Error, bloqueado, rechazado              |
 
 **Regla:** el estado nunca se comunica solo con color. Siempre va con texto ("Arriba", "Pendiente", "bloqueada").
 

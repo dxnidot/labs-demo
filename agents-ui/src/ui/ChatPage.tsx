@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { ArrowUp, Clock3 } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Mensaje } from "../domain/Mensaje";
@@ -89,6 +90,7 @@ const colorEtiqueta = {
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Mueve navegación al shell y titula la sesión inicial.
  * @modified Daniel Tovar 2026-09-30 Actualiza sugerencias al enfoque de finanzas personales.
+ * @modified Daniel 2026-09-30 Sustituye glifos decorativos con Lucide.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {
@@ -256,7 +258,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
               {mensajes.length === 0 && !cargandoSesion && (
                 <div className="m-auto w-full max-w-[760px] py-8">
                   <div className="mb-8 flex items-center gap-4">
-                    <span aria-hidden="true" className="text-4xl leading-none text-accent">◷</span>
+                    <Clock3 aria-hidden="true" className="size-10 shrink-0 text-accent" />
                     <h2 className="text-3xl font-semibold tracking-tight">
                       Hola, {usuario.username}. ¿En qué te ayudo?
                     </h2>
@@ -299,7 +301,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                     <div className="mt-3 flex items-center justify-between">
                       <Pill tone="mint">● Agente: orquestador</Pill>
                       <Button disabled={cargando || !texto.trim()} variant="primary">
-                        <span aria-hidden="true">↑</span>
+                        <ArrowUp aria-hidden="true" className="size-4" />
                         Enviar
                       </Button>
                     </div>
@@ -420,7 +422,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
               <div className="flex items-center justify-between px-2 pt-1">
                 <Pill tone="mint">● Agente: orquestador</Pill>
                 <Button disabled={cargando || !texto.trim()} variant="primary">
-                  <span aria-hidden="true">↑</span>
+                  <ArrowUp aria-hidden="true" className="size-4" />
                   {cargando ? "Enviando…" : "Enviar"}
                 </Button>
               </div>

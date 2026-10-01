@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Clock3, LogOut, Plus } from "lucide-react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router";
 import type { Usuario } from "../domain/Usuario";
 import type { MenuOpcion } from "../domain/MenuOpcion";
@@ -27,6 +28,7 @@ const rutasFijasLara = new Set(["/", "/chat"]);
  * @author Daniel
  * @since 2026-09-30
  * @modified Daniel 2026-09-30 Integra menú dinámico y conserva rutas fijas.
+ * @modified Daniel 2026-09-30 Sustituye glifos de navegación con Lucide.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -139,7 +141,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
     <main className="flex h-dvh overflow-hidden bg-bg font-sans text-text">
       <Sidebar>
         <div className="flex items-center gap-3 border-b border-divider pb-5">
-          <span aria-hidden="true" className="text-3xl leading-none text-accent">◷</span>
+          <Clock3 aria-hidden="true" className="size-8 text-accent" />
           <span className="text-2xl font-semibold">Lara</span>
         </div>
 
@@ -149,7 +151,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
             onClick={() => void iniciarChatNuevo()}
             variant="primary"
           >
-            <span aria-hidden="true" className="text-xl leading-none">+</span>
+            <Plus aria-hidden="true" className="size-5" />
             Nuevo chat
           </Button>
         </div>
@@ -215,7 +217,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
             </p>
           </div>
           <IconButton aria-label="Cerrar sesión" onClick={() => void cerrarSesion()}>
-            <span aria-hidden="true">↪</span>
+            <LogOut aria-hidden="true" />
           </IconButton>
         </footer>
       </Sidebar>
