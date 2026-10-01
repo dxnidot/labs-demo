@@ -55,7 +55,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [ ] ⏳ AG-04 · Delegación A2A a cálculos financieros y traductor
 - [ ] ⏳ AG-05 · Sesión persistente en SQLite
 - [ ] ⏳ AG-06 · MCP filesystem de solo lectura (opcional)
-- [ ] ⏳ AG-08 · Subagente inversiones en Python con tools conectadas a finanzas (Media; depende de FIN-10 y FIN-04)
+- [x] ❌ AG-08 · Cancelada: fusionada en FIN-14
 
 ## agents-ui / Lara (React, puerto 5173)
 
@@ -78,3 +78,4 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ FIN-11 · Hecho: movimientos de gastos e ingresos
 - [x] ✅ FIN-12 · Hecho: pestaña Finanzas en Lara
 - [x] ✅ FIN-13 · Hecho: autenticación del agente hacia finanzas
+- [x] ✅ FIN-14 · Hecho: agente ADK de finanzas

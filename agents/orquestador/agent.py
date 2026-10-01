@@ -2,6 +2,7 @@
 
 Autor: Daniel Tovar
 Desde: 2026-09-30
+Modificado: Daniel Tovar 2026-09-30 — delegación al agente financiero.
 """
 from google.adk.agents import LlmAgent
 from google.adk.models.lite_llm import LiteLlm
@@ -9,7 +10,10 @@ from google.genai import types
 from datetime import datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-def obtener_hora(zona_horaria: str) -> dict:
+from .finanzas import finanzas_agent
+
+
+def obtener_hora(zona_horaria: str) -> dict[str, str]:
     """Devuelve la fecha y hora actual en una zona horaria.
 
     Úsala cuando el usuario pregunte qué hora es en una ciudad o país.
@@ -30,16 +34,19 @@ root_agent = LlmAgent(
     model=LiteLlm(model="deepseek/deepseek-flash"),
     name="orquestador",
     tools=[obtener_hora],
+    sub_agents=[finanzas_agent],
     description=(
         "Asistente de finanzas personales del lab: gastos, gastos fijos, sueldo, "
-        "tarjeta de crédito e inversiones. También traduce y ayuda con programación."
+        "tarjetas de crédito, movimientos, resumen y calendario. También traduce "
+        "y ayuda con programación."
     ),
     instruction=(
         "Responde en español, claro y breve: máximo 150 palabras salvo que el usuario pida detalle. "\
         "Temas: finanzas personales, educación financiera, traducción y programación. "
+        "Transfiere al agente finanzas cuando el usuario trate tarjetas, movimientos, "
+        "resúmenes o calendario, especialmente consultas o registros de sus datos. "
         "Si piden algo fuera de esos temas, dilo con amabilidad y no respondas. "
-        "Todavía no tienes acceso a los gastos, sueldo ni movimientos del usuario: "
-        "si te preguntan por sus datos, dilo y explica qué podrá hacer Lara cuando los importe. "
+        "No afirmes que consultaste o guardaste datos financieros si no lo hizo el agente finanzas. "
         "Nunca inventes montos, tasas ni fechas. "
         "Cuando hables de inversiones o de pagar la tarjeta, explica conceptos, opciones y costos; "
         "aclara que es educativo y no una recomendación personalizada."

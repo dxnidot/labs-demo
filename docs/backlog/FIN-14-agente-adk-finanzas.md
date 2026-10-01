@@ -1,0 +1,29 @@
+# FIN-14 · Agente ADK de finanzas
+
+- Estado: Hecho
+- Prioridad: Alta
+- Parte del lab: agents (ADK)
+- Depende de: FIN-13
+- Fecha: 2026-09-30
+- Cerrado: 2026-09-30
+- Contexto: Añadir al orquestador un subagente delegado para temas de finanzas personales, que consulte el servicio `finanzas/` usando el cliente de servicio y mantenga identidad, privacidad y confirmación bajo controles deterministas.
+- Criterio de aceptación:
+  - El orquestador transfiere solicitudes sobre tarjetas, movimientos, resumen y calendario al subagente Finanzas.
+  - Expone `registrar_tarjetas`, `registrar_movimientos`, `consultar_resumen` y `consultar_calendario`, usando `FINANZAS_API_URL`, `FINANZAS_AGENT_TOKEN_URL`, `FINANZAS_AGENT_CLIENT_ID` y `FINANZAS_AGENT_CLIENT_SECRET` del entorno; no se registra token, secret, body ni prompt.
+  - El user ID se toma exclusivamente del ADK `ToolContext`/sesión; ninguna tool declara `user_id`/`owner_sub` como argumento y el modelo no puede elegir otro propietario. Se envía a finanzas en `X-User-Sub`.
+  - Las consultas devuelven los datos calculados por finanzas; no se duplican cálculos de dominio en Python o el LLM.
+  - Nunca se inventan importes ni fechas: si faltan datos se solicita aclaración antes de proponer una operación.
+  - Toda operación de escritura presenta primero una vista previa no persistida. Solo se guarda después de una confirmación explícita del usuario en un turno posterior de la misma sesión ADK y con la identidad de esa sesión; la confirmación no se acepta desde argumentos que pueda generar el modelo.
+  - Las pruebas verifican que no se escribe sin confirmación en turno siguiente, que la confirmación de otro turno no valida una vista previa de otra sesión y que el modelo no puede dirigir la operación a otro usuario.
+  - `pytest` pasa dentro de `agents/`: 37 pruebas.
+- Archivos relevantes:
+  - `agents/orquestador/`
+  - `agents/tests/`
+- Notas:
+  - Confirmado: el usuario informó que el cliente `finanzas-agent`, rol `usar-finanzas` y claims `azp`/rol ya están configurados en Keycloak.
+  - Confirmado: la política de FIN-11 conserva los movimientos al eliminar una tarjeta y pone en `NULL` la asociación opcional con la tarjeta; el resumen de FIN-11 distingue gasto/ingreso y moneda.
+  - Confirmado: no se leyó `agents/orquestador/.env`; los secretos ya existentes se usarán exclusivamente a través de variables de entorno.
+  - Confirmado: el agente usa el access token como Bearer y no lo expone en logs, respuestas ni errores.
+  - Confirmado: una escritura requiere confirmación clara (por ejemplo, "Confirmo", "Sí confirmo" o "Confirmo el registro") en el turno inmediato posterior; negativas o respuestas ambiguas no escriben.
+  - Pendiente: la exclusión de doble escritura usa un lock en proceso; una ejecución con varios workers requeriría idempotencia/coordinar de forma atómica con el servicio.
+  - Pendiente: adjuntos CSV y preview/confirmación de importación corresponden a FIN-15, no a esta historia.
