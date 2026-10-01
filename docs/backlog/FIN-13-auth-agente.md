@@ -30,5 +30,5 @@
   - Confirmado: Keycloak documenta service accounts por cliente y roles de cliente; Spring Security Resource Server valida JWT antes de autorizar.
   - Confirmado: según la guía oficial de Keycloak, client credentials requiere Client authentication y Service account roles; el token contiene roles resultantes de role scope mappings y service account roles. Consultada: https://www.keycloak.org/docs/latest/server_admin/#_service_accounts
   - Confirmado: las pruebas unitarias y de módulo pasan; no fue necesario usar credenciales ni datos reales.
-  - Pendiente: el dueño configurará manualmente el cliente y sus roles en Keycloak, y definirá localmente las variables de entorno listadas arriba.
+  - Confirmado por el usuario: cliente `finanzas-agent` y rol `usar-finanzas` configurados; el token ya lleva `azp` y el rol esperado.
   - Pendiente: AG-07 endurecerá la validación JWT del agente.
