@@ -1,0 +1,26 @@
+# FIN-10 · Microservicio de tarjetas y calendario financiero
+
+- Estado: Hecho
+- Prioridad: Alta
+- Parte del lab: Finanzas
+- Depende de: —
+- Fecha: 2026-09-30
+- Cerrado: 2026-09-30
+- Contexto: Implementar el primer agregado de finanzas personales en un servicio aislado, privado por usuario y con cálculos reproducibles en código.
+- Criterio de aceptación:
+  - `.\mvnw.cmd test` en `finanzas/` pasa; incluye pruebas unitarias con fechas esperadas calculadas a mano, fin de mes y cambio de año.
+  - `GET`, `POST`, `PUT` y `DELETE /api/finanzas/tarjetas` permiten administrar tarjetas del usuario autenticado; cada fila se filtra por `owner_sub` derivado del JWT.
+  - Solo se almacena `ultimos4` y se valida que tenga exactamente cuatro dígitos.
+  - `GET /api/finanzas/calendario?desde=YYYY-MM-DD&dias=60` ordena eventos de corte y pago de tarjetas activas y ajusta al último día cuando el día no existe.
+  - Las fechas de pago pertenecen al mes posterior al corte; no se desplazan por fin de semana o feriado.
+  - INFO registra hechos de negocio con conteos; no se registran tarjetas, tokens ni importes.
+- Archivos relevantes:
+  - finanzas/
+  - docs/decisions/0004-trazabilidad-y-logs.md
+  - docs/decisions/0005-enfoque-finanzas-personales.md
+- Notas:
+  - Confirmado: el servicio usa Java 21 y Spring Boot 4.1.1, igual que `kc-demo`.
+  - Confirmado: tests unitarios y prueba manual: CRUD, calendario y aislamiento por usuario (beto no ve tarjetas de ana).
+  - Confirmado: log INFO por request con traceId.
+  - Inferido: un período de hasta 3660 días limita consultas de calendario excesivas.
+  - Pendiente: mover las fechas de fines de semana o feriados no forma parte de esta historia.

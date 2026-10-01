@@ -1,0 +1,41 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: finanzas
+  datasource:
+    url: jdbc:postgresql://localhost:5433/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  flyway:
+    enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/lab}
+server:
+  port: 8083
+  address: 127.0.0.1
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  tracing:
+    export:
+      otlp:
+        enabled: false
+    sampling:
+      probability: 1.0
+logging:
+  level:
+    root: WARN
+    com.example.finanzas.application.usecases: INFO
+    com.example.finanzas.infrastructure.adapters.in.web: INFO
+  structured:
+    ecs:
+      service:
+        name: finanzas
+    format:
+      console: ecs

@@ -74,4 +74,4 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [ ] ⏳ FIN-06 · Registro de ingresos (sueldo) y porcentaje comprometido en gastos fijos
 - [ ] ⏳ FIN-07 · Recomendación educativa: pago total vs mínimo, intereses y fechas
 - [ ] ⏳ FIN-09 · Vista Próximos pagos en Lara (Media; depende de FIN-10)
-- [ ] 🔄 FIN-10 · En curso: microservicio de tarjetas y calendario financiero
+- [x] ✅ FIN-10 · Hecho: microservicio de tarjetas y calendario financiero

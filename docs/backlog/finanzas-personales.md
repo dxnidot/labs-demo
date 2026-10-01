@@ -29,3 +29,5 @@
 - [FIN-05 · Captura de cargos desde notificaciones del celular](FIN-05-notificaciones-celular.md)
 - [FIN-06 · Registro de ingresos (sueldo) y porcentaje del ingreso comprometido en gastos fijos](FIN-06-registro-ingresos-sueldo.md)
 - [FIN-07 · Recomendación educativa sobre pago de tarjeta de crédito](FIN-07-recomendacion-pago-tarjeta.md)
+- [FIN-09 · Vista Próximos pagos en Lara (cortes y pagos de tarjetas)](FIN-09-vista-proximos-pagos.md)
+- [FIN-10 · Microservicio de tarjetas y calendario financiero](FIN-10-microservicio-finanzas.md) — Hecho
