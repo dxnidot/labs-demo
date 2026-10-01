@@ -1,20 +1,22 @@
-# FIN-09 · Vista Próximos pagos en Lara (cortes y pagos de tarjetas)
+# FIN-09 · Vista Mis tarjetas y Próximos pagos (solo lectura)
 
-- Estado: Pendiente
+- Estado: Hecho
 - Prioridad: Media
 - Parte del lab: C.5
 - Depende de: FIN-10
 - Fecha: 2026-09-30
-- Contexto: Mostrar en Lara los cortes y pagos de tarjetas de los próximos 30 días consultando el calendario del microservicio finanzas.
+- Cerrado: 2026-09-30
+- Contexto: Mostrar en `/finanzas/pagos` los cortes y pagos de tarjetas de los próximos 30 días y el listado de tarjetas del usuario autenticado. La vista es de solo lectura, salvo activar o desactivar una tarjeta.
 - Criterio de aceptación:
-  - La vista de `agents-ui` consulta `GET /api/finanzas/calendario` para los próximos 30 días.
-  - La consulta usa el Bearer token actualizado por la autenticación de Lara.
-  - Los eventos CORTE y PAGO se agrupan por fecha.
-  - Cuando no hay eventos, la vista muestra un estado vacío.
-  - Una prueba Vitest valida la vista usando un adaptador falso.
+  - La ruta `/finanzas/pagos` muestra el calendario de los próximos 30 días, con eventos agrupados por fecha y fechas presentadas con locale `es-MX`.
+  - El listado muestra alias, últimos cuatro dígitos enmascarados (`••••`), corte, pago, MSI anticipado y estado activa.
+  - La única acción disponible para una tarjeta es activar o desactivar.
+  - Si no hay tarjetas, se muestra exactamente: "Aún no tienes tarjetas. Cárgalas desde el chat de Finanzas."
+  - El proxy de `/api/finanzas` apunta a `127.0.0.1:8083` y está declarado antes del proxy general `/api`.
+  - Pruebas Vitest cubren la vista usando adaptadores falsos.
 - Archivos relevantes:
-  - agents-ui/
-  - finanzas/
+  - `agents-ui/`
 - Notas:
-  - Confirmado: FIN-10 proporciona el endpoint autenticado de calendario.
-  - Pendiente: el manejo de fines de semana y feriados no forma parte de la vista.
+  - Confirmado: FIN-10 proporciona tarjetas y el endpoint autenticado de calendario.
+  - Confirmado: las reglas de fechas de corte/pago pertenecen a finanzas, no a la vista.
+  - Confirmado: Vitest y el build de agents-ui pasan; las tarjetas se actualizan mediante el endpoint autenticado.

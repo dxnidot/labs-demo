@@ -14,6 +14,7 @@ import { Sidebar } from "./components/Sidebar";
 import { SidebarItem } from "./components/SidebarItem";
 import { ChatPage } from "./ChatPage";
 import { MenuOpcionPage } from "./MenuOpcionPage";
+import { PagosPage } from "./PagosPage";
 import { ChatSessionsProvider, useChatSessions } from "./useChatSessions";
 
 const iniciarSesion = new IniciarSesion(keycloakAuthAdapter);
@@ -21,7 +22,7 @@ const apiHttpClient = new ApiHttpClient(keycloakAuthAdapter);
 const menuPort = new HttpMenuAdapter(apiHttpClient);
 const obtenerMenu = new ObtenerMenu(menuPort);
 const cargarMenu = () => obtenerMenu.ejecutar();
-const rutasFijasLara = new Set(["/", "/chat"]);
+const rutasFijasLara = new Set(["/", "/chat", "/finanzas/pagos"]);
 
 /**
  * Autentica al usuario y compone el shell persistente con sus vistas.
@@ -29,6 +30,7 @@ const rutasFijasLara = new Set(["/", "/chat"]);
  * @since 2026-09-30
  * @modified Daniel 2026-09-30 Integra menú dinámico y conserva rutas fijas.
  * @modified Daniel 2026-09-30 Sustituye glifos de navegación con Lucide.
+ * @modified Daniel 2026-09-30 Agrega la vista fija de pagos de Finanzas.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -158,6 +160,9 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
 
         <nav aria-label="Vistas" className="mt-4 space-y-1">
           <SidebarItem active={pathname === "/chat"} to="/chat">Chat</SidebarItem>
+          <SidebarItem active={pathname === "/finanzas/pagos"} to="/finanzas/pagos">
+            Pagos
+          </SidebarItem>
         </nav>
 
         {menu.length > 0 && (
@@ -231,6 +236,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
         <Routes>
           <Route path="/" element={<Navigate replace to="/chat" />} />
           <Route path="/chat" element={<ChatPage usuario={usuario} />} />
+          <Route path="/finanzas/pagos" element={<PagosPage />} />
           {menu.map((opcion) => (
             <Route
               element={<MenuOpcionPage opcion={opcion} />}

@@ -1,9 +1,10 @@
 import type { AuthPort } from "../../application/ports/AuthPort";
 
 /**
- * Envía peticiones autenticadas a la API de kc-demo.
+ * Envía peticiones autenticadas a las APIs locales de Lara.
  * @author Daniel
  * @since 2026-09-30
+ * @modified Daniel 2026-09-30 Generaliza los errores para distintos servicios.
  */
 export class ApiHttpClient {
   constructor(private readonly auth: AuthPort) {}
@@ -19,7 +20,7 @@ export class ApiHttpClient {
 
     const response = await fetch(path, { ...init, headers });
     if (!response.ok) {
-      throw new Error(`La API de kc-demo respondió HTTP ${response.status}.`);
+      throw new Error(`La API respondió HTTP ${response.status}.`);
     }
     return response.json() as Promise<unknown>;
   }

@@ -8,6 +8,10 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     proxy: {
+      "/api/finanzas": {
+        target: "http://127.0.0.1:8083",
+        changeOrigin: true,
+      },
       "/adk": {
         target: "http://localhost:8010",
         changeOrigin: true,

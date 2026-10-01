@@ -73,5 +73,5 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [ ] ⏳ FIN-03 · D.3: detección de fijos y proyección (Media)
 - [ ] ⏳ FIN-06 · Registro de ingresos (sueldo) y porcentaje comprometido en gastos fijos
 - [ ] ⏳ FIN-07 · Recomendación educativa: pago total vs mínimo, intereses y fechas
-- [ ] ⏳ FIN-09 · Vista Próximos pagos en Lara (Media; depende de FIN-10)
+- [x] ✅ FIN-09 · Hecho: Mis tarjetas y Próximos pagos (solo lectura)
 - [x] ✅ FIN-10 · Hecho: microservicio de tarjetas y calendario financiero
