@@ -14,6 +14,9 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/lab}
+finanzas:
+  agent:
+    client-id: ${FINANZAS_AGENT_CLIENT_ID:finanzas-agent}
 server:
   port: 8083
   address: 127.0.0.1

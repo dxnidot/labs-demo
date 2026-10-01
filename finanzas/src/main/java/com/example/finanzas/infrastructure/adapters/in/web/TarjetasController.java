@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +37,7 @@ import com.example.finanzas.domain.tarjeta.Tarjeta;
  * Adapta las solicitudes HTTP a los casos de uso de tarjetas y calendario.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified 2026-09-30
  */
 @Validated
 @RestController
@@ -49,6 +50,7 @@ public class TarjetasController {
     private final ActualizarTarjeta actualizarTarjeta;
     private final EliminarTarjeta eliminarTarjeta;
     private final ConsultarCalendario consultarCalendario;
+    private final OwnerSubResolver ownerSubResolver;
 
     public TarjetasController(
             CrearTarjeta crearTarjeta,
@@ -56,32 +58,42 @@ public class TarjetasController {
             ObtenerTarjeta obtenerTarjeta,
             ActualizarTarjeta actualizarTarjeta,
             EliminarTarjeta eliminarTarjeta,
-            ConsultarCalendario consultarCalendario) {
+            ConsultarCalendario consultarCalendario,
+            OwnerSubResolver ownerSubResolver) {
         this.crearTarjeta = crearTarjeta;
         this.listarTarjetas = listarTarjetas;
         this.obtenerTarjeta = obtenerTarjeta;
         this.actualizarTarjeta = actualizarTarjeta;
         this.eliminarTarjeta = eliminarTarjeta;
         this.consultarCalendario = consultarCalendario;
+        this.ownerSubResolver = ownerSubResolver;
     }
 
     @GetMapping("/tarjetas")
-    public List<TarjetaResponse> listarTarjetas(@AuthenticationPrincipal Jwt jwt) {
-        return listarTarjetas.ejecutar(subject(jwt)).stream().map(TarjetaResponse::desde).toList();
+    public List<TarjetaResponse> listarTarjetas(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestHeader(value = "X-User-Sub", required = false) String requestedOwnerSub) {
+        return listarTarjetas.ejecutar(resolvedOwnerSub(jwt, requestedOwnerSub)).stream()
+                .map(TarjetaResponse::desde)
+                .toList();
     }
 
     @GetMapping("/tarjetas/{id}")
-    public TarjetaResponse obtenerTarjeta(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
-        return TarjetaResponse.desde(obtenerTarjeta.ejecutar(id, subject(jwt)));
+    public TarjetaResponse obtenerTarjeta(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestHeader(value = "X-User-Sub", required = false) String requestedOwnerSub) {
+        return TarjetaResponse.desde(obtenerTarjeta.ejecutar(id, resolvedOwnerSub(jwt, requestedOwnerSub)));
     }
 
     @PostMapping("/tarjetas")
     @ResponseStatus(HttpStatus.CREATED)
     public TarjetaResponse crearTarjeta(
             @Valid @RequestBody TarjetaRequest request,
-            @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestHeader(value = "X-User-Sub", required = false) String requestedOwnerSub) {
         Tarjeta creada = crearTarjeta.ejecutar(
-                subject(jwt),
+                resolvedOwnerSub(jwt, requestedOwnerSub),
                 request.alias(),
                 request.ultimos4(),
                 request.diaCorte(),
@@ -95,10 +107,11 @@ public class TarjetasController {
     public TarjetaResponse actualizarTarjeta(
             @PathVariable UUID id,
             @Valid @RequestBody TarjetaRequest request,
-            @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestHeader(value = "X-User-Sub", required = false) String requestedOwnerSub) {
         Tarjeta actualizada = actualizarTarjeta.ejecutar(
                 id,
-                subject(jwt),
+                resolvedOwnerSub(jwt, requestedOwnerSub),
                 request.alias(),
                 request.ultimos4(),
                 request.diaCorte(),
@@ -109,23 +122,25 @@ public class TarjetasController {
     }
 
     @DeleteMapping("/tarjetas/{id}")
-    public void eliminarTarjeta(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
-        eliminarTarjeta.ejecutar(id, subject(jwt));
+    public void eliminarTarjeta(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestHeader(value = "X-User-Sub", required = false) String requestedOwnerSub) {
+        eliminarTarjeta.ejecutar(id, resolvedOwnerSub(jwt, requestedOwnerSub));
     }
 
     @GetMapping("/calendario")
     public List<EventoCalendarioResponse> consultarCalendario(
             @RequestParam LocalDate desde,
             @RequestParam(defaultValue = "60") @Min(1) @Max(3660) int dias,
-            @AuthenticationPrincipal Jwt jwt) {
-        List<EventoCalendario> eventos = consultarCalendario.ejecutar(subject(jwt), desde, dias);
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestHeader(value = "X-User-Sub", required = false) String requestedOwnerSub) {
+        List<EventoCalendario> eventos = consultarCalendario.ejecutar(
+                resolvedOwnerSub(jwt, requestedOwnerSub), desde, dias);
         return eventos.stream().map(EventoCalendarioResponse::desde).toList();
     }
 
-    private String subject(Jwt jwt) {
-        if (jwt == null || jwt.getSubject() == null || jwt.getSubject().isBlank()) {
-            throw new AccessDeniedException("El token no contiene un sujeto válido");
-        }
-        return jwt.getSubject();
+    private String resolvedOwnerSub(Jwt jwt, String requestedOwnerSub) {
+        return ownerSubResolver.resolver(jwt, requestedOwnerSub);
     }
 }
