@@ -15,5 +15,6 @@
   - docs/design/
 - Notas:
   - Confirmado: la UI debe reflejar el flujo mínimo del laboratorio.
-  - Inferido: la vista de historial y la de conversación son las dos piezas más sensibles para la validación del producto.
   - Confirmado: shell de chat e historial de sesiones implementados; las demás vistas siguen pendientes.
+  - Confirmado: sugerencias del nuevo chat, placeholder y colorimetría Hoki con enfoque de finanzas personales (ADR-0005).
+  - Pendiente: completar las demás vistas de C.5.

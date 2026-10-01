@@ -15,6 +15,5 @@
   - agents/
   - docs/backlog/
 - Notas:
-  - Confirmado: la consolidación de Lara es un cambio de frontend, no solo de estilo.
-  - Inferido: el rol del usuario debe validar el acceso a opciones del menú antes de mostrarlas.
-  - Pendiente: revisar si la base de frontend final usa Angular o ya se desplaza a una UI más ligera en otro framework.
+  - Confirmado: el menú por rol está integrado en Lara.
+  - Pendiente: retirar kc-front Angular del flujo principal del laboratorio.

@@ -29,7 +29,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ Valida JWT y roles de `resource_access.chat-api.roles`
 - [x] ✅ `/api/menu` filtra opciones y acciones por rol
 - [x] ✅ Java 21 fijado en `pom.xml`
-- [ ] ⏳ API-01 · Pruebas de `MenuService` con el agente `test-engineer`
+- [x] ✅ API-01 · Pruebas unitarias de `MenuService` (JUnit 5 + Mockito, AAA)
 
 ## kc-front (Angular, puerto 4200)
 

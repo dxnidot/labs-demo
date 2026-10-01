@@ -1,6 +1,6 @@
 # API-01 · Pruebas unitarias de MenuService (JUnit 5 + Mockito, AAA)
 
-- Estado: Pendiente
+- Estado: Hecho
 - Prioridad: Media
 - Parte del lab: kc-demo
 - Depende de: —
@@ -14,6 +14,5 @@
   - kc-demo/src/test/java/
   - kc-demo/src/main/java/com/example/kcdemo/MenuService.java
 - Notas:
-  - Confirmado: la prueba se centra en la lógica del servicio y no en la capa HTTP.
-  - Inferido: la forma de comparar permisos y acciones debe quedar reproducible por JUnit 5.
-  - Pendiente: validar qué exactos roles y acciones genera el menú final del proyecto.
+  - Confirmado: las pruebas cubren el filtrado de opciones y acciones según roles, roles nulos y listas de acciones nulas.
+  - Confirmado: la suite dedicada de `MenuService` está implementada con JUnit 5.
