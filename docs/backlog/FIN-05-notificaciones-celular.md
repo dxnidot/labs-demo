@@ -3,7 +3,7 @@
 - Estado: Pendiente
 - Prioridad: Baja
 - Parte del lab: Finanzas
-- Depende de: FIN-01
+- Depende de: FIN-01, FIN-11
 - Fecha: 2026-09-30
 - Contexto: Historia opcional para capturar cargos de una wallet desde notificaciones de Android mediante una app de automatización.
 - Criterio de aceptación:
@@ -14,4 +14,5 @@
 - Notas:
   - Confirmado: iOS no permite leer notificaciones de otras apps. El permiso de notificaciones ve todas las apps: filtrar solo la wallet y guardar solo esos cuatro campos.
   - Pendiente: formato exacto del texto de la notificación y cargos en moneda extranjera.
+  - Pendiente: cómo llega el celular al PC (red local o Tailscale).
   - Publica `CargoRegistrado` ([ADR-0003](../decisions/0003-arquitectura-por-eventos.md)).

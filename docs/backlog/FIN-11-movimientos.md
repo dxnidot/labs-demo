@@ -1,0 +1,24 @@
+# FIN-11 · Movimientos: gastos e ingresos
+
+- Estado: Hecho
+- Prioridad: Alta
+- Parte del lab: Finanzas
+- Depende de: FIN-10
+- Fecha: 2026-09-30
+- Cerrado: 2026-09-30
+- Contexto: Añadir movimientos financieros al servicio, aislados por usuario autenticado, y calcular resúmenes mensuales por categoría en el servicio.
+- Criterio de aceptación:
+  - Cada movimiento incluye fecha, monto, moneda (`MXN` o `USD`), comercio, categoría, tarjeta opcional, origen (`manual`, `import` o `notificacion`) y tipo (`GASTO` o `INGRESO`).
+  - Convención de signo documentada y aplicada: el monto se almacena y presenta como cantidad positiva; el tipo distingue gasto de ingreso.
+  - CRUD restringido al `sub` del JWT; el cliente no puede elegir ni cambiar el propietario.
+  - Al crear o actualizar un movimiento con tarjeta, el servicio valida que esa tarjeta pertenezca al usuario autenticado.
+  - Al eliminar una tarjeta, se conservan los movimientos y se elimina únicamente su asociación opcional con esa tarjeta.
+  - Resumen mensual calculado en servicio, agrupado por categoría y separado por tipo y moneda; nunca suma importes de monedas distintas.
+  - Migración Flyway y pruebas de persistencia/servicio/API cubren CRUD, aislamiento, pertenencia de tarjeta, signo y resumen por tipo/moneda.
+- Archivos relevantes:
+  - `finanzas/`
+- Notas:
+  - Confirmado: FIN-10 deriva el usuario del JWT y persiste tarjetas con propietario.
+  - Confirmado: los montos no se agregan entre MXN y USD.
+  - Inferido: para preservar el historial financiero, al eliminar una tarjeta los movimientos quedan sin asociación de tarjeta.
+  - Confirmado: `.\mvnw.cmd test` pasa con 22 pruebas, sin fallos ni errores.

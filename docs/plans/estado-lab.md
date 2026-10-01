@@ -75,3 +75,4 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [ ] ⏳ FIN-07 · Recomendación educativa: pago total vs mínimo, intereses y fechas
 - [x] ✅ FIN-09 · Hecho: Mis tarjetas y Próximos pagos (solo lectura)
 - [x] ✅ FIN-10 · Hecho: microservicio de tarjetas y calendario financiero
+- [x] ✅ FIN-11 · Hecho: movimientos de gastos e ingresos

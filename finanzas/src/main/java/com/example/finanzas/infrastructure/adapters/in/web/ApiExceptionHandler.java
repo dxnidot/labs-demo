@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import com.example.finanzas.domain.movimiento.MovimientoNoEncontradoException;
 import com.example.finanzas.domain.tarjeta.TarjetaNoEncontradaException;
 
 /**
  * Traduce errores de entrada, acceso y dominio a respuestas HTTP explícitas.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified 2026-09-30
  */
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -25,6 +27,11 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(TarjetaNoEncontradaException.class)
     public ResponseEntity<ApiError> tarjetaNoEncontrada(TarjetaNoEncontradaException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(MovimientoNoEncontradoException.class)
+    public ResponseEntity<ApiError> movimientoNoEncontrado(MovimientoNoEncontradoException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiError(exception.getMessage()));
     }
 
