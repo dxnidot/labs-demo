@@ -1,0 +1,21 @@
+# UI-06 · Eliminar y renombrar chats en Recientes
+
+- Estado: Pendiente
+- Prioridad: Media
+- Parte del lab: C.5
+- Depende de: UI-04
+- Fecha: 2026-09-30
+- Contexto: Recientes acumula chats de prueba y no hay forma de limpiarlos.
+- Criterio de aceptación:
+  - Cada chat de Recientes tiene un menú de acciones (botón con aria-label, visible al pasar el cursor y con teclado) con "Eliminar".
+  - Eliminar pide confirmación y borra la sesión en el API server de ADK; desaparece de Recientes sin recargar.
+  - Solo se pueden borrar sesiones del usuario autenticado (el user id es el sub del token).
+  - Si se borra el chat abierto, Lara pasa a un chat nuevo.
+  - Prueba Vitest del flujo de eliminación con el adaptador simulado.
+- Archivos relevantes:
+  - agents-ui/
+  - docs/backlog/UI-04-vistas-lara.md
+- Notas:
+  - Inferido: ADK expone un endpoint para borrar sesiones; pendiente verificarlo en http://localhost:8010/docs.
+  - Pendiente: "Renombrar" depende de si ADK permite actualizar el state de una sesión existente; si no, queda fuera de esta historia.
+  - Confirmado: borrar una sesión es irreversible; no hay papelera.
