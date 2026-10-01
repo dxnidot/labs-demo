@@ -64,6 +64,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ UI-03 · Design system de Lara — tokens Tailwind v4 y componentes base
 - [ ] 🔄 UI-04 · En curso: shell e historial; Recientes corregido; demás vistas pendientes
 - [ ] ⏳ UI-06 · Eliminar y renombrar chats en Recientes (Media; depende de UI-04)
+- [ ] 🔄 UI-07 · En curso: todas las vistas 01–14, login propio e íconos
 - [ ] 🔄 FE-01 · En curso: menú por rol implementado en Lara; retiro de kc-front pendiente — Track de identidad: solo para pruebas
 
 ## Finanzas personales

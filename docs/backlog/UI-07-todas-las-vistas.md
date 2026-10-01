@@ -1,0 +1,28 @@
+# UI-07 · Todas las vistas de Lara (pantallas 01–14)
+
+- Estado: En curso
+- Prioridad: Media
+- Parte del lab: C.5
+- Depende de: UI-04, FIN-15
+- Fecha: 2026-09-30
+- Contexto: Lara debe mostrar las 14 pantallas de la guía visual con su shell definitivo (login propio, barra lateral por secciones e íconos). Cada pantalla usa datos reales donde ya existen y un estado vacío explícito donde la fuente todavía no existe, para que se vea qué historia la desbloquea.
+- Criterio de aceptación:
+  - Sin sesión, Lara muestra su pantalla de login con un solo botón "Continuar con Keycloak" (PKCE S256); cerrar sesión cierra la sesión de Keycloak y regresa a esa pantalla.
+  - Cada pantalla 01–14 de `docs/design/lara/README.md` tiene su ruta y se abre sin error desde la barra lateral.
+  - Donde no hay datos se muestra "Sin datos todavía · Fuente: X · Pendiente: <historia>".
+  - Agentes y Herramientas MCP muestran la configuración estática transcrita de `agents/`.
+  - Ninguna pantalla muestra aclaraciones ni kc-front.
+  - `npm test` y `npm run build` terminan sin errores desde `agents-ui/`.
+- Archivos relevantes:
+  - agents-ui/src/ui/
+  - agents-ui/public/silent-check-sso.html
+  - docs/design/lara/README.md
+  - docs/design/lara/html/src/
+- Notas:
+  - Confirmado: `keycloak-js` 26.2.4 admite `onLoad: "check-sso"` con `silentCheckSsoRedirectUri`; la app debe servir `silent-check-sso.html` (https://www.keycloak.org/securing-apps/javascript-adapter).
+  - Confirmado: la sección MENÚ dinámica sale de la barra lateral; las opciones del usuario actual se muestran dentro de "Menú por rol".
+  - Confirmado: no se muestran "Buscar chats" ni "Configuración"; sí "Contraer barra lateral".
+  - Confirmado: Base de datos muestra la pestaña sessions con datos de la API de ADK, sin consulta SQL; las demás pestañas quedan vacías hasta AG-05.
+  - Confirmado: Estado del lab comprueba Keycloak, ADK, kc-demo y finanzas con timeout corto y estado "sin respuesta".
+  - Pendiente: validar cada pantalla contra capturas de la app en ejecución.
+  - Pendiente: la configuración estática de agentes y herramientas se actualiza a mano si cambian `agents/orquestador/agent.py` o `finanzas.py`.

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router";
 import type { MenuOpcion } from "../domain/MenuOpcion";
 import type { Usuario } from "../domain/Usuario";
@@ -13,178 +13,309 @@ const usuario: Usuario = {
   chatApiRoles: ["ver-menu"],
 };
 const menu: MenuOpcion[] = [
-  {
-    clave: "reportes",
-    titulo: "Reportes",
-    ruta: "/reportes",
-    acciones: ["consultar", "exportar"],
-  },
-  {
-    clave: "chat",
-    titulo: "Ruta duplicada",
-    ruta: "/CHAT/",
-    acciones: ["consultar"],
-  },
+  { clave: "reportes", titulo: "Reportes", ruta: "/reportes", acciones: ["consultar", "exportar"] },
 ];
+const claims = {
+  iss: "http://localhost:8080/realms/lab",
+  azp: "agents-ui",
+  preferred_username: "ana",
+};
+const tokenCrudo = "token-crudo-secreto";
+
+const auth = vi.hoisted(() => ({
+  init: vi.fn(),
+  login: vi.fn(),
+  logout: vi.fn(),
+  claimsToken: vi.fn(),
+  updateToken: vi.fn(),
+}));
 
 vi.mock("../infrastructure/adapters/KeycloakAuthAdapter", () => ({
-  keycloakAuthAdapter: {
-    init: vi.fn(async () => usuario),
-    updateToken: vi.fn(async () => "test-token"),
-    logout: vi.fn(async () => {}),
-  },
+  keycloakAuthAdapter: auth,
 }));
+
+beforeEach(() => {
+  auth.init.mockResolvedValue(usuario);
+  auth.login.mockResolvedValue(undefined);
+  auth.logout.mockResolvedValue(undefined);
+  auth.claimsToken.mockReturnValue(claims);
+  auth.updateToken.mockResolvedValue(tokenCrudo);
+});
 
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  vi.clearAllMocks();
 });
 
-describe("AppShell routes", () => {
-  it.each(["/", "/ruta-desconocida"])("redirige %s a /chat", async (path) => {
-    prepararFetch([]);
+function montar(ruta: string) {
+  return render(
+    <MemoryRouter initialEntries={[ruta]}>
+      <AppShell />
+    </MemoryRouter>,
+  );
+}
 
-    render(
-      <MemoryRouter initialEntries={[path]}>
-        <AppShell />
-      </MemoryRouter>,
-    );
+const vistas = [
+  { ruta: "/estado", enlace: "Estado del lab", titulo: "Estado del lab" },
+  { ruta: "/agentes", enlace: "Agentes", titulo: "Agentes" },
+  { ruta: "/base-de-datos", enlace: "Base de datos", titulo: "Base de datos" },
+  { ruta: "/memoria", enlace: "Memoria vectorizada", titulo: "Memoria vectorizada" },
+  { ruta: "/herramientas", enlace: "Herramientas MCP", titulo: "Herramientas MCP" },
+  { ruta: "/menu-por-rol", enlace: "Menú por rol", titulo: "Menú por rol" },
+  { ruta: "/usuarios", enlace: "Usuarios y roles", titulo: "Usuarios y roles" },
+  { ruta: "/sincronizacion-bpm", enlace: "Sincronización BPM", titulo: "Sincronización BPM" },
+  { ruta: "/gastos-fijos", enlace: "Gastos fijos", titulo: "Gastos fijos" },
+];
 
-    expect(await screen.findByRole("heading", { name: "Nuevo chat" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Chat" }).getAttribute("aria-current")).toBe("page");
+describe("login", () => {
+  it("sin sesión muestra el login y el botón llama a login()", async () => {
+    auth.init.mockResolvedValue(null);
+    prepararFetch();
+
+    montar("/chat");
+
+    const boton = await screen.findByRole("button", { name: "Continuar con Keycloak" });
+    await waitFor(() => expect((boton as HTMLButtonElement).disabled).toBe(false));
+    expect(screen.getByRole("heading", { name: "Inicia sesión" })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Agentes" })).toBeNull();
+    expect(screen.queryByLabelText(/contraseña/i)).toBeNull();
+
+    fireEvent.click(boton);
+
+    expect(auth.login).toHaveBeenCalledTimes(1);
   });
 
-  it("muestra las opciones del menú y abre su placeholder al cargar directamente la ruta", async () => {
-    const fetchMock = prepararFetch(menu);
-    const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+  it("si Keycloak no responde muestra el login con un mensaje accesible", async () => {
+    auth.init.mockRejectedValue(new Error("sin red"));
+    prepararFetch();
 
-    render(
-      <MemoryRouter initialEntries={["/reportes"]}>
-        <AppShell />
-      </MemoryRouter>,
-    );
+    montar("/chat");
 
-    expect(await screen.findByRole("heading", { name: "Reportes" })).toBeTruthy();
-    expect(screen.getByRole("region", { name: "MENÚ" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Reportes" }).getAttribute("href")).toBe("/reportes");
-    expect(screen.getByText("/reportes")).toBeTruthy();
-    expect(screen.getByText("consultar")).toBeTruthy();
-    expect(screen.getByText("exportar")).toBeTruthy();
-    expect(screen.getByText("Vista de prueba del control de acceso")).toBeTruthy();
-    expect(screen.getByText("ver-menu")).toBeTruthy();
-    expect(screen.queryByText("offline_access")).toBeNull();
-    expect(screen.queryByText("uma_authorization")).toBeNull();
-    expect(screen.queryByText("default-roles-lab")).toBeNull();
-    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/menu")).toHaveLength(1);
-    expect(warning).toHaveBeenCalledWith(
-      "Se omitió una ruta del menú que coincide con una ruta fija de Lara.",
-    );
+    const alerta = await screen.findByRole("alert");
+    expect(alerta.textContent).toContain("Keycloak");
+    expect(screen.getByRole("button", { name: "Continuar con Keycloak" })).toBeTruthy();
+  });
+
+  it("con sesión muestra el shell y cerrar sesión llama a logout", async () => {
+    prepararFetch();
+
+    montar("/chat");
+
+    expect(await screen.findByRole("heading", { name: "Hola, ana. ¿En qué te ayudo?" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Continuar con Keycloak" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Cerrar sesión" }));
+
+    expect(auth.logout).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("sidebar y rutas", () => {
+  it.each(["/", "/ruta-desconocida"])("redirige %s a /chat", async (ruta) => {
+    prepararFetch();
+
+    montar(ruta);
+
+    expect(await screen.findByRole("heading", { name: /Hola, ana/ })).toBeTruthy();
+  });
+
+  it.each(vistas)("la entrada $enlace abre su vista y marca aria-current", async (vista) => {
+    prepararFetch();
+
+    montar("/chat");
+    fireEvent.click(await screen.findByRole("link", { name: vista.enlace }));
+
+    expect(await screen.findByRole("heading", { name: vista.titulo, level: 1 })).toBeTruthy();
+    expect(screen.getByRole("link", { name: vista.enlace }).getAttribute("aria-current")).toBe("page");
+  });
+
+  it("no ofrece MENÚ, Buscar chats, Configuración ni la entrada Chat suelta", async () => {
+    prepararFetch([], menu);
+
+    montar("/chat");
+    await screen.findByRole("heading", { name: /Hola, ana/ });
+
+    expect(screen.queryByText("MENÚ")).toBeNull();
+    expect(screen.queryByText("Buscar chats")).toBeNull();
+    expect(screen.queryByLabelText("Configuración")).toBeNull();
+    expect(screen.queryByRole("link", { name: "Chat" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Reportes" })).toBeNull();
+    for (const titulo of ["AGENTES", "IDENTIDAD", "PERSONAL · SOLO LOCAL", "RECIENTES"]) {
+      expect(screen.getByText(titulo)).toBeTruthy();
+    }
+    expect(screen.getByText("ver-menu · LOCAL")).toBeTruthy();
+  });
+
+  it("contrae y vuelve a mostrar la barra lateral", async () => {
+    prepararFetch();
+
+    montar("/chat");
+    fireEvent.click(await screen.findByRole("button", { name: "Contraer barra lateral" }));
+
+    expect(screen.queryByRole("link", { name: "Agentes" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Mostrar barra lateral" }));
+
+    expect(screen.getByRole("link", { name: "Agentes" })).toBeTruthy();
+  });
+
+  it("Nuevo chat lleva a /chat desde otra vista", async () => {
+    prepararFetch();
+
+    montar("/agentes");
+    fireEvent.click(await screen.findByRole("button", { name: "Nuevo chat" }));
+
+    expect(await screen.findByRole("heading", { name: /Hola, ana/ })).toBeTruthy();
   });
 
   it.each(["/finanzas", "/finanzas/inexistente"])(
     "redirige %s a /finanzas/resumen y marca activa Finanzas",
-    async (path) => {
-      prepararFetch([]);
+    async (ruta) => {
+      prepararFetch();
 
-      render(
-        <MemoryRouter initialEntries={[path]}>
-          <AppShell />
-        </MemoryRouter>,
-      );
+      montar(ruta);
 
       expect(await screen.findByRole("heading", { name: "Finanzas" })).toBeTruthy();
-      expect(
-        screen.getByRole("tab", { name: "Resumen" }).getAttribute("aria-selected"),
-      ).toBe("true");
-      expect(
-        screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current"),
-      ).toBe("page");
+      expect(screen.getByRole("tab", { name: "Resumen" }).getAttribute("aria-selected")).toBe("true");
+      expect(screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current")).toBe("page");
     },
   );
 
   it("redirige /finanzas/pagos a /finanzas/tarjetas y no ofrece la entrada Pagos", async () => {
-    prepararFetch([]);
+    prepararFetch();
 
-    render(
-      <MemoryRouter initialEntries={["/finanzas/pagos"]}>
-        <AppShell />
-      </MemoryRouter>,
-    );
+    montar("/finanzas/pagos");
 
     expect(
       (await screen.findByRole("tab", { name: "Tarjetas y pagos" })).getAttribute("aria-selected"),
     ).toBe("true");
     expect(screen.queryByRole("link", { name: "Pagos" })).toBeNull();
-    expect(
-      screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current"),
-    ).toBe("page");
+    expect(screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current")).toBe("page");
   });
 
   it("mantiene Finanzas activa en cualquier /finanzas/* y navega entre pestañas", async () => {
-    prepararFetch([]);
+    prepararFetch();
 
-    render(
-      <MemoryRouter initialEntries={["/finanzas/gastos"]}>
-        <AppShell />
-      </MemoryRouter>,
-    );
+    montar("/finanzas/gastos");
 
-    expect(
-      (await screen.findByRole("tab", { name: "Gastos" })).getAttribute("aria-selected"),
-    ).toBe("true");
-    expect(
-      screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current"),
-    ).toBe("page");
+    expect((await screen.findByRole("tab", { name: "Gastos" })).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current")).toBe("page");
 
     fireEvent.click(screen.getByRole("tab", { name: "Trading MX" }));
 
-    expect(
-      screen.getByRole("tab", { name: "Trading MX" }).getAttribute("aria-selected"),
-    ).toBe("true");
+    expect(screen.getByRole("tab", { name: "Trading MX" }).getAttribute("aria-selected")).toBe("true");
   });
 
   it("Recientes no lista las sesiones creadas desde el panel de finanzas", async () => {
-    prepararFetch([], false, [
+    prepararFetch([
       { id: "s1", lastUpdateTime: 2, state: { titulo: "Conversación normal" } },
       { id: "s2", lastUpdateTime: 3, state: { titulo: "Gasto del panel", origen: "finanzas" } },
     ]);
 
-    render(
-      <MemoryRouter initialEntries={["/chat"]}>
-        <AppShell />
-      </MemoryRouter>,
-    );
+    montar("/chat");
 
     const historial = await screen.findByRole("navigation", { name: "Historial de chats" });
     expect(await within(historial).findByText("Conversación normal")).toBeTruthy();
     expect(within(historial).queryByText("Gasto del panel")).toBeNull();
   });
+});
 
-  it("oculta MENÚ cuando falla la API sin mostrar un error en la interfaz", async () => {
-    prepararFetch([], true);
-    vi.spyOn(console, "error").mockImplementation(() => {});
+describe("pantallas con datos", () => {
+  it("estados vacíos con el texto exacto de la regla", async () => {
+    prepararFetch();
 
-    render(
-      <MemoryRouter initialEntries={["/chat"]}>
-        <AppShell />
-      </MemoryRouter>,
+    montar("/memoria");
+
+    expect(
+      await screen.findByText("Sin datos todavía · Fuente: memory service / RAG · Pendiente: EXT-01"),
+    ).toBeTruthy();
+  });
+
+  it("Estado del lab muestra un servicio arriba y otro sin respuesta", async () => {
+    prepararFetch();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url === "/salud/keycloak") {
+          return new Response("{}", { status: 200 });
+        }
+        if (url.endsWith("/sessions")) {
+          return new Response("[]", { status: 200 });
+        }
+        throw new Error("sin conexión");
+      }),
     );
 
-    expect(await screen.findByRole("heading", { name: "Nuevo chat" })).toBeTruthy();
-    expect(screen.queryByRole("region", { name: "MENÚ" })).toBeNull();
-    expect(screen.queryByRole("alert")).toBeNull();
+    montar("/estado");
+
+    const tarjetaKeycloak = (await screen.findByText("Keycloak", { selector: "span" })).closest("section");
+    await waitFor(() => expect(within(tarjetaKeycloak as HTMLElement).getByText("Arriba")).toBeTruthy());
+    const tarjetaFinanzas = screen.getByText("finanzas", { selector: "span" }).closest("section");
+    expect(within(tarjetaFinanzas as HTMLElement).getByText("Sin respuesta")).toBeTruthy();
+    expect(screen.queryByText("kc-front")).toBeNull();
+    expect(
+      screen.getByText("Sin datos todavía · Fuente: health check de Java A2A · Pendiente: AG-02"),
+    ).toBeTruthy();
+  });
+
+  it("Base de datos lista las sesiones del usuario y deja vacías las demás tablas", async () => {
+    prepararFetch([
+      {
+        id: "3f9c0000000000000000a21e",
+        lastUpdateTime: 1_790_000_000,
+        state: { titulo: "Gastos de septiembre" },
+      },
+    ]);
+
+    montar("/base-de-datos");
+
+    const panel = await screen.findByRole("tabpanel");
+    expect(await within(panel).findByText("Gastos de septiembre")).toBeTruthy();
+    expect(within(panel).getByText("3f9c…a21e")).toBeTruthy();
+    expect(screen.getByText("Solo lectura")).toBeTruthy();
+    expect(screen.queryByText(/SELECT/)).toBeNull();
+
+    fireEvent.click(screen.getByRole("tab", { name: "events" }));
+
+    expect(
+      screen.getByText("Sin datos todavía · Fuente: ADK API server · tabla events · Pendiente: AG-05"),
+    ).toBeTruthy();
+  });
+
+  it("Menú por rol muestra las opciones de /api/menu del usuario actual", async () => {
+    const fetchMock = prepararFetch([], menu);
+
+    montar("/menu-por-rol");
+
+    expect(await screen.findByText("Reportes")).toBeTruthy();
+    expect(screen.getByText("consultar")).toBeTruthy();
+    expect(screen.getByText("exportar")).toBeTruthy();
+    expect(screen.getByText("roles: ver-menu")).toBeTruthy();
+    expect(screen.getByText("La acción también se valida en el backend.")).toBeTruthy();
+    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/menu")).toHaveLength(1);
+  });
+
+  it("Usuarios y roles muestra los claims sin el token crudo", async () => {
+    prepararFetch();
+
+    const { container } = montar("/usuarios");
+
+    expect(await screen.findByText(/"azp": "agents-ui"/)).toBeTruthy();
+    expect(screen.getByText(/"preferred_username": "ana"/)).toBeTruthy();
+    expect(container.textContent).not.toContain(tokenCrudo);
   });
 });
 
-function prepararFetch(opciones: MenuOpcion[], menuError = false, sesiones: unknown[] = []) {
+function prepararFetch(sesiones: unknown[] = [], opcionesMenu: MenuOpcion[] = []) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
-    if (String(input) === "/api/menu") {
-      return menuError
-        ? new Response("", { status: 503 })
-        : new Response(JSON.stringify(opciones), { status: 200 });
+    const url = String(input);
+    if (url === "/api/menu") {
+      return new Response(JSON.stringify(opcionesMenu), { status: 200 });
     }
-    if (String(input).endsWith("/sessions")) {
+    if (url.endsWith("/sessions")) {
       return new Response(JSON.stringify(sesiones), { status: 200 });
     }
     return new Response("[]", { status: 200 });

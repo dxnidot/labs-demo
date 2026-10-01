@@ -53,6 +53,7 @@ function esPestana(valor: string | undefined): valor is PestanaId {
  * @modified Daniel 2026-09-30 Integra chat e importación CSV con confirmación.
  * @modified Daniel Tovar 2026-09-30 Rediseño con pestañas como rutas, alternador de moneda y panel derecho.
  * @modified Daniel Tovar 2026-09-30 ARIA completo de pestañas, foco visible y retorno de foco del asistente.
+ * @modified Daniel Tovar 2026-09-30 La pestaña activa lleva solo la línea inferior (.ftab de la maqueta).
  */
 export function FinanzasPage() {
   const { tab } = useParams();
@@ -201,14 +202,14 @@ export function FinanzasPage() {
 
         <div
           aria-label="Secciones de finanzas"
-          className="flex gap-1 overflow-x-auto border-b border-border pb-0.5"
+          className="flex gap-1 overflow-x-auto border-b border-border"
           role="tablist"
         >
           {pestanas.map((pestana) => (
             <Link
               aria-controls={idPanelPestanas}
               aria-selected={pestana.id === tab}
-              className={`inline-flex min-h-10 items-center whitespace-nowrap border-b-2 px-3.5 text-sm hover:text-text ${claseFoco} ${
+              className={`inline-flex min-h-10 items-center whitespace-nowrap rounded-none border-b-2 bg-transparent px-3.5 text-sm hover:text-text ${claseFoco} ${
                 pestana.id === tab ? "border-accent text-text" : "border-transparent text-muted"
               }`}
               id={idPestana(pestana.id)}

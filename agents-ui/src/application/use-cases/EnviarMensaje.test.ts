@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+﻿import { describe, expect, it, vi } from "vitest";
 import type { AgentePort } from "../ports/AgentePort";
 import type { AuthPort } from "../ports/AuthPort";
 import { EnviarMensaje } from "./EnviarMensaje";
@@ -17,6 +17,8 @@ describe("EnviarMensaje", () => {
       token: () => null,
       updateToken: async () => "test-token",
       logout: async () => {},
+      login: async () => {},
+      claimsToken: () => null,
     };
     const agente: AgentePort = {
       crearSesion: vi.fn(async () => "sesion-1"),
@@ -43,6 +45,8 @@ describe("EnviarMensaje", () => {
       token: () => null,
       updateToken: async () => "test-token",
       logout: async () => {},
+      login: async () => {},
+      claimsToken: () => null,
     };
     const agente: AgentePort = {
       crearSesion: vi.fn(async () => "sesion-2"),

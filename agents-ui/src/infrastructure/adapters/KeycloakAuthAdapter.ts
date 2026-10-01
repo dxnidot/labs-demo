@@ -7,28 +7,33 @@ const keycloak = new Keycloak({
   realm: "lab",
   clientId: "agents-ui",
 });
-let initPromise: Promise<Usuario> | undefined;
+let initPromise: Promise<Usuario | null> | undefined;
 
 /**
  * Adapta el cliente JavaScript de Keycloak al puerto de autenticación.
  * @author Daniel
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-09-30 Usa check-sso con SSO silencioso, añade login y claims del token.
  */
 export class KeycloakAuthAdapter implements AuthPort {
-  init(): Promise<Usuario> {
+  init(): Promise<Usuario | null> {
     initPromise ??= keycloak
       .init({
-        onLoad: "login-required",
+        onLoad: "check-sso",
         pkceMethod: "S256",
+        silentCheckSsoRedirectUri: `${window.location.origin}/silent-check-sso.html`,
         checkLoginIframe: false,
       })
-      .then((authenticated) => {
-        if (!authenticated) {
-          throw new Error("Keycloak no autenticó al usuario.");
-        }
-        return this.leerUsuario();
-      });
+      .then((authenticated) => (authenticated ? this.leerUsuario() : null));
     return initPromise;
+  }
+
+  login(): Promise<void> {
+    return keycloak.login();
+  }
+
+  claimsToken(): Record<string, unknown> | null {
+    return keycloak.tokenParsed ? { ...keycloak.tokenParsed } : null;
   }
 
   usuarioActual(): Usuario | null {

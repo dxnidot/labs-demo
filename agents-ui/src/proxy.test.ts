@@ -12,4 +12,13 @@ describe("proxy de finanzas", () => {
     expect(rutasProxy.indexOf("/api/finanzas")).toBeGreaterThanOrEqual(0);
     expect(rutasProxy.indexOf("/api/finanzas")).toBeLessThan(rutasProxy.indexOf("/api"));
   });
+
+  it("expone la salud de Keycloak por el proxy y no por CORS", () => {
+    const proxy = viteConfig.server?.proxy as
+      | Record<string, { target?: string; rewrite?: (ruta: string) => string }>
+      | undefined;
+
+    expect(proxy?.["/salud/keycloak"]?.target).toBe("http://localhost:8080");
+    expect(proxy?.["/salud/keycloak"]?.rewrite?.("/salud/keycloak")).toBe("/realms/lab");
+  });
 });

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+﻿import { afterEach, describe, expect, it, vi } from "vitest";
 import type { AuthPort } from "../../application/ports/AuthPort";
 import { AdkAgenteAdapter } from "./AdkAgenteAdapter";
 
@@ -19,6 +19,8 @@ describe("AdkAgenteAdapter", () => {
       token: () => null,
       updateToken: async () => "test-token",
       logout: async () => {},
+      login: async () => {},
+      claimsToken: () => null,
     };
     const fetchMock = vi.fn(
       async (_input: RequestInfo | URL, _init?: RequestInit) =>
@@ -41,6 +43,8 @@ describe("AdkAgenteAdapter", () => {
       token: () => null,
       updateToken: async () => "test-token",
       logout: async () => {},
+      login: async () => {},
+      claimsToken: () => null,
     };
     const fetchMock = vi.fn(
       async (_input: RequestInfo | URL, _init?: RequestInit) =>
