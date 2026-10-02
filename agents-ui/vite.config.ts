@@ -12,6 +12,10 @@ export default defineConfig({
         target: "http://127.0.0.1:8083",
         changeOrigin: true,
       },
+      "/api/llm": {
+        target: "http://localhost:8010",
+        changeOrigin: true,
+      },
       "/salud/keycloak": {
         target: "http://localhost:8080",
         changeOrigin: true,

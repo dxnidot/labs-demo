@@ -1,10 +1,10 @@
-ï»¿import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { AgentePort } from "../ports/AgentePort";
 import type { AuthPort } from "../ports/AuthPort";
 import { EnviarMensaje } from "./EnviarMensaje";
 
 describe("EnviarMensaje", () => {
-  it("usa los primeros 60 caracteres del primer mensaje recortado como tÃ­tulo", async () => {
+  it("usa los primeros 60 caracteres del primer mensaje recortado como título", async () => {
     const usuario = {
       id: "usuario-1",
       username: "ana",
@@ -28,7 +28,7 @@ describe("EnviarMensaje", () => {
     };
     const enviarMensaje = new EnviarMensaje(auth, agente);
 
-    await enviarMensaje.ejecutar(`  ${"a".repeat(65)}  `, null, () => {});
+    await enviarMensaje.ejecutar(`  ${"a".repeat(65)}  `, null, () => {}, "deepseek/deepseek-flash");
 
     expect(agente.crearSesion).toHaveBeenCalledWith(
       "usuario-1",
@@ -37,7 +37,7 @@ describe("EnviarMensaje", () => {
     );
   });
 
-  it("propaga el origen finanzas al crear la sesiÃ³n", async () => {
+  it("propaga el origen finanzas al crear la sesión", async () => {
     const usuario = { id: "usuario-1", username: "ana", roles: [], chatApiRoles: [] };
     const auth: AuthPort = {
       init: async () => usuario,
@@ -55,7 +55,13 @@ describe("EnviarMensaje", () => {
       enviarMensaje: async () => {},
     };
 
-    await new EnviarMensaje(auth, agente).ejecutar("Hola", null, () => {}, "finanzas");
+    await new EnviarMensaje(auth, agente).ejecutar(
+      "Hola",
+      null,
+      () => {},
+      "deepseek/deepseek-flash",
+      "finanzas",
+    );
 
     expect(agente.crearSesion).toHaveBeenCalledWith("usuario-1", "Hola", "finanzas");
   });

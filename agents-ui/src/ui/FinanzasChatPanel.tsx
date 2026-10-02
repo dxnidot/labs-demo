@@ -13,6 +13,7 @@ import type { ActualizacionStreaming } from "../application/ports/AgentePort";
 import type { FinanzasPort } from "../application/ports/FinanzasPort";
 import type { MovimientoImportacion, PreviewImportacion } from "../domain/ImportacionFinanciera";
 import type { Mensaje } from "../domain/Mensaje";
+import { modeloOrquestador } from "../agentesConfig";
 import { Button } from "./components/Button";
 import { claseFoco, claseFocoContenedor } from "./components/foco";
 import { IconButton } from "./components/IconButton";
@@ -67,6 +68,7 @@ const componentesMarkdown: Components = {
  * @modified Daniel Tovar 2026-09-30 Panel lateral plegable con composer y adjuntar archivo.
  * @modified Daniel Tovar 2026-09-30 Drawer modal bajo 980px con fondo, Escape y foco atrapado.
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout: cabecera y composer fijos, hilo como único scroll.
+ * @modified Daniel Tovar 2026-10-01 Usa el modelo por defecto del orquestador (sin selector en este panel).
  */
 export function FinanzasChatPanel({
   abierto,
@@ -190,6 +192,7 @@ export function FinanzasChatPanel({
             ),
           );
         },
+        modeloOrquestador,
         "finanzas",
       );
       sesionCargada.current = sessionId;

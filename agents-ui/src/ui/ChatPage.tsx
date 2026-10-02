@@ -2,14 +2,25 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import { ArrowUp } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { ListarModelos } from "../application/use-cases/ListarModelos";
 import type { Mensaje } from "../domain/Mensaje";
+import type { Modelo } from "../domain/Modelo";
 import type { Usuario } from "../domain/Usuario";
+import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
+import { HttpModeloAdapter } from "../infrastructure/adapters/HttpModeloAdapter";
+import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { Button } from "./components/Button";
 import { claseFoco, claseFocoContenedor } from "./components/foco";
 import { LaraLogo } from "./components/LaraLogo";
 import { PageLayout } from "./components/PageLayout";
+import { SelectorModelo } from "./components/SelectorModelo";
 import { modeloOrquestador } from "../agentesConfig";
 import { useChatSessions } from "./useChatSessions";
+
+const listarModelos = new ListarModelos(new HttpModeloAdapter(new ApiHttpClient(keycloakAuthAdapter)));
+const modelosDeRespaldo: Modelo[] = [
+  { id: modeloOrquestador, nombre: modeloOrquestador.split("/")[1], tier: "basic" },
+];
 
 const componentesMarkdown: Components = {
   h1: ({ children }) => <h1 className="mb-3 mt-5 text-2xl font-semibold">{children}</h1>,
@@ -87,6 +98,8 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
  * @modified Daniel 2026-09-30 Reutiliza el puerto de sesión compartido con Finanzas.
  * @modified Daniel Tovar 2026-09-30 Ajustado a las maquetas 03 y 04 (logo, composer, sugerencias de finanzas).
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (cabecera y composer fijos, conversación como único scroll), foco visible y avatar solo con la L.
+ * @modified Daniel Tovar 2026-10-01 Agrega el selector de modelo de LLM en la cabecera.
+ * @modified Daniel Tovar 2026-10-02 Logs de consola del catálogo cargado y del modelo elegido por envío.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {
@@ -104,9 +117,32 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
   const [cargandoSesion, setCargandoSesion] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mostrarIrAlFinal, setMostrarIrAlFinal] = useState(false);
+  const [modelos, setModelos] = useState<Modelo[]>(modelosDeRespaldo);
+  const [modeloId, setModeloId] = useState(modelosDeRespaldo[0].id);
   const composicionActiva = useRef(false);
   const listaMensajesRef = useRef<HTMLDivElement>(null);
   const seguirAlFinal = useRef(true);
+
+  useEffect(() => {
+    let active = true;
+    listarModelos
+      .ejecutar()
+      .then((disponibles) => {
+        if (active && disponibles.length > 0) {
+          console.info(
+            `[modelo] catálogo cargado (${disponibles.length}): ${disponibles.map((m) => m.id).join(", ")}; default=${disponibles[0].id}`,
+          );
+          setModelos(disponibles);
+          setModeloId(disponibles[0].id);
+        }
+      })
+      .catch((reason: unknown) => {
+        console.warn("[modelo] no se pudo cargar el catálogo; usando respaldo", reason);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!activeSessionId) {
@@ -165,6 +201,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     ]);
 
     let receivedText = false;
+    console.info(`[modelo] enviando mensaje con model=${modeloId}`);
     try {
       const sentSessionId = await enviarMensaje(
         mensaje,
@@ -191,6 +228,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
             ),
           );
         },
+        modeloId,
       );
       setActiveSessionId(sentSessionId);
       if (!receivedText) {
@@ -242,9 +280,17 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                 {sesionActiva?.titulo ?? "Nuevo chat"}
               </h1>
               <span className="whitespace-nowrap rounded-pill border border-border bg-surface px-2.5 py-0.5 font-mono text-xs text-muted">
-                {`orquestador · ${modeloOrquestador.split("/")[1]}`}
+                orquestador
               </span>
             </div>
+            <SelectorModelo
+              modelos={modelos}
+              onCambiar={(id) => {
+                console.info(`[modelo] seleccionado por el usuario: ${modeloId} -> ${id}`);
+                setModeloId(id);
+              }}
+              seleccionado={modeloId}
+            />
           </header>
         ) : undefined
       }

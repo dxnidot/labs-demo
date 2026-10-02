@@ -339,6 +339,7 @@ describe("FinanzasPage · panel del asistente", () => {
       "¿Cuánto gasté?",
       null,
       expect.any(Function),
+      "deepseek/deepseek-flash",
       "finanzas",
     );
   });

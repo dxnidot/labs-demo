@@ -58,4 +58,38 @@ describe("AdkAgenteAdapter", () => {
       state: { titulo: "Mi gasto", origen: "finanzas" },
     });
   });
+
+  it("envía el modelo elegido en la cabecera X-LLM-Model", async () => {
+    const auth: AuthPort = {
+      init: async () => ({ id: "usuario-1", username: "ana", roles: [], chatApiRoles: [] }),
+      usuarioActual: () => null,
+      token: () => null,
+      updateToken: async () => "test-token",
+      logout: async () => {},
+      login: async () => {},
+      claimsToken: () => null,
+    };
+    const fetchMock = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => {
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.close();
+        },
+      });
+      return new Response(stream, { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await new AdkAgenteAdapter(auth).enviarMensaje(
+      {
+        userId: "usuario-1",
+        sessionId: "sesion-1",
+        texto: "hola",
+        modeloId: "deepseek/deepseek-v4-pro",
+      },
+      () => {},
+    );
+
+    const headers = new Headers(fetchMock.mock.calls[0]?.[1]?.headers);
+    expect(headers.get("X-LLM-Model")).toBe("deepseek/deepseek-v4-pro");
+  });
 });

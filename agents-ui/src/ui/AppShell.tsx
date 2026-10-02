@@ -21,6 +21,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router"
 import type { Usuario } from "../domain/Usuario";
 import { IniciarSesion } from "../application/use-cases/IniciarSesion";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import { AccesoDenegado } from "./components/AccesoDenegado";
 import { claseFoco } from "./components/foco";
 import { IconButton } from "./components/IconButton";
 import { LaraLogo } from "./components/LaraLogo";
@@ -31,6 +32,7 @@ import { ChatPage } from "./ChatPage";
 import { FinanzasPage } from "./FinanzasPage";
 import { LoginPage } from "./LoginPage";
 import { ChatSessionsProvider, useChatSessions } from "./useChatSessions";
+import { useHasRole } from "./useHasRole";
 import { useTrampaFoco } from "./useTrampaFoco";
 import { useVistaEstrecha } from "./useVistaEstrecha";
 
@@ -67,6 +69,8 @@ const iconoNav = "size-4.5 shrink-0";
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Pantalla de login propia, sidebar de la maqueta y una ruta por vista.
  * @modified Daniel Tovar 2026-09-30 Shell sobre PageLayout, drawer de navegación bajo 980px, landmarks y carga diferida.
+ * @modified Daniel Tovar 2026-10-01 Oculta del DOM las secciones AGENTES, IDENTIDAD y PERSONAL según los roles del usuario.
+ * @modified Daniel Tovar 2026-10-02 Protege las rutas de esas secciones: sin el rol muestra AccesoDenegado.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -157,6 +161,9 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   const [error, setError] = useState<string | null>(null);
   const [barraVisible, setBarraVisible] = useState(true);
   const [rutaDrawer, setRutaDrawer] = useState<string | null>(null);
+  const puedeVerAgentes = useHasRole(usuario, ["ver_agentes", "admin"]);
+  const puedeVerIdentidad = useHasRole(usuario, ["ver_identidad", "admin"]);
+  const puedeVerPersonal = useHasRole(usuario, ["usar_finanzas", "admin"]);
 
   const panelNav = useRef<HTMLElement | null>(null);
   const botonMenu = useRef<HTMLButtonElement | null>(null);
@@ -215,6 +222,9 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
       setError(reason instanceof Error ? reason.message : "No se pudo cerrar sesión.");
     }
   }
+
+  const protegido = (permitido: boolean, elemento: ReactNode) =>
+    permitido ? elemento : <AccesoDenegado />;
 
   const enRuta = (ruta: string) => pathname === ruta;
   const enFinanzas = pathname === "/finanzas" || pathname.startsWith("/finanzas/");
@@ -296,77 +306,83 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
                   Estado del lab
                 </SidebarItem>
 
-                <SeccionNav titulo="AGENTES">
-                  <SidebarItem
-                    active={enRuta("/agentes")}
-                    icono={<Network aria-hidden="true" className={iconoNav} />}
-                    to="/agentes"
-                  >
-                    Agentes
-                  </SidebarItem>
-                  <SidebarItem
-                    active={enRuta("/base-de-datos")}
-                    icono={<Database aria-hidden="true" className={iconoNav} />}
-                    to="/base-de-datos"
-                  >
-                    Base de datos
-                  </SidebarItem>
-                  <SidebarItem
-                    active={enRuta("/memoria")}
-                    icono={<Waypoints aria-hidden="true" className={iconoNav} />}
-                    to="/memoria"
-                  >
-                    Memoria vectorizada
-                  </SidebarItem>
-                  <SidebarItem
-                    active={enRuta("/herramientas")}
-                    icono={<Wrench aria-hidden="true" className={iconoNav} />}
-                    to="/herramientas"
-                  >
-                    Herramientas MCP
-                  </SidebarItem>
-                </SeccionNav>
+                {puedeVerAgentes && (
+                  <SeccionNav titulo="AGENTES">
+                    <SidebarItem
+                      active={enRuta("/agentes")}
+                      icono={<Network aria-hidden="true" className={iconoNav} />}
+                      to="/agentes"
+                    >
+                      Agentes
+                    </SidebarItem>
+                    <SidebarItem
+                      active={enRuta("/base-de-datos")}
+                      icono={<Database aria-hidden="true" className={iconoNav} />}
+                      to="/base-de-datos"
+                    >
+                      Base de datos
+                    </SidebarItem>
+                    <SidebarItem
+                      active={enRuta("/memoria")}
+                      icono={<Waypoints aria-hidden="true" className={iconoNav} />}
+                      to="/memoria"
+                    >
+                      Memoria vectorizada
+                    </SidebarItem>
+                    <SidebarItem
+                      active={enRuta("/herramientas")}
+                      icono={<Wrench aria-hidden="true" className={iconoNav} />}
+                      to="/herramientas"
+                    >
+                      Herramientas MCP
+                    </SidebarItem>
+                  </SeccionNav>
+                )}
 
-                <SeccionNav titulo="IDENTIDAD">
-                  <SidebarItem
-                    active={enRuta("/menu-por-rol")}
-                    icono={<TextAlignStart aria-hidden="true" className={iconoNav} />}
-                    to="/menu-por-rol"
-                  >
-                    Menú por rol
-                  </SidebarItem>
-                  <SidebarItem
-                    active={enRuta("/usuarios")}
-                    icono={<Users aria-hidden="true" className={iconoNav} />}
-                    to="/usuarios"
-                  >
-                    Usuarios y roles
-                  </SidebarItem>
-                  <SidebarItem
-                    active={enRuta("/sincronizacion-bpm")}
-                    icono={<RefreshCw aria-hidden="true" className={iconoNav} />}
-                    to="/sincronizacion-bpm"
-                  >
-                    Sincronización BPM
-                  </SidebarItem>
-                </SeccionNav>
+                {puedeVerIdentidad && (
+                  <SeccionNav titulo="IDENTIDAD">
+                    <SidebarItem
+                      active={enRuta("/menu-por-rol")}
+                      icono={<TextAlignStart aria-hidden="true" className={iconoNav} />}
+                      to="/menu-por-rol"
+                    >
+                      Menú por rol
+                    </SidebarItem>
+                    <SidebarItem
+                      active={enRuta("/usuarios")}
+                      icono={<Users aria-hidden="true" className={iconoNav} />}
+                      to="/usuarios"
+                    >
+                      Usuarios y roles
+                    </SidebarItem>
+                    <SidebarItem
+                      active={enRuta("/sincronizacion-bpm")}
+                      icono={<RefreshCw aria-hidden="true" className={iconoNav} />}
+                      to="/sincronizacion-bpm"
+                    >
+                      Sincronización BPM
+                    </SidebarItem>
+                  </SeccionNav>
+                )}
 
-                <SeccionNav titulo="PERSONAL · SOLO LOCAL">
-                  <SidebarItem
-                    active={enFinanzas}
-                    icono={<ChartNoAxesColumn aria-hidden="true" className={iconoNav} />}
-                    to="/finanzas"
-                  >
-                    Finanzas
-                  </SidebarItem>
-                  <SidebarItem
-                    active={enRuta("/gastos-fijos")}
-                    icono={<Calendar aria-hidden="true" className={iconoNav} />}
-                    to="/gastos-fijos"
-                  >
-                    Gastos fijos
-                  </SidebarItem>
-                </SeccionNav>
+                {puedeVerPersonal && (
+                  <SeccionNav titulo="PERSONAL · SOLO LOCAL">
+                    <SidebarItem
+                      active={enFinanzas}
+                      icono={<ChartNoAxesColumn aria-hidden="true" className={iconoNav} />}
+                      to="/finanzas"
+                    >
+                      Finanzas
+                    </SidebarItem>
+                    <SidebarItem
+                      active={enRuta("/gastos-fijos")}
+                      icono={<Calendar aria-hidden="true" className={iconoNav} />}
+                      to="/gastos-fijos"
+                    >
+                      Gastos fijos
+                    </SidebarItem>
+                  </SeccionNav>
+                )}
               </nav>
 
               <div className="flex shrink-0 flex-col gap-0.5">
@@ -447,17 +463,32 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
               <Route path="/" element={<Navigate replace to="/chat" />} />
               <Route path="/chat" element={<ChatPage usuario={usuario} />} />
               <Route path="/estado" element={<EstadoLabPage />} />
-              <Route path="/agentes" element={<AgentesPage />} />
-              <Route path="/base-de-datos" element={<BaseDeDatosPage usuario={usuario} />} />
-              <Route path="/memoria" element={<MemoriaPage />} />
-              <Route path="/herramientas" element={<HerramientasPage />} />
-              <Route path="/menu-por-rol" element={<MenuPorRolPage usuario={usuario} />} />
-              <Route path="/usuarios" element={<UsuariosRolesPage />} />
-              <Route path="/sincronizacion-bpm" element={<SincronizacionBpmPage />} />
-              <Route path="/gastos-fijos" element={<GastosFijosPage />} />
-              <Route path="/finanzas" element={<Navigate replace to="/finanzas/resumen" />} />
-              <Route path="/finanzas/pagos" element={<Navigate replace to="/finanzas/tarjetas" />} />
-              <Route path="/finanzas/:tab" element={<FinanzasPage />} />
+              <Route path="/agentes" element={protegido(puedeVerAgentes, <AgentesPage />)} />
+              <Route
+                path="/base-de-datos"
+                element={protegido(puedeVerAgentes, <BaseDeDatosPage usuario={usuario} />)}
+              />
+              <Route path="/memoria" element={protegido(puedeVerAgentes, <MemoriaPage />)} />
+              <Route path="/herramientas" element={protegido(puedeVerAgentes, <HerramientasPage />)} />
+              <Route
+                path="/menu-por-rol"
+                element={protegido(puedeVerIdentidad, <MenuPorRolPage usuario={usuario} />)}
+              />
+              <Route path="/usuarios" element={protegido(puedeVerIdentidad, <UsuariosRolesPage />)} />
+              <Route
+                path="/sincronizacion-bpm"
+                element={protegido(puedeVerIdentidad, <SincronizacionBpmPage />)}
+              />
+              <Route path="/gastos-fijos" element={protegido(puedeVerPersonal, <GastosFijosPage />)} />
+              <Route
+                path="/finanzas"
+                element={protegido(puedeVerPersonal, <Navigate replace to="/finanzas/resumen" />)}
+              />
+              <Route
+                path="/finanzas/pagos"
+                element={protegido(puedeVerPersonal, <Navigate replace to="/finanzas/tarjetas" />)}
+              />
+              <Route path="/finanzas/:tab" element={protegido(puedeVerPersonal, <FinanzasPage />)} />
               <Route path="*" element={<Navigate replace to="/chat" />} />
             </Routes>
           </Suspense>

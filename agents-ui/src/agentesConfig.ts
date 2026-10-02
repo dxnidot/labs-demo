@@ -15,6 +15,7 @@ export interface HerramientaConfig {
   permiso: PermisoHerramienta;
 }
 
+// @modified Daniel Tovar 2026-10-01 Id real de DeepSeek (V4.1 Flash); se usa como respaldo si falla /api/llm/available-models.
 export const modeloOrquestador = "deepseek/deepseek-flash";
 
 export const agentesConfig: readonly AgenteConfig[] = [
@@ -29,7 +30,7 @@ export const agentesConfig: readonly AgenteConfig[] = [
     nombre: "finanzas",
     descripcion:
       "Agente educativo de finanzas personales para registrar tarjetas y movimientos, consultar resumen mensual y calendario.",
-    detalle: "Python · deepseek/deepseek-flash · agents/orquestador/finanzas.py",
+    detalle: `Python · ${modeloOrquestador} · agents/orquestador/finanzas.py`,
     colaboracion: "transfiere el control",
   },
 ];

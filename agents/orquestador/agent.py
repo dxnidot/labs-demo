@@ -3,14 +3,15 @@
 Autor: Daniel Tovar
 Desde: 2026-09-30
 Modificado: Daniel Tovar 2026-09-30 — delegación al agente financiero.
+Modificado: Daniel Tovar 2026-10-01 - role-aware LiteLLM routing.
 """
 from google.adk.agents import LlmAgent
-from google.adk.models.lite_llm import LiteLlm
 from google.genai import types
 from datetime import datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from .finanzas import finanzas_agent
+from .model_router import RoleAwareLiteLlm
 
 
 def obtener_hora(zona_horaria: str) -> dict[str, str]:
@@ -31,7 +32,7 @@ def obtener_hora(zona_horaria: str) -> dict[str, str]:
     return {"status": "success", "zona_horaria": zona_horaria, "hora": ahora.strftime("%Y-%m-%d %H:%M")}
 
 root_agent = LlmAgent(
-    model=LiteLlm(model="deepseek/deepseek-flash"),
+    model=RoleAwareLiteLlm(model="role-aware-router"),
     name="orquestador",
     tools=[obtener_hora],
     sub_agents=[finanzas_agent],

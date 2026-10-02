@@ -9,8 +9,21 @@ import { AppShell } from "./AppShell";
 const usuario: Usuario = {
   id: "usuario-1",
   username: "ana",
-  roles: ["offline_access", "uma_authorization", "default-roles-lab"],
+  roles: [
+    "offline_access",
+    "uma_authorization",
+    "default-roles-lab",
+    "ver_agentes",
+    "ver_identidad",
+    "usar_finanzas",
+  ],
   chatApiRoles: ["ver-menu"],
+};
+const usuarioSinRolesPrivilegiados: Usuario = {
+  id: "usuario-2",
+  username: "beto",
+  roles: ["offline_access", "uma_authorization", "default-roles-lab"],
+  chatApiRoles: [],
 };
 const menu: MenuOpcion[] = [
   { clave: "reportes", titulo: "Reportes", ruta: "/reportes", acciones: ["consultar", "exportar"] },
@@ -207,6 +220,47 @@ describe("sidebar y rutas", () => {
 
     expect(screen.getByRole("tab", { name: "Trading MX" }).getAttribute("aria-selected")).toBe("true");
   });
+
+  it("sin ver_agentes, ver_identidad ni usar_finanzas no renderiza esas secciones en el DOM", async () => {
+    auth.init.mockResolvedValue(usuarioSinRolesPrivilegiados);
+    prepararFetch();
+
+    montar("/chat");
+
+    expect(await screen.findByRole("heading", { name: /Hola, beto/ })).toBeTruthy();
+    expect(screen.getByText("Estado del lab")).toBeTruthy();
+    for (const titulo of ["AGENTES", "IDENTIDAD", "PERSONAL · SOLO LOCAL"]) {
+      expect(screen.queryByText(titulo)).toBeNull();
+    }
+    for (const enlace of [
+      "Agentes",
+      "Base de datos",
+      "Memoria vectorizada",
+      "Herramientas MCP",
+      "Menú por rol",
+      "Usuarios y roles",
+      "Sincronización BPM",
+      "Finanzas",
+      "Gastos fijos",
+    ]) {
+      expect(screen.queryByRole("link", { name: enlace })).toBeNull();
+    }
+  });
+
+  it.each(["/agentes", "/finanzas/resumen", "/usuarios"])(
+    "sin el rol requerido, entrar por URL a %s muestra Acceso denegado en vez de la vista",
+    async (ruta) => {
+      auth.init.mockResolvedValue(usuarioSinRolesPrivilegiados);
+      prepararFetch();
+
+      montar(ruta);
+
+      expect(await screen.findByText("No tienes permiso para ver esta sección.")).toBeTruthy();
+      expect(screen.queryByRole("heading", { name: "Agentes" })).toBeNull();
+      expect(screen.queryByRole("heading", { name: "Finanzas" })).toBeNull();
+      expect(screen.queryByRole("heading", { name: "Usuarios y roles" })).toBeNull();
+    },
+  );
 
   it("Recientes no lista las sesiones creadas desde el panel de finanzas", async () => {
     prepararFetch([

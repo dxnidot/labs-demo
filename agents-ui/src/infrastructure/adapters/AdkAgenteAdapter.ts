@@ -28,6 +28,8 @@ async function* decodificarChunks(
  * @since 2026-09-30
  * @modified Daniel 2026-09-30 Añade consultas de historial ADK y título de sesión.
  * @modified Daniel Tovar 2026-09-30 Marca con origen las sesiones creadas desde el panel de finanzas.
+ * @modified Daniel Tovar 2026-10-01 Envía el modelo elegido en la cabecera X-LLM-Model.
+ * @modified Daniel Tovar 2026-10-02 Logs de consola del modelo enviado/aceptado/rechazado.
  */
 export class AdkAgenteAdapter implements AgentePort {
   constructor(private readonly auth: AuthPort) {}
@@ -100,16 +102,18 @@ export class AdkAgenteAdapter implements AgentePort {
   }
 
   async enviarMensaje(
-    input: { userId: string; sessionId: string; texto: string },
+    input: { userId: string; sessionId: string; texto: string; modeloId: string },
     onUpdate: (update: ActualizacionStreaming) => void,
   ): Promise<void> {
     const token = await this.auth.updateToken();
+    console.info(`[modelo] POST /adk/run_sse con X-LLM-Model=${input.modeloId}`);
     const response = await fetch("/adk/run_sse", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         Accept: "text/event-stream",
+        "X-LLM-Model": input.modeloId,
       },
       body: JSON.stringify({
         appName: "orquestador",
@@ -123,8 +127,12 @@ export class AdkAgenteAdapter implements AgentePort {
       }),
     });
     if (!response.ok) {
+      if (response.status === 403) {
+        console.warn(`[modelo] rechazado por el backend (model=${input.modeloId}, HTTP 403)`);
+      }
       throw new Error(`No se pudo enviar el mensaje al agente (HTTP ${response.status}).`);
     }
+    console.info(`[modelo] aceptado por el backend (model=${input.modeloId})`);
     if (!response.body) {
       throw new Error("El servidor ADK no devolvió el flujo de eventos.");
     }

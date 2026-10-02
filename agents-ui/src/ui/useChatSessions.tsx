@@ -32,6 +32,7 @@ interface ChatSessionsValue {
     texto: string,
     sessionId: string | null,
     onUpdate: (update: ActualizacionStreaming) => void,
+    modeloId: string,
     origen?: OrigenSesion,
   ) => Promise<string>;
 }
@@ -49,6 +50,7 @@ const ChatSessionsContext = createContext<ChatSessionsValue | null>(null);
  * @since 2026-09-30
  * @modified Daniel 2026-09-30 Comparte el puerto y caso de uso de chat embebido.
  * @modified Daniel Tovar 2026-09-30 Separa la sesión del panel de finanzas y la oculta de Recientes.
+ * @modified Daniel Tovar 2026-10-01 enviarMensaje exige el modeloId elegido en el chat.
  */
 export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderProps) {
   const [todasLasSesiones, setTodasLasSesiones] = useState<SesionChat[]>([]);
@@ -87,8 +89,9 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
       texto: string,
       sessionId: string | null,
       onUpdate: (update: ActualizacionStreaming) => void,
+      modeloId: string,
       origen?: OrigenSesion,
-    ) => casoEnviarMensaje.ejecutar(texto, sessionId, onUpdate, origen),
+    ) => casoEnviarMensaje.ejecutar(texto, sessionId, onUpdate, modeloId, origen),
     [],
   );
   const sessions = useMemo(

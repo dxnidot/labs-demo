@@ -11,13 +11,14 @@ export type ActualizacionStreaming =
  * @since 2026-09-30
  * @modified Daniel 2026-09-30 Agrega lectura del historial y título inicial de sesión.
  * @modified Daniel Tovar 2026-09-30 Permite marcar el origen de la sesión (chat o finanzas).
+ * @modified Daniel Tovar 2026-10-01 Agrega modeloId para elegir el LLM que atiende el mensaje.
  */
 export interface AgentePort {
   crearSesion(userId: string, titulo: string, origen?: OrigenSesion): Promise<string>;
   listarSesiones(userId: string): Promise<SesionChat[]>;
   obtenerSesion(userId: string, sessionId: string): Promise<Mensaje[]>;
   enviarMensaje(
-    input: { userId: string; sessionId: string; texto: string },
+    input: { userId: string; sessionId: string; texto: string; modeloId: string },
     onUpdate: (update: ActualizacionStreaming) => void,
   ): Promise<void>;
 }

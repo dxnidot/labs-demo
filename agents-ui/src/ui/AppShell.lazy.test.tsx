@@ -8,7 +8,7 @@ import { AppShell } from "./AppShell";
 const usuario: Usuario = {
   id: "usuario-1",
   username: "ana",
-  roles: ["offline_access"],
+  roles: ["offline_access", "ver_agentes"],
   chatApiRoles: [],
 };
 
