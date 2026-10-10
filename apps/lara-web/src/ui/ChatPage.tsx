@@ -11,6 +11,7 @@ import { HttpModeloAdapter } from "../infrastructure/adapters/HttpModeloAdapter"
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { Button } from "./components/Button";
 import { claseFoco, claseFocoContenedor } from "./components/foco";
+import { AvisoProveedorModelo } from "./components/AvisoProveedorModelo";
 import { LaraLogo } from "./components/LaraLogo";
 import { PageLayout } from "./components/PageLayout";
 import { PuntoEstado } from "./components/PuntoEstado";
@@ -101,6 +102,7 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (cabecera y composer fijos, conversación como único scroll), foco visible y avatar solo con la L.
  * @modified Daniel Tovar 2026-10-01 Agrega el selector de modelo de LLM en la cabecera.
  * @modified Daniel Tovar 2026-10-02 Logs de consola del catálogo cargado y del modelo elegido por envío.
+ * @modified Daniel Tovar 2026-10-10 Aviso fijo de ADR-0007 junto al campo de mensaje.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {
@@ -333,6 +335,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                 <textarea
                   className="w-full resize-none bg-transparent text-body text-text outline-none placeholder:text-faint"
                   disabled={cargando || cargandoSesion}
+                  aria-describedby="aviso-proveedor-chat"
                   id="mensaje-chat"
                   onChange={(event) => setTexto(event.target.value)}
                   onCompositionEnd={() => {
@@ -351,6 +354,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                   <BotonEnviar deshabilitado={cargando || cargandoSesion || !texto.trim()} />
                 </div>
               </form>
+              <AvisoProveedorModelo id="aviso-proveedor-chat" />
               <p className="m-0 text-center text-xs text-faint">
                 Lara puede equivocarse. Verifica los datos importantes.
               </p>
@@ -378,6 +382,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
               <textarea
                 className="w-full resize-none bg-transparent text-body text-text outline-none placeholder:text-faint"
                 disabled={cargando}
+                aria-describedby="aviso-proveedor-inicio"
                 id="mensaje"
                 onChange={(event) => setTexto(event.target.value)}
                 onCompositionEnd={() => {
@@ -396,6 +401,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                 <BotonEnviar deshabilitado={cargando || !texto.trim()} />
               </div>
             </form>
+            <AvisoProveedorModelo className="-mt-3" id="aviso-proveedor-inicio" />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 wide:grid-cols-4">
               {sugerencias.map((sugerencia) => (
                 <button

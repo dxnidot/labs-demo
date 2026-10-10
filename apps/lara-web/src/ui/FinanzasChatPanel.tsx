@@ -14,6 +14,7 @@ import type { FinanzasPort } from "../application/ports/FinanzasPort";
 import type { MovimientoImportacion, PreviewImportacion } from "../domain/ImportacionFinanciera";
 import type { Mensaje } from "../domain/Mensaje";
 import { modeloOrquestador } from "../agentesConfig";
+import { AvisoProveedorModelo } from "./components/AvisoProveedorModelo";
 import { Button } from "./components/Button";
 import { claseFoco, claseFocoContenedor } from "./components/foco";
 import { IconButton } from "./components/IconButton";
@@ -69,6 +70,7 @@ const componentesMarkdown: Components = {
  * @modified Daniel Tovar 2026-09-30 Drawer modal bajo 980px con fondo, Escape y foco atrapado.
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout: cabecera y composer fijos, hilo como único scroll.
  * @modified Daniel Tovar 2026-10-01 Usa el modelo por defecto del orquestador (sin selector en este panel).
+ * @modified Daniel Tovar 2026-10-10 Aviso fijo de ADR-0007 junto al campo de mensaje.
  */
 export function FinanzasChatPanel({
   abierto,
@@ -336,6 +338,7 @@ export function FinanzasChatPanel({
                 <textarea
                   className="w-full resize-none bg-transparent text-sm text-text outline-none placeholder:text-faint"
                   disabled={cargandoChat || cargandoSesion}
+                  aria-describedby="aviso-proveedor-finanzas"
                   id="mensaje-finanzas"
                   onChange={(event) => setTexto(event.target.value)}
                   onCompositionEnd={() => {
@@ -388,6 +391,7 @@ export function FinanzasChatPanel({
                   </button>
                 </div>
               </form>
+              <AvisoProveedorModelo className="mt-2" id="aviso-proveedor-finanzas" />
             </div>
           }
         >

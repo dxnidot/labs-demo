@@ -140,6 +140,34 @@ describe("login", () => {
   });
 });
 
+describe("aviso de ADR-0007 junto al campo del chat", () => {
+  function descripcionDe(campo: HTMLElement): string {
+    const id = campo.getAttribute("aria-describedby");
+    return (id && document.getElementById(id)?.textContent) || "";
+  }
+
+  it("el chat nuevo lo muestra enlazado al campo de mensaje, sin botón de cerrar y sin localStorage", async () => {
+    prepararFetch();
+    localStorage.clear();
+
+    montar("/chat");
+
+    const campo = await screen.findByRole("textbox", { name: "Mensaje para Lara" });
+    expect(descripcionDe(campo)).toContain("se envía al proveedor del modelo");
+    expect(screen.queryByRole("button", { name: /cerrar aviso|descartar/i })).toBeNull();
+    expect(localStorage.length).toBe(0);
+  });
+
+  it("el asistente de Finanzas también lo muestra junto a su campo", async () => {
+    prepararFetch();
+
+    montar("/finanzas/resumen");
+
+    const campo = await screen.findByRole("textbox", { name: "Mensaje para el asistente de finanzas" });
+    expect(descripcionDe(campo)).toContain("No incluyas datos reales");
+  });
+});
+
 describe("sidebar y rutas", () => {
   it.each(["/", "/ruta-desconocida"])("redirige %s a /chat", async (ruta) => {
     prepararFetch();
