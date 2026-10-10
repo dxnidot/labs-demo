@@ -106,6 +106,7 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
  * @modified Daniel Tovar 2026-10-10 Aviso fijo de ADR-0007 junto al campo de mensaje.
  * @modified Daniel Tovar 2026-10-10 "Ir al final" respeta prefers-reduced-motion.
  * @modified Daniel Tovar 2026-10-10 Esqueleto al abrir una conversación y errores con reintento (abrir y enviar).
+ * @modified Daniel Tovar 2026-10-10 El estado inicial arranca arriba (antes bajaba el scroll al final y ocultaba el saludo a 320px).
  * @modified Daniel Tovar 2026-10-10 Catálogo de domain/catalogoLab y catálogo de modelos desde el composition root.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
@@ -189,7 +190,15 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
 
   useEffect(() => {
     const list = listaMensajesRef.current;
-    if (list && seguirAlFinal.current) {
+    if (!list) {
+      return;
+    }
+    if (mensajes.length === 0) {
+      // Estado inicial (saludo, campo y sugerencias): arranca arriba, no al final del contenido.
+      list.scrollTop = 0;
+      return;
+    }
+    if (seguirAlFinal.current) {
       list.scrollTop = list.scrollHeight;
       setMostrarIrAlFinal(false);
     }

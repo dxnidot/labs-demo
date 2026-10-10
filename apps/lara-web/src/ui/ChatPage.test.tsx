@@ -127,3 +127,33 @@ describe("ChatPage · enviar un mensaje", () => {
     expect(screen.queryByRole("button", { name: "Reintentar" })).toBeNull();
   });
 });
+
+describe("ChatPage · posición del scroll", () => {
+  function simularAltura(alto: number) {
+    return vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(alto);
+  }
+
+  it("el estado inicial arranca arriba y no baja al final del contenido (saludo visible a 320px)", async () => {
+    const altura = simularAltura(900);
+
+    montar();
+
+    expect(((await screen.findByRole("log")) as HTMLElement).scrollTop).toBe(0);
+    altura.mockRestore();
+  });
+
+  it("con una conversación abierta sí baja al último mensaje", async () => {
+    const altura = simularAltura(900);
+    chatFake.activeSessionId = "s1";
+    chatFake.obtenerSesion.mockResolvedValue([
+      { rol: "usuario", texto: "Hola", fecha: new Date() },
+      { rol: "agente", texto: "Respuesta", fecha: new Date() },
+    ]);
+
+    montar();
+
+    await screen.findByText("Respuesta");
+    expect((screen.getByRole("log") as HTMLElement).scrollTop).toBe(900);
+    altura.mockRestore();
+  });
+});

@@ -211,6 +211,22 @@ describe("FinanzasPage · carga y resumen", () => {
     expect(within(categoriasUsd).queryByText("Vivienda")).toBeNull();
   });
 
+  it("Últimos movimientos muestra fecha, concepto con su origen y monto, sin scroll horizontal que corte el monto", async () => {
+    renderizar();
+
+    const ultimos = await screen.findByRole("table", { name: "Últimos movimientos en MXN" });
+    expect(
+      within(ultimos)
+        .getAllByRole("columnheader")
+        .map((columna) => columna.textContent),
+    ).toEqual(["fecha", "concepto", "monto"]);
+    expect(ultimos.closest(".overflow-x-auto")).toBeNull();
+    const fila = within(ultimos).getByText("Supermercado MXN").closest("tr") as HTMLElement;
+    expect(within(fila).getByText("Origen:")).toBeTruthy();
+    expect(within(fila).getByText("manual")).toBeTruthy();
+    expect(within(fila).getByText(/1,250\.00/).className).toContain("whitespace-nowrap");
+  });
+
   it("mientras carga muestra esqueletos y un aviso accesible, sin 'Cargando' visible como texto suelto", async () => {
     vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>(() => {})));
 

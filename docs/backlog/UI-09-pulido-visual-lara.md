@@ -49,7 +49,7 @@
   - Confirmado: el tema se define con `light-dark()` y `color-scheme` (MDN: Chrome y Edge 123, Firefox 120, Safari 17.5); el oscuro conserva los valores de la guía y el claro sale de la misma paleta.
   - Confirmado: sin `VITE_USE_MOCKS` (o con `false`) Lara usa los adaptadores reales, igual que antes; en modo mock no hay peticiones a Keycloak ni a ningún backend (verificado en navegador).
   - Pendiente: ok de quien mantiene el lab a la paleta clara (checkpoint de 4b) antes de seguir con el resto de las vistas.
-  - Pendiente: defecto previo, sin arreglar: en Finanzas > Resumen la columna "monto" de "Últimos movimientos" queda cortada por el scroll horizontal cuando el panel del asistente está abierto (1440 px).
-  - Pendiente: defecto previo, sin arreglar: el estado vacío del chat a 320x640 aparece desplazado hacia abajo (el saludo y parte del campo quedan fuera de vista), probablemente por el efecto que baja el scroll al final.
+  - Confirmado: se corrigieron dos defectos previos: la columna "monto" de "Últimos movimientos" ya no se corta con el panel del asistente abierto (tabla de 3 columnas con el origen bajo el concepto) y el estado vacío del chat arranca arriba, con el saludo visible a 320 px.
+  - Confirmado: el test intermitente de foco al contraer la barra lateral era una carrera del componente (un efecto con estado anterior consumía el destino de foco); se corrigió con `focoAplicable`.
   - Pendiente: Lato y NTR, que la guía visual citaba como fuentes alternativas, no están instaladas; requieren decidir y autorizar sus paquetes `@fontsource`.
   - Pendiente: el `Estado` del backlog de UI-09 pasará a "Hecho" solo al cerrar las fases C y D.

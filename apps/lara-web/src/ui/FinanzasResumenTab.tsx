@@ -23,6 +23,7 @@ const enlaceClase = `inline-flex min-h-11 items-center text-compact text-accent 
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-10-10 Textos sin jerga de backlog.
+ * @modified Daniel Tovar 2026-10-10 Últimos movimientos en 3 columnas (el origen va bajo el concepto): el monto ya no queda cortado.
  */
 export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTabProps) {
   const proximoPago = datos.eventos.find((evento) => evento.tipo === "PAGO");
@@ -154,39 +155,39 @@ export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTa
               No hay movimientos en {moneda} para este periodo.
             </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left text-compact">
-                <caption className="sr-only">Últimos movimientos en {moneda}</caption>
-                <thead className="bg-surface">
-                  <tr className="border-b border-divider text-muted">
-                    <th className="px-3.5 py-2.5 font-medium" scope="col">fecha</th>
-                    <th className="px-3.5 py-2.5 font-medium" scope="col">concepto</th>
-                    <th className="px-3.5 py-2.5 font-medium" scope="col">origen</th>
-                    <th className="px-3.5 py-2.5 text-right font-medium" scope="col">monto</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ultimos.map((movimiento) => (
-                    <tr
-                      className="border-b border-divider text-text-2 last:border-0"
-                      key={movimiento.id}
-                    >
-                      <td className="whitespace-nowrap px-3.5 py-3 font-mono">
-                        {fechaCorta(movimiento.fecha)}
-                      </td>
-                      <td className="px-3.5 py-3">{movimiento.comercio}</td>
-                      <td className="px-3.5 py-3">
+            <table className="w-full border-collapse text-left text-compact">
+              <caption className="sr-only">Últimos movimientos en {moneda}</caption>
+              <thead className="bg-surface">
+                <tr className="border-b border-divider text-muted">
+                  <th className="px-2 py-2.5 font-medium" scope="col">fecha</th>
+                  <th className="px-2 py-2.5 font-medium" scope="col">concepto</th>
+                  <th className="px-2 py-2.5 text-right font-medium" scope="col">monto</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ultimos.map((movimiento) => (
+                  <tr
+                    className="border-b border-divider text-text-2 last:border-0"
+                    key={movimiento.id}
+                  >
+                    <td className="whitespace-nowrap px-2 py-3 align-top font-mono">
+                      {fechaCorta(movimiento.fecha)}
+                    </td>
+                    <td className="px-2 py-3">
+                      <span className="block">{movimiento.comercio}</span>
+                      <span className="mt-1 inline-flex">
+                        <span className="sr-only">Origen: </span>
                         <Tag>{etiquetaOrigen(movimiento.origen)}</Tag>
-                      </td>
-                      <td className="whitespace-nowrap px-3.5 py-3 text-right font-mono">
-                        {movimiento.tipo === "GASTO" ? "−" : "+"}
-                        {formatoMoneda[movimiento.moneda].format(movimiento.monto)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-2 py-3 text-right align-top font-mono">
+                      {movimiento.tipo === "GASTO" ? "−" : "+"}
+                      {formatoMoneda[movimiento.moneda].format(movimiento.monto)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </Card>
       </div>
