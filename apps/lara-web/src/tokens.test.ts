@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const raizUi = new URL("./ui/", import.meta.url);
@@ -11,7 +11,7 @@ function archivosTsx(directorio: URL): string[] {
       return archivosTsx(ruta);
     }
     return entrada.name.endsWith(".tsx") && !entrada.name.endsWith(".test.tsx")
-      ? [join(ruta.pathname)]
+      ? [fileURLToPath(ruta)]
       : [];
   });
 }

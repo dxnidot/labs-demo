@@ -157,3 +157,83 @@ describe("ChatPage · posición del scroll", () => {
     altura.mockRestore();
   });
 });
+
+describe("ChatPage · eventos A2A y pasos", () => {
+  it("muestra el separador A2A y los pasos con check cuando el agente delega", async () => {
+    chatFake.enviarMensaje.mockImplementationOnce(async (_texto, _sesion, onUpdate) => {
+      onUpdate({ tipo: "a2a", origen: "orquestador", destino: "aclaraciones", modo: "transfiere el control" });
+      onUpdate({ tipo: "paso", clave: "validarTarjeta", nombre: "Validar tarjeta", completado: true });
+      onUpdate({ tipo: "paso", clave: "registrarAclaracion", nombre: "Registrar aclaración", completado: true });
+      onUpdate({ tipo: "texto", operacion: "agregar", texto: "Tu folio es ACL-0001." });
+      return "sesion-1";
+    });
+
+    montar();
+    fireEvent.change(await screen.findByRole("textbox", { name: "Mensaje para Lara" }), {
+      target: { value: "¿Puedo levantar una aclaración?" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+    expect(await screen.findByText("orquestador → aclaraciones · A2A · transfiere el control")).toBeTruthy();
+    expect(screen.getByText("Validar tarjeta")).toBeTruthy();
+    expect(screen.getByText("Registrar aclaración")).toBeTruthy();
+    expect(await screen.findByText(/ACL-0001/)).toBeTruthy();
+  });
+
+  it("un paso sin evento A2A previo no rompe la conversación (se ignora)", async () => {
+    chatFake.enviarMensaje.mockImplementationOnce(async (_texto, _sesion, onUpdate) => {
+      onUpdate({ tipo: "paso", clave: "x", nombre: "Paso suelto", completado: true });
+      onUpdate({ tipo: "texto", operacion: "agregar", texto: "Respuesta normal." });
+      return "sesion-1";
+    });
+
+    montar();
+    fireEvent.change(await screen.findByRole("textbox", { name: "Mensaje para Lara" }), {
+      target: { value: "Hola" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+    expect(await screen.findByText("Respuesta normal.")).toBeTruthy();
+    expect(screen.queryByText("Paso suelto")).toBeNull();
+  });
+});
+
+describe("ChatPage · composer: adjuntar y memoria activa", () => {
+  it("muestra el chip de memoria activa y el botón adjuntar", async () => {
+    montar();
+
+    expect(await screen.findByText("Memoria: activa")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Adjuntar archivo" })).toBeTruthy();
+  });
+
+  it("elegir un archivo lo muestra como chip removible, y desaparece al pulsar quitar", async () => {
+    montar();
+    const entrada = (await screen.findByLabelText("Elegir archivo para adjuntar")) as HTMLInputElement;
+    const archivo = new File(["contenido"], "estado-de-cuenta.pdf", { type: "application/pdf" });
+
+    fireEvent.change(entrada, { target: { files: [archivo] } });
+
+    expect(await screen.findByText("estado-de-cuenta.pdf")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Quitar estado-de-cuenta.pdf" }));
+
+    await waitFor(() => expect(screen.queryByText("estado-de-cuenta.pdf")).toBeNull());
+  });
+
+  it("al enviar un mensaje se limpia el archivo adjunto (no se sube a ningún lado)", async () => {
+    chatFake.enviarMensaje.mockResolvedValueOnce("sesion-1");
+    montar();
+    const entrada = (await screen.findByLabelText("Elegir archivo para adjuntar")) as HTMLInputElement;
+    fireEvent.change(entrada, {
+      target: { files: [new File(["x"], "ejemplo.csv", { type: "text/csv" })] },
+    });
+    await screen.findByText("ejemplo.csv");
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Mensaje para Lara" }), {
+      target: { value: "Hola" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+    await waitFor(() => expect(screen.queryByText("ejemplo.csv")).toBeNull());
+  });
+});

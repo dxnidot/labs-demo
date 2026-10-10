@@ -184,6 +184,10 @@ export function FinanzasChatPanel({
             setEstadoChat(`Consultando ${update.nombre}…`);
             return;
           }
+          if (update.tipo === "a2a" || update.tipo === "paso") {
+            // El asistente de Finanzas no delega a otros agentes: estos eventos no deberían llegar aquí.
+            return;
+          }
 
           recibioTexto = true;
           setEstadoChat("");

@@ -1,5 +1,12 @@
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
-import { ArrowUp } from "lucide-react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+  type RefObject,
+} from "react";
+import { ArrowUp, Check, Paperclip, X } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ListarModelos } from "../application/use-cases/ListarModelos";
@@ -7,7 +14,10 @@ import type { Mensaje } from "../domain/Mensaje";
 import type { Modelo } from "../domain/Modelo";
 import type { Usuario } from "../domain/Usuario";
 import { adaptadores } from "../infrastructure/composition";
+import { agregarOActualizarPaso, agregarOActualizarTexto } from "./chatEventos";
 import { Button } from "./components/Button";
+import { IconButton } from "./components/IconButton";
+import { Tag } from "./components/Tag";
 import { claseFoco, claseFocoContenedor } from "./components/foco";
 import { AvisoProveedorModelo } from "./components/AvisoProveedorModelo";
 import { Esqueleto, AvisoCarga } from "./components/Esqueleto";
@@ -79,6 +89,91 @@ function ChipAgente() {
   );
 }
 
+function ChipMemoria() {
+  return (
+    <span className="inline-flex min-h-8 items-center gap-2 rounded-pill border border-border px-3 text-compact text-text-2">
+      <PuntoEstado estado="ok" />
+      Memoria: activa
+    </span>
+  );
+}
+
+/** Separador A2A centrado en mono, con los pasos del flujo determinista cuando los hay (mockup 04). */
+function MensajeEvento({ mensaje }: { mensaje: Mensaje }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <div aria-hidden="true" className="flex items-center gap-3 text-xs text-faint">
+        <span className="h-px flex-1 bg-divider" />
+        <span className="font-mono">{mensaje.texto}</span>
+        <span className="h-px flex-1 bg-divider" />
+      </div>
+      {mensaje.pasos && mensaje.pasos.length > 0 && (
+        <ul className="m-0 flex list-none flex-col gap-2 rounded-card border border-border bg-surface p-3.5 text-sm">
+          {mensaje.pasos.map((paso) => (
+            <li className="flex items-center justify-between gap-3" key={paso.clave}>
+              <span className="flex items-center gap-2">
+                <Check
+                  aria-hidden="true"
+                  className={`size-4 shrink-0 ${paso.completado ? "text-ok" : "text-faint opacity-0"}`}
+                />
+                {paso.nombre}
+              </span>
+              <span className="font-mono text-xs text-faint">{paso.clave}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+interface AdjuntarArchivoProps {
+  archivo: File | null;
+  entradaRef: RefObject<HTMLInputElement | null>;
+  onElegir: (archivo: File | null) => void;
+}
+
+/**
+ * Control "adjuntar" del composer: solo previsualiza el nombre del archivo elegido (sin backend de
+ * carga en el chat general todavía), para que el usuario vea que se seleccionó antes de poder quitarlo.
+ */
+function AdjuntarArchivo({ archivo, entradaRef, onElegir }: AdjuntarArchivoProps) {
+  return (
+    <>
+      <input
+        aria-label="Elegir archivo para adjuntar"
+        className="hidden"
+        onChange={(event) => onElegir(event.target.files?.[0] ?? null)}
+        ref={entradaRef}
+        type="file"
+      />
+      <IconButton
+        aria-label="Adjuntar archivo"
+        onClick={() => entradaRef.current?.click()}
+        tamano="compacto"
+        type="button"
+      >
+        <Paperclip aria-hidden="true" className="size-4.5" />
+      </IconButton>
+      {archivo && (
+        <Tag>
+          <span className="flex items-center gap-1.5">
+            {archivo.name}
+            <button
+              aria-label={`Quitar ${archivo.name}`}
+              className="inline-flex size-4 items-center justify-center"
+              onClick={() => onElegir(null)}
+              type="button"
+            >
+              <X aria-hidden="true" className="size-3.5" />
+            </button>
+          </span>
+        </Tag>
+      )}
+    </>
+  );
+}
+
 function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
   return (
     <button
@@ -108,6 +203,7 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
  * @modified Daniel Tovar 2026-10-10 Esqueleto al abrir una conversación y errores con reintento (abrir y enviar).
  * @modified Daniel Tovar 2026-10-10 El estado inicial arranca arriba (antes bajaba el scroll al final y ocultaba el saludo a 320px).
  * @modified Daniel Tovar 2026-10-10 Catálogo de domain/catalogoLab y catálogo de modelos desde el composition root.
+ * @modified Daniel Tovar 2026-10-10 Eventos A2A y pasos del flujo determinista como mensajes "evento" (mockup 04).
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {
@@ -133,6 +229,8 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
   const composicionActiva = useRef(false);
   const listaMensajesRef = useRef<HTMLDivElement>(null);
   const seguirAlFinal = useRef(true);
+  const entradaArchivo = useRef<HTMLInputElement>(null);
+  const [archivoAdjunto, setArchivoAdjunto] = useState<File | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -219,12 +317,9 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     setOrigenError(null);
     setCargando(true);
     setTexto("");
+    setArchivoAdjunto(null);
     seguirAlFinal.current = true;
-    setMensajes((actuales) => [
-      ...actuales,
-      { rol: "usuario", texto: mensaje, fecha: new Date() },
-      { rol: "agente", texto: "", fecha: new Date() },
-    ]);
+    setMensajes((actuales) => [...actuales, { rol: "usuario", texto: mensaje, fecha: new Date() }]);
 
     let receivedText = false;
     console.info(`[modelo] enviando mensaje con model=${modeloId}`);
@@ -237,22 +332,27 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
             setEstado(`Consultando ${update.nombre}…`);
             return;
           }
+          if (update.tipo === "a2a") {
+            setEstado("");
+            setMensajes((actuales) => [
+              ...actuales,
+              {
+                rol: "evento",
+                texto: `${update.origen} → ${update.destino} · A2A · ${update.modo}`,
+                fecha: new Date(),
+                pasos: [],
+              },
+            ]);
+            return;
+          }
+          if (update.tipo === "paso") {
+            setMensajes((actuales) => agregarOActualizarPaso(actuales, update));
+            return;
+          }
 
           receivedText = true;
           setEstado("");
-          setMensajes((actuales) =>
-            actuales.map((item, index) =>
-              index === actuales.length - 1 && item.rol === "agente"
-                ? {
-                    ...item,
-                    texto:
-                      update.operacion === "agregar"
-                        ? item.texto + update.texto
-                        : update.texto,
-                  }
-                : item,
-            ),
-          );
+          setMensajes((actuales) => agregarOActualizarTexto(actuales, update));
         },
         modeloId,
       );
@@ -262,12 +362,10 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
       }
       await refreshSessions();
     } catch (reason: unknown) {
-      setMensajes((actuales) =>
-        actuales.filter(
-          (item, index) =>
-            index !== actuales.length - 1 || item.rol !== "agente" || item.texto.length > 0,
-        ),
-      );
+      setMensajes((actuales) => {
+        const ultimo = actuales.at(-1);
+        return ultimo?.rol === "agente" && ultimo.texto.length === 0 ? actuales.slice(0, -1) : actuales;
+      });
       setError(reason instanceof Error ? reason.message : "No se pudo completar el mensaje.");
       setOrigenError("envio");
     } finally {
@@ -385,7 +483,15 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                   value={texto}
                 />
                 <div className="flex items-center justify-between gap-2">
-                  <ChipAgente />
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <AdjuntarArchivo
+                      archivo={archivoAdjunto}
+                      entradaRef={entradaArchivo}
+                      onElegir={setArchivoAdjunto}
+                    />
+                    <ChipAgente />
+                    <ChipMemoria />
+                  </div>
                   <BotonEnviar deshabilitado={cargando || cargandoSesion || !texto.trim()} />
                 </div>
               </form>
@@ -432,7 +538,15 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                 value={texto}
               />
               <div className="flex items-center justify-between gap-2">
-                <ChipAgente />
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <AdjuntarArchivo
+                    archivo={archivoAdjunto}
+                    entradaRef={entradaArchivo}
+                    onElegir={setArchivoAdjunto}
+                  />
+                  <ChipAgente />
+                  <ChipMemoria />
+                </div>
                 <BotonEnviar deshabilitado={cargando || !texto.trim()} />
               </div>
             </form>
@@ -469,7 +583,11 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
           </>
         )}
 
-        {mensajes.map((mensaje, index) => (
+        {mensajes.map((mensaje, index) => {
+          if (mensaje.rol === "evento") {
+            return <MensajeEvento key={`${mensaje.fecha.getTime()}-${index}`} mensaje={mensaje} />;
+          }
+          return (
           <article
             className={
               mensaje.rol === "usuario"
@@ -499,7 +617,8 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
               )}
             </div>
           </article>
-        ))}
+          );
+        })}
 
         {estado && <p className="mx-auto font-mono text-xs text-muted">{estado}</p>}
         {error && <EstadoError mensaje={error} onReintentar={reintentar} />}

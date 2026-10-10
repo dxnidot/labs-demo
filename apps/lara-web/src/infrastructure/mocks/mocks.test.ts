@@ -49,9 +49,26 @@ describe("MockAgenteAdapter", () => {
     const agente = new MockAgenteAdapter(0);
 
     const propias = await agente.listarSesiones("usuario-mock");
-    expect(propias).toHaveLength(2);
+    expect(propias).toHaveLength(3);
     expect(propias[0].actualizado.getTime()).toBeGreaterThan(propias[1].actualizado.getTime());
+    expect(propias.map((sesion) => sesion.titulo)).toContain("Aclaración por cargo no reconocido");
     expect(await agente.listarSesiones("otra-persona")).toEqual([]);
+  });
+
+  it("la sesión sembrada de aclaración trae el evento A2A con sus pasos completados", async () => {
+    const agente = new MockAgenteAdapter(0);
+    const sesiones = await agente.listarSesiones("usuario-mock");
+    const conAclaracion = sesiones.find(
+      (candidata) => candidata.titulo === "Aclaración por cargo no reconocido",
+    );
+    expect(conAclaracion).toBeDefined();
+
+    const mensajes = await agente.obtenerSesion("usuario-mock", conAclaracion!.id);
+    const evento = mensajes.find((mensaje) => mensaje.rol === "evento");
+    expect(evento?.texto).toBe("orquestador → aclaraciones · A2A · transfiere el control");
+    expect(evento?.pasos).toHaveLength(3);
+    expect(evento?.pasos?.every((paso) => paso.completado)).toBe(true);
+    expect(mensajes.at(-1)?.texto).toContain("ACL-0001");
   });
 
   it("crea una sesión, transmite la respuesta por fragmentos y la guarda en memoria", async () => {
@@ -70,6 +87,36 @@ describe("MockAgenteAdapter", () => {
     expect(mensajes.map((m) => m.rol)).toEqual(["usuario", "agente"]);
     expect(mensajes[1].texto).toContain("modo mock");
     expect((await agente.listarSesiones("usuario-mock")).find((s) => s.id === id)?.origen).toBe("finanzas");
+  });
+
+  it("enviar un mensaje que menciona 'aclaración' transmite el evento a2a y los 3 pasos antes del texto", async () => {
+    const agente = new MockAgenteAdapter(0);
+    const id = await agente.crearSesion("usuario-mock", "Otra aclaración", "chat");
+    const updates: ActualizacionStreaming[] = [];
+
+    await agente.enviarMensaje(
+      { userId: "usuario-mock", sessionId: id, texto: "Quiero una aclaración", modeloId: "m" },
+      (update) => updates.push(update),
+    );
+
+    expect(updates[0]).toEqual({
+      tipo: "a2a",
+      origen: "orquestador",
+      destino: "aclaraciones",
+      modo: "transfiere el control",
+    });
+    const pasos = updates.filter((u) => u.tipo === "paso");
+    expect(pasos.map((p) => (p as { clave: string }).clave)).toEqual([
+      "validarTarjeta",
+      "registrarAclaracion",
+      "devolverFolio",
+    ]);
+    expect(pasos.every((p) => (p as { completado: boolean }).completado)).toBe(true);
+    const ultimaActualizacion = updates.at(-1);
+    expect(ultimaActualizacion?.tipo).toBe("texto");
+
+    const mensajes = await agente.obtenerSesion("usuario-mock", id);
+    expect(mensajes.map((m) => m.rol)).toEqual(["usuario", "evento", "agente"]);
   });
 
   it("rechaza sesiones inexistentes o de otro usuario", async () => {
