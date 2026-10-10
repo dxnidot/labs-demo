@@ -1,6 +1,6 @@
 ---
 name: keycloak-lab
-description: Cómo levantar, detener y probar el lab local de Keycloak (keycloak, kc-menu, kc-front) en D:\dev\labs, incluidos puertos, realm, usuarios de prueba, clients y cómo obtener un token con PowerShell. Úsala cuando pregunten cómo arrancar el lab, en qué puerto está algo, cómo sacar un token o por qué no carga el login.
+description: Cómo levantar, detener y probar el lab local (Keycloak, kc-menu, kc-finanzas, orquestador y Lara) en D:\dev\labs, incluidos puertos, realm, usuarios de prueba, clients y cómo obtener un token con PowerShell. Úsala cuando pregunten cómo arrancar el lab, en qué puerto está algo, cómo sacar un token o por qué no carga el login.
 ---
 
 # Lab de Keycloak
@@ -13,7 +13,9 @@ Entorno solo local en Windows, monorepo `D:\dev\labs`. Terminal: PowerShell.
 | --- | --- | --- | --- |
 | Keycloak 26 + PostgreSQL | `infra/keycloak/` | 8080 | `docker compose up -d` |
 | kc-menu (Spring Boot 4, Java 21) | `services/kc-menu/` | 8081 | `.\mvnw.cmd spring-boot:run` |
-| kc-front (Angular) | `kc-front/` | 4200 | `npm start` |
+| kc-finanzas (Spring Boot 4, Java 21) | `services/kc-finanzas/` | 8083 (BD PostgreSQL en 5433) | `docker compose up -d` y luego `.\mvnw.cmd spring-boot:run` |
+| Lara (React + Vite) | `apps/lara-web/` | 5173 | `npm run dev` |
+| Orquestador ADK (Python) | `agents/orquestador/` | 8010 (API server); 8000 con `adk web` | `adk web` (ver AG-01); comando del API server POR CONFIRMAR |
 
 Consola de administración: http://localhost:8080/admin
 
@@ -21,8 +23,11 @@ Consola de administración: http://localhost:8080/admin
 
 - Realm: `lab` (confirmar arriba a la izquierda que no estás en `master`).
 - Usuarios: `ana` (ejecutivo, rol `ver-menu`) y `beto` (supervisor, roles `ver-menu` y `autorizar`).
-- Clients: `chat-api` (API, roles en `resource_access.chat-api.roles`), `chat-front` (front Angular, público con PKCE). `agents-ui` está pendiente (backlog KC-02).
-- Las contraseñas y el secret de `chat-api` **no están en el repo**. Se leen de variables de entorno; nunca las escribas en archivos ni en respuestas.
+- Clients:
+  - `chat-api`: API de kc-menu; sus roles llegan en `resource_access.chat-api.roles`.
+  - `agents-ui`: client público de Lara (PKCE, redirect `http://localhost:5173/*`), hecho en KC-02. Lleva un mapper de audiencia para que el access token traiga `aud=agents-ui` (KC-04).
+  - `finanzas-agent`: client confidencial con service account que usa el orquestador para llamar a kc-finanzas; su client role es `usar-finanzas` (FIN-13).
+- Las contraseñas y los secrets de los clients **no están en el repo**. Se leen de variables de entorno; nunca las escribas en archivos ni en respuestas.
 
 ## Arrancar el lab
 
@@ -33,11 +38,19 @@ cd D:\dev\labs\services\kc-menu
 .\mvnw.cmd spring-boot:run
 ```
 
-En otra terminal, si se necesita el front:
+En otra terminal, si se necesita finanzas (requiere su `.env`, ver `services/kc-finanzas/README.md`):
 
 ```powershell
-cd D:\dev\labs\kc-front
-npm start
+cd D:\dev\labs\services\kc-finanzas
+docker compose up -d
+.\mvnw.cmd spring-boot:run
+```
+
+En otra terminal, para Lara:
+
+```powershell
+cd D:\dev\labs\apps\lara-web
+npm run dev
 ```
 
 Keycloak tarda cerca de un minuto en quedar listo después de `up -d`.
@@ -47,9 +60,11 @@ Keycloak tarda cerca de un minuto en quedar listo después de `up -d`.
 ```powershell
 cd D:\dev\labs\infra\keycloak
 docker compose stop
+cd D:\dev\labs\services\kc-finanzas
+docker compose stop
 ```
 
-En kc-menu y kc-front: `Ctrl+C`.
+En kc-menu, kc-finanzas y Lara: `Ctrl+C`.
 
 ## Obtener un token (solo lab)
 
@@ -75,8 +90,8 @@ Invoke-RestMethod -Uri 'http://localhost:8081/api/menu' -Headers @{ Authorizatio
 
 ## Reglas que no se rompen
 
-- **Nunca** `docker compose down -v`: `-v` borra el volumen `keycloak_kc-pgdata` y con él el realm, usuarios y permisos. Para apagar usa `stop` (o `down` sin `-v`).
-- La carpeta debe seguir llamándose `keycloak`: Docker Compose arma el nombre del volumen con ella. Si cambia, levanta un Keycloak vacío.
+- **Nunca** `docker compose down -v`: `-v` borra los volúmenes de datos y con ellos el realm, usuarios y permisos (Keycloak) o los datos de finanzas. Para apagar usa `stop` (o `down` sin `-v`).
+- El nombre del proyecto Compose está fijado con `name:` al inicio de cada `compose.yaml` (`keycloak` y `finanzas`), así que mover o renombrar la carpeta ya no cambia el nombre de los volúmenes. Los volúmenes deberían ser `keycloak_kc-pgdata` y `finanzas_finanzas-pgdata` (inferido; confírmalo con `docker volume ls`). Si cambias el `name:`, levantas una BD vacía.
 - El puerto 8080 está atado a `127.0.0.1`; no exponerlo a la red.
 - No imprimir ni guardar tokens, secrets ni contraseñas. Si hace falta mostrar un token, solo sus claims decodificados.
 
@@ -85,3 +100,4 @@ Invoke-RestMethod -Uri 'http://localhost:8081/api/menu' -Headers @{ Authorizatio
 - **El login no carga:** revisar `docker compose ps` en `infra/keycloak/` y esperar a que Keycloak termine de arrancar.
 - **401 en kc-menu:** token vencido, o el client/realm no coincide con el emisor esperado por kc-menu.
 - **403 en kc-menu:** el usuario no tiene el rol que pide el endpoint (por ejemplo, `ana` no tiene `autorizar`).
+- **401 en el orquestador:** el access token no trae `aud=agents-ui`; revisar el mapper de audiencia del client `agents-ui` y volver a iniciar sesión en Lara.
