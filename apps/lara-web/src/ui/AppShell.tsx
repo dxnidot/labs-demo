@@ -11,6 +11,7 @@ import {
   PanelLeftOpen,
   Plus,
   RefreshCw,
+  SunMoon,
   TextAlignStart,
   Users,
   Waypoints,
@@ -21,6 +22,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router"
 import type { Usuario } from "../domain/Usuario";
 import { IniciarSesion } from "../application/use-cases/IniciarSesion";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import { DialogoApariencia } from "./apariencia/DialogoApariencia";
 import { AccesoDenegado } from "./components/AccesoDenegado";
 import { claseFoco } from "./components/foco";
 import { IconButton } from "./components/IconButton";
@@ -73,6 +75,7 @@ const iconoNav = "size-4.5 shrink-0";
  * @modified Daniel Tovar 2026-10-02 Protege las rutas de esas secciones: sin el rol muestra AccesoDenegado.
  * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
  * @modified Daniel Tovar 2026-10-10 El shell usa PageLayout libre: sin el marco de 32/24/32 px alrededor de la barra lateral.
+ * @modified Daniel Tovar 2026-10-10 Botón y diálogo "Apariencia" en el pie de la barra lateral.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -163,6 +166,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   const [error, setError] = useState<string | null>(null);
   const [barraVisible, setBarraVisible] = useState(true);
   const [rutaDrawer, setRutaDrawer] = useState<string | null>(null);
+  const [aparienciaAbierta, setAparienciaAbierta] = useState(false);
   const puedeVerAgentes = useHasRole(usuario, ["ver_agentes", "admin"]);
   const puedeVerIdentidad = useHasRole(usuario, ["ver_identidad", "admin"]);
   const puedeVerPersonal = useHasRole(usuario, ["ver-finanzas", "admin"]);
@@ -171,6 +175,8 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   const botonMenu = useRef<HTMLButtonElement | null>(null);
   const botonContraer = useRef<HTMLButtonElement | null>(null);
   const botonMostrar = useRef<HTMLButtonElement | null>(null);
+  const botonApariencia = useRef<HTMLButtonElement | null>(null);
+  const aparienciaEstabaAbierta = useRef(false);
   const navEstabaAbierta = useRef(false);
   const focoPendiente = useRef<"contraer" | "mostrar" | null>(null);
 
@@ -194,6 +200,13 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
     }
     navEstabaAbierta.current = drawerActivo;
   }, [drawerActivo]);
+
+  useEffect(() => {
+    if (aparienciaEstabaAbierta.current && !aparienciaAbierta) {
+      botonApariencia.current?.focus();
+    }
+    aparienciaEstabaAbierta.current = aparienciaAbierta;
+  }, [aparienciaAbierta]);
 
   useEffect(() => {
     const destino = focoPendiente.current;
@@ -431,6 +444,16 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
                 </span>
               </div>
               <IconButton
+                aria-haspopup="dialog"
+                aria-label="Apariencia"
+                onClick={() => setAparienciaAbierta(true)}
+                ref={botonApariencia}
+                tamano="compacto"
+                tono="atenuado"
+              >
+                <SunMoon aria-hidden="true" className="size-4.5" />
+              </IconButton>
+              <IconButton
                 aria-label="Cerrar sesión"
                 onClick={() => void cerrarSesion()}
                 tamano="compacto"
@@ -497,6 +520,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
           </Suspense>
         </main>
       </div>
+      {aparienciaAbierta && <DialogoApariencia onCerrar={() => setAparienciaAbierta(false)} />}
     </PageLayout>
   );
 }

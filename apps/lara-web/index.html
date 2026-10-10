@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#111316" />
     <title>Lara · Chat</title>
+    <script>
+      // Aplica la fuente elegida antes del primer render (misma clave que PreferenciasLocalStorageAdapter).
+      (function () {
+        try {
+          var fuente = localStorage.getItem("lara.fuente");
+          if (fuente === "ibm-plex-sans" || fuente === "ibm-plex-mono") {
+            document.documentElement.dataset.font = fuente;
+          }
+        } catch (error) {
+          // Sin almacenamiento: se queda la fuente por defecto.
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

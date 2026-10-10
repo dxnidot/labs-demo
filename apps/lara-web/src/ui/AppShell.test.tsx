@@ -123,6 +123,21 @@ describe("login", () => {
 
     expect(auth.logout).toHaveBeenCalledTimes(1);
   });
+
+  it("el botón Apariencia abre el diálogo y al cerrarlo devuelve el foco al botón", async () => {
+    prepararFetch();
+
+    montar("/chat");
+
+    const boton = await screen.findByRole("button", { name: "Apariencia" });
+    fireEvent.click(boton);
+    expect(screen.getByRole("dialog", { name: "Apariencia" })).toBeTruthy();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Apariencia" })).toBeNull());
+    expect(document.activeElement).toBe(boton);
+  });
 });
 
 describe("sidebar y rutas", () => {

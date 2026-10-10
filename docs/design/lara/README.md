@@ -74,8 +74,8 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 
 ### Tipografía
 
-- Fuente de la interfaz: a elegir entre **IBM Plex Mono** (por defecto), **Lato** y **NTR** desde el diálogo "Apariencia". Se aplica con el atributo `data-font` en `<html>`, que cambia `--font-sans`.
-- Datos técnicos (••••, puertos, ids, tokens, SQL, nombres de tools): siempre **IBM Plex Mono** vía `--font-mono`, con cualquiera de las tres fuentes.
+- Fuente de la interfaz: **IBM Plex Sans** (por defecto, la que muestran los PNG) o **IBM Plex Mono**, a elegir en el diálogo "Apariencia". Se aplica con el atributo `data-font` (`ibm-plex-sans` | `ibm-plex-mono`) en `<html>`, que cambia `--font-sans`, y se guarda en `localStorage` con la clave `lara.fuente`. Lato y NTR, que esta guía listaba antes, no están instaladas: se añadirían solo si se decide y se autoriza el paquete.
+- Datos técnicos (••••, puertos, ids, tokens, SQL, nombres de tools): siempre **IBM Plex Mono** vía `--font-mono`, con cualquiera de las fuentes elegidas.
 - Fechas, montos y porcentajes: fuente de la interfaz con cifras tabulares (`font-variant-numeric: tabular-nums`, utilidad `num`). No usan mono.
 - Las fuentes se sirven desde el repo con Fontsource; no se carga Google Fonts en ejecución.
 - Tamaños: título de pantalla 26px/600 · subtítulo 14px muted · cuerpo del chat 15px/1.6 · tablas 13px · etiquetas de sección 11px mono con `letter-spacing: .08em`.

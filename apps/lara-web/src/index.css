@@ -1,4 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
 @import "tailwindcss";
 
 @theme {
@@ -60,12 +64,17 @@
   --color-pill-pink: var(--color-neutral-800);
   --color-pill-butter: var(--color-neutral-800);
   --color-pill-peach: var(--color-neutral-800);
-  --font-sans: "IBM Plex Sans", sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --radius-button: 9px;
   --radius-card: 13px;
   --radius-composer: 16px;
   --radius-pill: 999px;
+}
+
+/* "Apariencia" > Fuente: data-font en <html> (ver index.html y useApariencia). */
+:root[data-font="ibm-plex-mono"] {
+  --font-sans: var(--font-mono);
 }
 
 :root {
