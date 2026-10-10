@@ -37,6 +37,21 @@ _ALLOWED_CURRENCIES = {"MXN", "USD"}
 _ALLOWED_ORIGINS = {"MANUAL", "IMPORT", "NOTIFICACION"}
 _ALLOWED_MOVEMENT_TYPES = {"GASTO", "INGRESO"}
 
+# Campos que pueden llegar al modelo, por ruta del API. Todo campo no listado se
+# descarta (ADR-0007). Una ruta sin entrada falla cerrada: no se llama al API.
+_CAMPOS_PERMITIDOS: dict[str, frozenset[str]] = {
+    "/api/finanzas/movimientos/resumen-mensual": frozenset(
+        {"categoria", "tipo", "moneda", "total"}
+    ),
+    "/api/finanzas/calendario": frozenset({"fecha", "tipo", "alias"}),
+    # Escrituras confirmadas: el modelo solo recibe el estado y el id.
+    "/api/finanzas/tarjetas": frozenset({"id"}),
+    "/api/finanzas/movimientos": frozenset({"id"}),
+}
+# Nunca llegan al modelo, aunque alguien los añada por error a una lista permitida.
+_CAMPOS_PROHIBIDOS = frozenset({"ownersub", "ultimos4"})
+_VALORES_ESCALARES = (str, int, float, bool, type(None))
+
 
 class FinanzasApiClient:
     """Cliente HTTP pequeño para el API de finanzas y OAuth client_credentials."""
@@ -83,6 +98,12 @@ class FinanzasApiClient:
         payload: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Ejecuta una llamada autenticada y devuelve errores sin cuerpos remotos."""
+        campos_permitidos = _CAMPOS_PERMITIDOS.get(path)
+        if campos_permitidos is None:
+            return {
+                "status": "error",
+                "mensaje": "La ruta no tiene una política de campos para el modelo.",
+            }
         base_url = self._environment_value("FINANZAS_API_URL")
         if not base_url:
             return {
@@ -134,7 +155,10 @@ class FinanzasApiClient:
                 "status": "error",
                 "mensaje": "El servicio de finanzas devolvió una respuesta no válida.",
             }
-        return {"status": "success", "data": _remove_owner_sub(data)}
+        return {
+            "status": "success",
+            "data": _solo_campos_permitidos(data, campos_permitidos),
+        }
 
     def post(
         self, path: str, payload: dict[str, Any], user_sub: str
@@ -149,18 +173,28 @@ class FinanzasApiClient:
         return self._request("get", path, user_sub=user_sub, params=params)
 
 
-def _remove_owner_sub(value: Any) -> Any:
-    """Elimina ownerSub recursivamente antes de devolver datos al modelo."""
+def _normalizar_campo(nombre: Any) -> str:
+    """Normaliza un nombre de campo para compararlo sin separadores ni mayúsculas."""
+    return str(nombre).replace("_", "").replace("-", "").casefold()
+
+
+def _solo_campos_permitidos(value: Any, permitidos: frozenset[str]) -> Any:
+    """Conserva únicamente los campos permitidos; el resto no llega al modelo.
+
+    Descarta cualquier campo no listado, los prohibidos aunque estén listados y
+    los valores anidados (objetos o listas) dentro de un campo permitido.
+    """
+    if isinstance(value, list):
+        return [_solo_campos_permitidos(item, permitidos) for item in value]
     if isinstance(value, dict):
         return {
-            key: _remove_owner_sub(item)
+            key: item
             for key, item in value.items()
-            if str(key).replace("_", "").replace("-", "").casefold()
-            != "ownersub"
+            if key in permitidos
+            and _normalizar_campo(key) not in _CAMPOS_PROHIBIDOS
+            and isinstance(item, _VALORES_ESCALARES)
         }
-    if isinstance(value, list):
-        return [_remove_owner_sub(item) for item in value]
-    return value
+    return None
 
 
 def _required_text(value: str, label: str) -> str:
@@ -605,7 +639,10 @@ finanzas_agent = LlmAgent(
         "«Confirmo» en un turno posterior de la misma sesión. No interpretes "
         "respuestas ambiguas como consentimiento, no confirmes mediante una "
         "decisión del modelo, y no vuelvas a suministrar datos para modificar "
-        "una vista previa pendiente. El contexto y el mensaje actual del usuario "
+        "una vista previa pendiente. Tras una escritura confirmada la herramienta "
+        "solo devuelve el estado y el id: confirma al usuario lo registrado usando "
+        "la vista previa del turno anterior y no inventes campos que no recibiste. "
+        "El contexto y el mensaje actual del usuario "
         "son la única fuente de identidad y confirmación."
     ),
     before_tool_callback=_contar_llamada_herramienta,

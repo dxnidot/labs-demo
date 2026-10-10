@@ -484,10 +484,10 @@ def test_identidad_de_la_escritura_proviene_de_session_user_id(
     assert preview["status"] == "preview"
 
 
-def test_cliente_lecturas_usa_headers_auth_y_filtra_owner_sub(
+def test_cliente_lecturas_usa_headers_auth_y_solo_campos_permitidos(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """El cliente transmite identidad autenticada y elimina ownerSub recursivamente."""
+    """El cliente transmite identidad autenticada y devuelve solo campos permitidos."""
     monkeypatch.setenv("FINANZAS_API_URL", "https://finanzas.invalid/")
     monkeypatch.setenv("FINANZAS_AGENT_TOKEN_URL", "https://auth.invalid/token")
     monkeypatch.setenv("FINANZAS_AGENT_CLIENT_ID", "test-client-id")
@@ -496,17 +496,34 @@ def test_cliente_lecturas_usa_headers_auth_y_filtra_owner_sub(
     token_response = Mock()
     token_response.json.return_value = {"access_token": "test-only-access-token"}
     token_response.raise_for_status.return_value = None
-    api_response = Mock()
-    api_response.status_code = 200
-    api_response.json.return_value = {
-        "ownerSub": "private-owner",
-        "Owner_Sub": "private-owner",
-        "resumen": {"detalle": [{"owner-sub": "private-owner", "total": 1}]},
-    }
-    api_response.raise_for_status.return_value = None
+    summary_response = Mock()
+    summary_response.status_code = 200
+    summary_response.json.return_value = [
+        {
+            "categoria": "Categoría de prueba",
+            "tipo": "GASTO",
+            "moneda": "MXN",
+            "total": 10,
+            "ownerSub": "private-owner",
+            "comercio": "Comercio de prueba",
+        }
+    ]
+    summary_response.raise_for_status.return_value = None
+    calendar_response = Mock()
+    calendar_response.status_code = 200
+    calendar_response.json.return_value = [
+        {
+            "fecha": "2026-10-01",
+            "tipo": "CORTE",
+            "alias": "Tarjeta de prueba",
+            "ultimos4": "1234",
+            "Owner_Sub": "private-owner",
+        }
+    ]
+    calendar_response.raise_for_status.return_value = None
     http = SimpleNamespace(
         post=Mock(return_value=token_response),
-        get=Mock(return_value=api_response),
+        get=Mock(side_effect=[summary_response, calendar_response]),
     )
     client = finanzas.FinanzasApiClient(http_client=http)
 
@@ -523,10 +540,17 @@ def test_cliente_lecturas_usa_headers_auth_y_filtra_owner_sub(
 
     assert summary["status"] == "success"
     assert calendar["status"] == "success"
-    assert summary["data"] == {
-        "resumen": {"detalle": [{"total": 1}]}
-    }
-    assert calendar["data"] == summary["data"]
+    assert summary["data"] == [
+        {
+            "categoria": "Categoría de prueba",
+            "tipo": "GASTO",
+            "moneda": "MXN",
+            "total": 10,
+        }
+    ]
+    assert calendar["data"] == [
+        {"fecha": "2026-10-01", "tipo": "CORTE", "alias": "Tarjeta de prueba"}
+    ]
     assert http.post.call_count == 2
     assert http.post.call_args_list[0].args == ("https://auth.invalid/token",)
     assert http.post.call_args_list[0].kwargs["auth"] == (
@@ -654,3 +678,144 @@ def test_errores_no_revelan_token_secret_body_ni_headers(
         assert "test-only-header-marker" not in repr(api_headers)
     if status_code is not None:
         assert str(status_code) in result["mensaje"]
+
+
+def _cliente_con_respuesta(
+    monkeypatch: pytest.MonkeyPatch, cuerpo: Any
+) -> finanzas.FinanzasApiClient:
+    """Crea un cliente cuyo transporte devuelve siempre el cuerpo indicado."""
+    monkeypatch.setenv("FINANZAS_API_URL", "https://finanzas.invalid")
+    monkeypatch.setenv("FINANZAS_AGENT_TOKEN_URL", "https://auth.invalid/token")
+    monkeypatch.setenv("FINANZAS_AGENT_CLIENT_ID", "test-client-id")
+    monkeypatch.setenv("FINANZAS_AGENT_CLIENT_SECRET", "test-only-secret")
+    token_response = Mock()
+    token_response.json.return_value = {"access_token": "test-only-access-token"}
+    token_response.raise_for_status.return_value = None
+    api_response = Mock()
+    api_response.status_code = 200
+    api_response.json.return_value = cuerpo
+    api_response.raise_for_status.return_value = None
+    http = SimpleNamespace(
+        post=Mock(side_effect=lambda url, **_: token_response if "auth" in url else api_response),
+        get=Mock(return_value=api_response),
+    )
+    return finanzas.FinanzasApiClient(http_client=http)
+
+
+def test_un_campo_nuevo_no_listado_no_llega_al_modelo(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Un campo que el API añada mañana se descarta mientras nadie lo permita."""
+    client = _cliente_con_respuesta(
+        monkeypatch,
+        [
+            {
+                "categoria": "Categoría de prueba",
+                "tipo": "GASTO",
+                "moneda": "MXN",
+                "total": 10,
+                "campoNuevoDelApi": "no debe llegar",
+                "detalle": {"total": 1},
+            }
+        ],
+    )
+
+    result = client.get(
+        "/api/finanzas/movimientos/resumen-mensual", {"periodo": "2026-09"}, "user"
+    )
+
+    assert result["data"] == [
+        {
+            "categoria": "Categoría de prueba",
+            "tipo": "GASTO",
+            "moneda": "MXN",
+            "total": 10,
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    "ruta",
+    sorted(finanzas._CAMPOS_PERMITIDOS),
+)
+def test_owner_sub_y_ultimos4_nunca_llegan_al_modelo(
+    monkeypatch: pytest.MonkeyPatch, ruta: str
+) -> None:
+    """Ni siquiera una lista permitida mal configurada deja pasar esos campos."""
+    permitidos = finanzas._CAMPOS_PERMITIDOS[ruta] | {
+        "ownerSub",
+        "owner_sub",
+        "ultimos4",
+        "ultimos_4",
+    }
+    monkeypatch.setitem(finanzas._CAMPOS_PERMITIDOS, ruta, permitidos)
+    registro = {campo: "valor-de-prueba" for campo in permitidos}
+    client = _cliente_con_respuesta(monkeypatch, [registro, registro])
+
+    result = client.get(ruta, {}, "user")
+
+    for fila in result["data"]:
+        claves = {str(clave).replace("_", "").casefold() for clave in fila}
+        assert "ownersub" not in claves
+        assert "ultimos4" not in claves
+        assert claves  # los campos legítimos sí se conservan
+
+
+def test_ruta_sin_politica_no_llama_al_api(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Una ruta sin lista de campos falla cerrada, antes de cualquier llamada."""
+    client = _cliente_con_respuesta(monkeypatch, [])
+
+    result = client.get("/api/finanzas/otra-ruta", {}, "user")
+
+    assert result["status"] == "error"
+    client._http.get.assert_not_called()
+    client._http.post.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ("tool", "arguments", "path"),
+    _WRITES,
+)
+def test_escritura_confirmada_solo_devuelve_estado_e_id(
+    monkeypatch: pytest.MonkeyPatch,
+    tool: Any,
+    arguments: dict[str, Any],
+    path: str,
+) -> None:
+    """Tras confirmar, el modelo recibe el estado y el id, no el registro creado."""
+    cliente = _cliente_con_respuesta(
+        monkeypatch,
+        {
+            "id": "id-de-prueba",
+            "ownerSub": "private-owner",
+            "ultimos4": "1234",
+            "alias": "Tarjeta de prueba",
+            "comercio": "Comercio de prueba",
+            "monto": 125.5,
+        },
+    )
+    monkeypatch.setattr(
+        finanzas,
+        "FinanzasApiClient",
+        Mock(return_value=cliente),
+    )
+    preview, first_context = _prepare_preview(tool, arguments, Mock())
+    confirmation_id = "invocation-confirmation"
+    confirmation_context = _context(
+        session_id=first_context.session.id,
+        user_id=first_context.session.user_id,
+        invocation_id=confirmation_id,
+        user_text="Confirmo",
+        events=[
+            *first_context.session.events,
+            SimpleNamespace(author="user", invocation_id=confirmation_id),
+        ],
+        state=first_context.state,
+    )
+
+    result = _invoke(tool, confirmation_context)
+
+    assert result == {"status": "success", "data": {"id": "id-de-prueba"}}
+    assert preview["vista_previa"] == arguments  # el modelo conserva la vista previa
