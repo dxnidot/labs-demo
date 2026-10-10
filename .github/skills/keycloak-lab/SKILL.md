@@ -19,6 +19,8 @@ Entorno solo local en Windows, monorepo `D:\dev\labs`. Terminal: PowerShell.
 
 Consola de administración: http://localhost:8080/admin
 
+kc-menu y kc-finanzas leen el emisor del JWT de la variable `KEYCLOAK_ISSUER_URI` (por defecto `http://localhost:8080/realms/lab`). Solo defínela si Keycloak no está en `localhost:8080`.
+
 ## Realm y datos de prueba
 
 - Realm: `lab` (confirmar arriba a la izquierda que no estás en `master`).
