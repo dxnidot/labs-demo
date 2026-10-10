@@ -28,6 +28,8 @@ Lo que **no** es local: el chat usa modelos de lenguaje en la nube (Gemini y Dee
 
 Estado (confirmado en `agents/orquestador`): no hay enmascarado de comercios, alias ni montos antes de enviarlos al proveedor. La afirmación de que el modelo "recibe solo agregados" no es cierta para los registros.
 
+Política vigente: [ADR-0007](docs/decisions/0007-politica-de-datos-hacia-el-proveedor.md). Las herramientas solo devuelven al modelo los campos permitidos por ruta (nunca `ownerSub` ni `ultimos4`) y, tras una escritura confirmada, solo el estado y el `id`.
+
 ## Operating Context
 
 - Uso local en Windows; Lara es una app React + Vite + Tailwind 4 que se sirve en `localhost:5173`.

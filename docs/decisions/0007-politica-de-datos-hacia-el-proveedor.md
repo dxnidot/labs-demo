@@ -9,10 +9,11 @@
   - Los datos financieros persisten en la PostgreSQL local de `kc-finanzas`, no en `agents/data/`.
 - Decisión (opción B, documentar y reducir lo que se envía):
   - **Documentar el flujo real** de datos hacia el modelo: lo descrito arriba pasa a ser la referencia, en `PRODUCT.md` y en este ADR, y se mantiene al día cuando cambien las herramientas.
-  - **Enviar menos en las herramientas** (cambio propuesto, **sin aplicar todavía**), en `agents/orquestador/finanzas.py`:
+  - **Enviar menos en las herramientas** (aplicado el 2026-10-10), en `agents/orquestador/finanzas.py`:
     - Pasar de eliminar solo `ownerSub` a una lista de campos permitidos por herramienta: `consultar_resumen` (categoría, tipo, moneda, total) y `consultar_calendario` (fecha, tipo y alias, porque sin alias no se puede decir qué tarjeta paga).
     - No devolver nunca `ultimos4` al modelo en ninguna respuesta.
     - Tras una escritura confirmada, devolver al modelo solo el estado y el `id`, sin repetir el registro creado.
+    - Excepción conocida: la vista previa de una escritura repite al modelo lo que él mismo envió como argumentos (incluido `ultimos4`), porque la confirmación del usuario depende de verla; esos valores ya están en el historial.
     - Alcance real: lo que el usuario escribe en el chat (incluidos comercio, alias y últimos cuatro dígitos al registrar) sigue yendo al proveedor y queda en el historial; este cambio solo evita repetirlo y ampliarlo.
   - **Aviso visible en Lara** de que lo escrito en el chat se envía al proveedor del modelo (tarea en UI-09).
   - **Revisar los términos de retención** de cada proveedor y plan usados: retención, uso para entrenamiento y ubicación de los datos. Registrar el resultado aquí con la fecha; no asumir nada hasta leer los términos oficiales.
