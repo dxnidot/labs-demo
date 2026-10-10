@@ -82,7 +82,7 @@
       "protocol": "openid-connect",
       "publicClient": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "${KC_MENU_CLIENT_SECRET}",
+      "secret": "${LAB_MENU_CLIENT_SECRET}",
       "standardFlowEnabled": false,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
@@ -171,7 +171,7 @@
       "credentials": [
         {
           "type": "password",
-          "value": "${KC_ANA_PASSWORD}",
+          "value": "${LAB_ANA_PASSWORD}",
           "temporary": false
         }
       ],
@@ -193,7 +193,7 @@
       "credentials": [
         {
           "type": "password",
-          "value": "${KC_BETO_PASSWORD}",
+          "value": "${LAB_BETO_PASSWORD}",
           "temporary": false
         }
       ],
@@ -217,7 +217,7 @@
       "credentials": [
         {
           "type": "password",
-          "value": "${KC_LAB_ADMIN_PASSWORD}",
+          "value": "${LAB_ADMIN_PASSWORD}",
           "temporary": false
         }
       ],

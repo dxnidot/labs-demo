@@ -25,12 +25,12 @@ kc-menu y kc-finanzas leen el emisor del JWT de la variable `KEYCLOAK_ISSUER_URI
 
 - Realm: `lab` (confirmar arriba a la izquierda que no estás en `master`).
 - El realm se crea al primer arranque desde `infra/keycloak/import/lab-realm.json` (`--import-realm`); si el realm ya existe, la importación se omite.
-- Usuarios de prueba: `ana` (grupo `ejecutivo`, rol `ver-menu`), `beto` (grupo `supervisor`, roles `ver-menu` y `autorizar`) y `admin` (todos los roles). Sus contraseñas salen de `KC_ANA_PASSWORD`, `KC_BETO_PASSWORD` y `KC_LAB_ADMIN_PASSWORD` en `infra/keycloak/.env`. Tu usuario real lo creas tú en la consola de admin.
+- Usuarios de prueba: `ana` (grupo `ejecutivo`, rol `ver-menu`), `beto` (grupo `supervisor`, roles `ver-menu` y `autorizar`) y `admin` (todos los roles). Sus contraseñas salen de `LAB_ANA_PASSWORD`, `LAB_BETO_PASSWORD` y `LAB_ADMIN_PASSWORD` en `infra/keycloak/.env`. Tu usuario real lo creas tú en la consola de admin.
 - Clients:
   - `kc-menu`: API de kc-menu (antes `chat-api`); sus roles llegan en `resource_access.kc-menu.roles`.
   - `lara-web`: client público de Lara (antes `agents-ui`; PKCE S256, redirect `http://localhost:5173/*`), hecho en KC-02. Lleva el mapper `audience-lara-web` para que el access token traiga `aud=lara-web` (KC-04).
   - `finanzas-agent`: client confidencial con service account que usa el orquestador para llamar a kc-finanzas; su client role es `usar-finanzas` (FIN-13).
-- Las contraseñas y los secrets de los clients **no están en el repo**: el JSON del realm solo trae marcadores `${VAR}` y los valores viven en `infra/keycloak/.env` (`KC_MENU_CLIENT_SECRET`, `FINANZAS_AGENT_CLIENT_SECRET`, y las tres contraseñas). Nunca las escribas en archivos versionados ni en respuestas.
+- Las contraseñas y los secrets de los clients **no están en el repo**: el JSON del realm solo trae marcadores `${VAR}` y los valores viven en `infra/keycloak/.env` (`LAB_MENU_CLIENT_SECRET`, `FINANZAS_AGENT_CLIENT_SECRET`, y las tres contraseñas). Nunca las escribas en archivos versionados ni en respuestas.
 
 ## Arrancar el lab
 
@@ -77,9 +77,9 @@ Requiere que el client tenga habilitado Direct access grants y las variables de 
 $body = @{
   grant_type    = 'password'
   client_id     = 'kc-menu'
-  client_secret = $env:KC_MENU_CLIENT_SECRET
+  client_secret = $env:LAB_MENU_CLIENT_SECRET
   username      = 'ana'
-  password      = $env:KC_ANA_PASSWORD
+  password      = $env:LAB_ANA_PASSWORD
 }
 $r = Invoke-RestMethod -Method Post -Uri 'http://localhost:8080/realms/lab/protocol/openid-connect/token' -Body $body
 $r.access_token

@@ -10,7 +10,7 @@ Copy-Item .env.example .env
 docker compose up -d
 ```
 
-- Compose se detiene si falta alguna variable del realm (`KC_MENU_CLIENT_SECRET`, `FINANZAS_AGENT_CLIENT_SECRET`, `KC_ANA_PASSWORD`, `KC_BETO_PASSWORD`, `KC_LAB_ADMIN_PASSWORD`): un marcador `${VAR}` sin resolver quedaría como texto literal en el secret.
+- Compose se detiene si falta alguna variable del realm (`LAB_MENU_CLIENT_SECRET`, `FINANZAS_AGENT_CLIENT_SECRET`, `LAB_ANA_PASSWORD`, `LAB_BETO_PASSWORD`, `LAB_ADMIN_PASSWORD`): un marcador `${VAR}` sin resolver quedaría como texto literal en el secret. Llevan el prefijo `LAB_` (o `FINANZAS_AGENT_`) y no `KC_`, porque Keycloak reserva `KC_*` para sus propias opciones.
 - Consola de administración: http://localhost:8080/admin (usuario y contraseña de `KC_BOOTSTRAP_ADMIN_*`, realm `master`).
 - `FINANZAS_AGENT_CLIENT_SECRET` debe ser el mismo valor que `agents/orquestador/.env`.
 

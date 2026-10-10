@@ -15,7 +15,7 @@ Equivalencia de nombres. Los docs históricos (`docs/backlog`, `docs/decisions`,
 | `kc-demo/` | `services/kc-menu/` |
 | `agents-ui/` | `apps/lara-web/` |
 
-Sin cambios: puertos, nombres de BD, rutas HTTP y paquetes Java. Clients de Keycloak (2026-10-10, realm recreado desde `infra/keycloak/import/lab-realm.json`): `chat-api` → `kc-menu`, `agents-ui` → `lara-web`, `chat-front` eliminado, `finanzas-agent` sin cambios; rol de realm `usar_finanzas` → `ver-finanzas`; volumen `kc-pgdata` → `keycloak-pgdata`; variable `KC_CHAT_API_SECRET` → `KC_MENU_CLIENT_SECRET`. Los compose fijan `name: keycloak` y `name: finanzas` para conservar los volúmenes de datos.
+Sin cambios: puertos, nombres de BD, rutas HTTP y paquetes Java. Clients de Keycloak (2026-10-10, realm recreado desde `infra/keycloak/import/lab-realm.json`): `chat-api` → `kc-menu`, `agents-ui` → `lara-web`, `chat-front` eliminado, `finanzas-agent` sin cambios; rol de realm `usar_finanzas` → `ver-finanzas`; volumen `kc-pgdata` → `keycloak-pgdata`; variable `KC_CHAT_API_SECRET` → `LAB_MENU_CLIENT_SECRET`. Los compose fijan `name: keycloak` y `name: finanzas` para conservar los volúmenes de datos.
 
 ## Repo y documentación
 

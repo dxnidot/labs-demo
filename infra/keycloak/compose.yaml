@@ -28,11 +28,11 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
       # Marcadores ${VAR} de import/lab-realm.json. Sin valor, Compose se detiene:
       # un marcador sin resolver quedaría como texto literal en el secret.
-      KC_MENU_CLIENT_SECRET: ${KC_MENU_CLIENT_SECRET:?define KC_MENU_CLIENT_SECRET en infra/keycloak/.env}
+      LAB_MENU_CLIENT_SECRET: ${LAB_MENU_CLIENT_SECRET:?define LAB_MENU_CLIENT_SECRET en infra/keycloak/.env}
       FINANZAS_AGENT_CLIENT_SECRET: ${FINANZAS_AGENT_CLIENT_SECRET:?define FINANZAS_AGENT_CLIENT_SECRET en infra/keycloak/.env}
-      KC_ANA_PASSWORD: ${KC_ANA_PASSWORD:?define KC_ANA_PASSWORD en infra/keycloak/.env}
-      KC_BETO_PASSWORD: ${KC_BETO_PASSWORD:?define KC_BETO_PASSWORD en infra/keycloak/.env}
-      KC_LAB_ADMIN_PASSWORD: ${KC_LAB_ADMIN_PASSWORD:?define KC_LAB_ADMIN_PASSWORD en infra/keycloak/.env}
+      LAB_ANA_PASSWORD: ${LAB_ANA_PASSWORD:?define LAB_ANA_PASSWORD en infra/keycloak/.env}
+      LAB_BETO_PASSWORD: ${LAB_BETO_PASSWORD:?define LAB_BETO_PASSWORD en infra/keycloak/.env}
+      LAB_ADMIN_PASSWORD: ${LAB_ADMIN_PASSWORD:?define LAB_ADMIN_PASSWORD en infra/keycloak/.env}
     volumes:
       - ./import:/opt/keycloak/data/import:ro
     ports:
