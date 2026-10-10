@@ -37,6 +37,7 @@ import { FinanzasPage } from "./FinanzasPage";
 import { LoginPage } from "./LoginPage";
 import { ChatSessionsProvider, useChatSessions } from "./useChatSessions";
 import { useHasRole } from "./useHasRole";
+import { focoAplicable, type DestinoFocoBarra } from "./focoBarra";
 import { tituloDeRuta, useTituloDocumento } from "./tituloDocumento";
 import { useTrampaFoco } from "./useTrampaFoco";
 import { useVistaEstrecha } from "./useVistaEstrecha";
@@ -83,6 +84,7 @@ const iconoNav = "size-4.5 shrink-0";
  * @modified Daniel Tovar 2026-10-10 Skip link, contenido principal enfocable y título del documento por vista.
  * @modified Daniel Tovar 2026-10-10 Adaptadores desde el composition root e indicador MOCK.
  * @modified Daniel Tovar 2026-10-10 Esqueletos de carga y reintento en Recientes.
+ * @modified Daniel Tovar 2026-10-10 El foco al contraer/mostrar la barra ya no se pierde si un efecto viejo corre antes (carrera del montaje).
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -193,7 +195,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   const contenidoPrincipal = useRef<HTMLElement | null>(null);
   const aparienciaEstabaAbierta = useRef(false);
   const navEstabaAbierta = useRef(false);
-  const focoPendiente = useRef<"contraer" | "mostrar" | null>(null);
+  const focoPendiente = useRef<DestinoFocoBarra | null>(null);
 
   // El drawer queda abierto solo para la ruta en la que se abrió: al navegar se cierra sin efectos.
   const navAbierta = rutaDrawer === pathname;
@@ -224,13 +226,12 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   }, [aparienciaAbierta]);
 
   useEffect(() => {
-    const destino = focoPendiente.current;
-    focoPendiente.current = null;
-    if (destino === "contraer") {
-      botonContraer.current?.focus();
-    } else if (destino === "mostrar") {
-      botonMostrar.current?.focus();
+    const destino = focoAplicable(focoPendiente.current, barraVisible);
+    if (destino === null) {
+      return;
     }
+    focoPendiente.current = null;
+    (destino === "contraer" ? botonContraer : botonMostrar).current?.focus();
   }, [barraVisible]);
 
   function alternarBarra(visible: boolean) {
