@@ -24,7 +24,7 @@ export const serviciosLab: readonly ServicioLab[] = [
 
 /** Servicios del plan sin health check todavía: la vista los muestra como pendientes. */
 export const serviciosPendientes = [
-  { nombre: "Java A2A", detalle: ":8002 · Java A2A", pendiente: "AG-02" },
-  { nombre: "TypeScript A2A", detalle: ":8003 · TypeScript A2A", pendiente: "AG-03" },
-  { nombre: "Open WebUI", detalle: ":3000 · RAG", pendiente: "EXT-01" },
+  { nombre: "Java A2A", detalle: ":8002 · Java A2A" },
+  { nombre: "TypeScript A2A", detalle: ":8003 · TypeScript A2A" },
+  { nombre: "Open WebUI", detalle: ":3000 · RAG" },
 ] as const;

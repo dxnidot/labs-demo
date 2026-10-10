@@ -12,6 +12,7 @@ const obtenerClaims = new ObtenerClaimsToken(adaptadores.auth);
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  * @modified Daniel Tovar 2026-10-10 Adaptador de auth desde el composition root (VITE_USE_MOCKS).
+ * @modified Daniel Tovar 2026-10-10 Vacío sin jerga.
  */
 export function UsuariosRolesPage() {
   const claims = obtenerClaims.ejecutar();
@@ -24,7 +25,10 @@ export function UsuariosRolesPage() {
       titulo="Usuarios y roles"
     >
       <div className="grid grid-cols-1 gap-4 shell:grid-cols-2">
-        <EstadoVacio className="self-start" fuente="Keycloak Admin REST API" pendiente="UI-07" />
+        <EstadoVacio
+          className="self-start"
+          mensaje="La lista de usuarios del realm aún no se puede consultar desde Lara."
+        />
         <Card>
           <div className="flex items-center justify-between gap-3">
             <h2 className="m-0 text-base font-semibold">Inspector de token</h2>

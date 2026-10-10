@@ -29,7 +29,7 @@
   - [x] Aviso fijo de ADR-0007 junto al campo del chat (inicio, conversación y asistente de Finanzas).
   - [x] 5. Accesibilidad: foco, switch, áreas de 44 px, pestañas con flechas, skip link, título por vista, favicon y `prefers-reduced-motion`.
   - [x] 6. Mocks (`VITE_USE_MOCKS`, `.env.example`, composition root, pill MOCK) para `AuthPort`, `AgentePort`, `ModeloPort`, `EstadoLabPort`, `MenuPort` y `FinanzasPort`; catálogo de agentes y servicios pendientes movido a `domain/`.
-  - [ ] 7. Estados comunes: carga con esqueleto, vacío sin jerga de backlog, error con reintento.
+  - [x] 7. Estados comunes: carga con esqueleto (`Esqueleto`, `AvisoCarga`), vacío sin jerga de backlog (`EstadoVacio` con mensaje claro) y error con reintento (`EstadoError`) en Estado, Base de datos, Menú por rol, Finanzas, Chat, asistente de Finanzas y Recientes.
   - [ ] 8. Finanzas (12 y 14) según el mockup.
 - Archivos relevantes:
   - apps/lara-web/src/index.css

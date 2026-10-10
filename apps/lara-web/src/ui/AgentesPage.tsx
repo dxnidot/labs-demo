@@ -10,6 +10,7 @@ import { Pill } from "./components/Pill";
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  * @modified Daniel Tovar 2026-10-10 Datos pendientes en domain/catalogoLab (sin datos en el componente).
+ * @modified Daniel Tovar 2026-10-10 Vacío sin jerga.
  */
 export function AgentesPage() {
   return (
@@ -30,7 +31,7 @@ export function AgentesPage() {
           <Card key={agente.nombre}>
             <h2 className="m-0 text-heading font-semibold">{agente.nombre}</h2>
             <span className="font-mono text-xs text-text-2">{agente.detalle}</span>
-            <EstadoVacio fuente={`agent card de ${agente.nombre}`} pendiente={agente.pendiente} />
+            <EstadoVacio mensaje="Este agente aún no está disponible en el lab." />
           </Card>
         ))}
       </div>

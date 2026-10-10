@@ -17,6 +17,8 @@ import { modeloOrquestador } from "../domain/catalogoLab";
 import { AvisoProveedorModelo } from "./components/AvisoProveedorModelo";
 import { Button } from "./components/Button";
 import { claseFoco, claseFocoContenedor } from "./components/foco";
+import { Esqueleto, AvisoCarga } from "./components/Esqueleto";
+import { EstadoError } from "./components/EstadoError";
 import { IconButton } from "./components/IconButton";
 import { PageLayout } from "./components/PageLayout";
 import { useChatSessions } from "./useChatSessions";
@@ -71,6 +73,7 @@ const componentesMarkdown: Components = {
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout: cabecera y composer fijos, hilo como único scroll.
  * @modified Daniel Tovar 2026-10-01 Usa el modelo por defecto del orquestador (sin selector en este panel).
  * @modified Daniel Tovar 2026-10-10 Aviso fijo de ADR-0007 junto al campo de mensaje.
+ * @modified Daniel Tovar 2026-10-10 Esqueleto y reintento al abrir la conversación.
  * @modified Daniel Tovar 2026-10-10 Catálogo importado de domain/catalogoLab.
  */
 export function FinanzasChatPanel({
@@ -93,6 +96,8 @@ export function FinanzasChatPanel({
   const [estadoChat, setEstadoChat] = useState("");
   const [cargandoChat, setCargandoChat] = useState(false);
   const [cargandoSesion, setCargandoSesion] = useState(false);
+  const [errorSesion, setErrorSesion] = useState<string | null>(null);
+  const [intentoSesion, setIntentoSesion] = useState(0);
   const [errorChat, setErrorChat] = useState<string | null>(null);
   const [importacion, setImportacion] = useState<ImportacionPendiente | null>(null);
   const [confirmando, setConfirmando] = useState(false);
@@ -117,6 +122,7 @@ export function FinanzasChatPanel({
     let activa = true;
     sesionCargada.current = finanzasSessionId;
     setErrorChat(null);
+    setErrorSesion(null);
     setCargandoSesion(true);
     setMensajes([]);
     void obtenerSesion(finanzasSessionId)
@@ -127,7 +133,7 @@ export function FinanzasChatPanel({
       })
       .catch((reason: unknown) => {
         if (activa) {
-          setErrorChat(
+          setErrorSesion(
             reason instanceof Error ? reason.message : "No se pudo abrir la conversación.",
           );
         }
@@ -141,7 +147,7 @@ export function FinanzasChatPanel({
     return () => {
       activa = false;
     };
-  }, [finanzasSessionId, obtenerSesion]);
+  }, [finanzasSessionId, obtenerSesion, intentoSesion]);
 
   useTrampaFoco(drawer && abierto, onCerrar, panelRef);
 
@@ -398,7 +404,23 @@ export function FinanzasChatPanel({
         >
           <div className="flex flex-col gap-4 p-4.5">
             {cargandoSesion && (
-              <p className="m-0 text-sm text-muted" role="status">Cargando conversación…</p>
+              <>
+                <AvisoCarga texto="Cargando conversación…" />
+                <div aria-hidden="true" className="flex flex-col gap-3">
+                  <Esqueleto className="h-4 w-full" />
+                  <Esqueleto className="h-4 w-4/5" />
+                  <Esqueleto className="h-4 w-3/5" />
+                </div>
+              </>
+            )}
+            {errorSesion && (
+              <EstadoError
+                mensaje={errorSesion}
+                onReintentar={() => {
+                  sesionCargada.current = null;
+                  setIntentoSesion((actual) => actual + 1);
+                }}
+              />
             )}
             {mensajes.length === 0 && !cargandoSesion && !importacion && (
               <p className="m-0 text-sm text-muted">

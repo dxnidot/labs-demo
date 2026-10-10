@@ -10,6 +10,8 @@ import { adaptadores } from "../infrastructure/composition";
 import { Button } from "./components/Button";
 import { claseFoco, claseFocoContenedor } from "./components/foco";
 import { AvisoProveedorModelo } from "./components/AvisoProveedorModelo";
+import { Esqueleto, AvisoCarga } from "./components/Esqueleto";
+import { EstadoError } from "./components/EstadoError";
 import { LaraLogo } from "./components/LaraLogo";
 import { PageLayout } from "./components/PageLayout";
 import { PuntoEstado } from "./components/PuntoEstado";
@@ -103,6 +105,7 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
  * @modified Daniel Tovar 2026-10-02 Logs de consola del catálogo cargado y del modelo elegido por envío.
  * @modified Daniel Tovar 2026-10-10 Aviso fijo de ADR-0007 junto al campo de mensaje.
  * @modified Daniel Tovar 2026-10-10 "Ir al final" respeta prefers-reduced-motion.
+ * @modified Daniel Tovar 2026-10-10 Esqueleto al abrir una conversación y errores con reintento (abrir y enviar).
  * @modified Daniel Tovar 2026-10-10 Catálogo de domain/catalogoLab y catálogo de modelos desde el composition root.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
@@ -120,6 +123,9 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
   const [cargando, setCargando] = useState(false);
   const [cargandoSesion, setCargandoSesion] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [origenError, setOrigenError] = useState<"sesion" | "envio" | null>(null);
+  const [intentoSesion, setIntentoSesion] = useState(0);
+  const ultimoEnvio = useRef("");
   const [mostrarIrAlFinal, setMostrarIrAlFinal] = useState(false);
   const [modelos, setModelos] = useState<Modelo[]>(modelosDeRespaldo);
   const [modeloId, setModeloId] = useState(modelosDeRespaldo[0].id);
@@ -156,6 +162,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
 
     let active = true;
     setError(null);
+    setOrigenError(null);
     setCargandoSesion(true);
     setMensajes([]);
     obtenerSesion(activeSessionId)
@@ -167,6 +174,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
       .catch((reason: unknown) => {
         if (active) {
           setError(reason instanceof Error ? reason.message : "No se pudo abrir la conversación.");
+          setOrigenError("sesion");
         }
       })
       .finally(() => {
@@ -177,7 +185,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     return () => {
       active = false;
     };
-  }, [activeSessionId, obtenerSesion]);
+  }, [activeSessionId, obtenerSesion, intentoSesion]);
 
   useEffect(() => {
     const list = listaMensajesRef.current;
@@ -187,14 +195,19 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     }
   }, [mensajes, estado, cargandoSesion]);
 
-  async function enviar(event: FormEvent<HTMLFormElement>) {
+  function enviar(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const mensaje = texto.trim();
     if (!mensaje || cargando || cargandoSesion || composicionActiva.current) {
       return;
     }
+    void enviarTexto(mensaje);
+  }
 
+  async function enviarTexto(mensaje: string) {
+    ultimoEnvio.current = mensaje;
     setError(null);
+    setOrigenError(null);
     setCargando(true);
     setTexto("");
     seguirAlFinal.current = true;
@@ -247,11 +260,23 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
         ),
       );
       setError(reason instanceof Error ? reason.message : "No se pudo completar el mensaje.");
+      setOrigenError("envio");
     } finally {
       setEstado("");
       setCargando(false);
     }
   }
+
+  /** Reabre la conversación o reenvía el último mensaje (solo si el fallo no dejó una respuesta a medias). */
+  const reintentar =
+    origenError === "sesion"
+      ? () => setIntentoSesion((actual) => actual + 1)
+      : origenError === "envio" && mensajes.at(-1)?.rol === "usuario"
+        ? () => {
+            setMensajes((actuales) => actuales.slice(0, -1));
+            void enviarTexto(ultimoEnvio.current);
+          }
+        : undefined;
 
   function desplazarAlFinal() {
     const list = listaMensajesRef.current;
@@ -419,7 +444,21 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
           </div>
         )}
 
-        {cargandoSesion && <p className="m-auto text-sm text-muted">Cargando conversación…</p>}
+        {cargandoSesion && (
+          <>
+            <AvisoCarga texto="Cargando conversación…" />
+            <div aria-hidden="true" className="flex flex-col gap-6">
+              <Esqueleto className="h-11 w-3/5 self-end" />
+              <div className="flex gap-3.5">
+                <Esqueleto className="size-7.5 shrink-0" />
+                <div className="flex w-full flex-col gap-3">
+                  <Esqueleto className="h-4 w-full" />
+                  <Esqueleto className="h-4 w-4/5" />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {mensajes.map((mensaje, index) => (
           <article
@@ -454,11 +493,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
         ))}
 
         {estado && <p className="mx-auto font-mono text-xs text-muted">{estado}</p>}
-        {error && (
-          <p className="rounded-card border border-border bg-surface-active px-4 py-3 text-sm text-danger" role="alert">
-            {error}
-          </p>
-        )}
+        {error && <EstadoError mensaje={error} onReintentar={reintentar} />}
       </div>
     </PageLayout>
   );

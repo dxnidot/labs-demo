@@ -15,6 +15,7 @@ const tonoPermiso: Record<PermisoHerramienta, PillTone> = {
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  * @modified Daniel Tovar 2026-10-10 Catálogo importado de domain/catalogoLab.
+ * @modified Daniel Tovar 2026-10-10 Vacío sin jerga.
  */
 export function HerramientasPage() {
   return (
@@ -52,7 +53,7 @@ export function HerramientasPage() {
           </tbody>
         </table>
       </div>
-      <EstadoVacio fuente="MCP filesystem" pendiente="AG-06" />
+      <EstadoVacio mensaje="Las herramientas MCP de archivos aún no están conectadas; arriba se listan las que ya existen." />
     </PageLayout>
   );
 }

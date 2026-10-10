@@ -6,6 +6,7 @@ import { PageLayout } from "./components/PageLayout";
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Vacío sin jerga.
  */
 export function GastosFijosPage() {
   return (
@@ -13,7 +14,7 @@ export function GastosFijosPage() {
       subtitulo="Pagos que se repiten y su proyección. Confirma los que detectó Lara."
       titulo="Gastos fijos"
     >
-      <EstadoVacio fuente="servicio finanzas" pendiente="FIN-03" />
+      <EstadoVacio mensaje="La detección de gastos fijos aún no está disponible: todavía no hay pagos recurrentes que confirmar." />
     </PageLayout>
   );
 }

@@ -1,8 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { ComprobarServicios } from "../application/use-cases/ComprobarServicios";
-import { serviciosPendientes, type Disponibilidad, type EstadoServicio } from "../domain/ServicioLab";
+import {
+  serviciosLab,
+  serviciosPendientes,
+  type Disponibilidad,
+  type EstadoServicio,
+} from "../domain/ServicioLab";
 import { adaptadores } from "../infrastructure/composition";
 import { Card } from "./components/Card";
+import { AvisoCarga, Esqueleto } from "./components/Esqueleto";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { claseFoco } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
@@ -21,6 +27,7 @@ const leyenda: Record<Disponibilidad, { texto: string; estado: EstadoPunto }> = 
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  * @modified Daniel Tovar 2026-10-10 Adaptador desde el composition root y servicios pendientes en domain/ServicioLab.
+ * @modified Daniel Tovar 2026-10-10 Esqueleto de carga y vacíos sin jerga.
  */
 export function EstadoLabPage() {
   const [estados, setEstados] = useState<EstadoServicio[] | null>(null);
@@ -50,9 +57,16 @@ export function EstadoLabPage() {
     >
       <div className="grid grid-cols-1 gap-4 shell:grid-cols-4">
         {estados === null && (
-          <p className="m-0 text-sm text-muted shell:col-span-4" role="status">
-            Comprobando servicios…
-          </p>
+          <>
+            <AvisoCarga texto="Comprobando servicios…" />
+            {serviciosLab.map((servicio) => (
+              <Card aria-hidden="true" key={servicio.clave}>
+                <Esqueleto className="h-5 w-2/5" />
+                <Esqueleto className="h-3 w-4/5" />
+                <Esqueleto className="h-4 w-1/4" />
+              </Card>
+            ))}
+          </>
         )}
         {estados?.map(({ servicio, disponibilidad }) => (
           <Card key={servicio.clave}>
@@ -68,7 +82,7 @@ export function EstadoLabPage() {
           <Card key={servicio.nombre}>
             <span className="font-medium">{servicio.nombre}</span>
             <span className="font-mono text-xs text-muted">{servicio.detalle}</span>
-            <EstadoVacio fuente={`health check de ${servicio.nombre}`} pendiente={servicio.pendiente} />
+            <EstadoVacio mensaje="Aún no hay comprobación de salud para este servicio." />
           </Card>
         ))}
       </div>
@@ -81,11 +95,11 @@ export function EstadoLabPage() {
       <div className="grid grid-cols-1 gap-4 shell:grid-cols-2">
         <Card>
           <h2 className="m-0 text-base font-semibold">Avance por parte</h2>
-          <EstadoVacio fuente="docs/plans/estado-lab.md" pendiente="UI-07" />
+          <EstadoVacio mensaje="El avance del plan aún no se muestra aquí; está en docs/plans/estado-lab.md." />
         </Card>
         <Card>
           <h2 className="m-0 text-base font-semibold">Sigue en el checklist</h2>
-          <EstadoVacio fuente="docs/plans/estado-lab.md" pendiente="UI-07" />
+          <EstadoVacio mensaje="Los siguientes pendientes aún no se muestran aquí; están en docs/plans/estado-lab.md." />
         </Card>
       </div>
     </PageLayout>

@@ -23,6 +23,7 @@ import type { Usuario } from "../domain/Usuario";
 import { IniciarSesion } from "../application/use-cases/IniciarSesion";
 import { adaptadores, usarMocks } from "../infrastructure/composition";
 import { DialogoApariencia } from "./apariencia/DialogoApariencia";
+import { AvisoCarga, Esqueleto, EsqueletoTabla } from "./components/Esqueleto";
 import { AccesoDenegado } from "./components/AccesoDenegado";
 import { claseFoco } from "./components/foco";
 import { IconButton } from "./components/IconButton";
@@ -81,6 +82,7 @@ const iconoNav = "size-4.5 shrink-0";
  * @modified Daniel Tovar 2026-10-10 Botón y diálogo "Apariencia" en el pie de la barra lateral.
  * @modified Daniel Tovar 2026-10-10 Skip link, contenido principal enfocable y título del documento por vista.
  * @modified Daniel Tovar 2026-10-10 Adaptadores desde el composition root e indicador MOCK.
+ * @modified Daniel Tovar 2026-10-10 Esqueletos de carga y reintento en Recientes.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -150,9 +152,14 @@ function SeccionNav({ titulo, children }: { titulo: string; children: ReactNode 
 
 function CargandoVista() {
   return (
-    <p className="m-0 p-4 text-sm text-muted sm:p-8" role="status">
-      Cargando vista…
-    </p>
+    <div className="flex flex-col gap-6 p-4 sm:p-8">
+      <AvisoCarga texto="Cargando vista…" />
+      <div aria-hidden="true" className="flex flex-col gap-3">
+        <Esqueleto className="h-7 w-1/3" />
+        <Esqueleto className="h-4 w-1/2" />
+      </div>
+      <EsqueletoTabla />
+    </div>
   );
 }
 
@@ -164,6 +171,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
     activeSessionId,
     historyError,
     isLoadingHistory,
+    refreshSessions,
     selectSession,
     sessions,
     setActiveSessionId,
@@ -425,7 +433,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
                   <h2 className="m-0 font-mono text-label font-normal tracking-label text-faint">
                     RECIENTES
                   </h2>
-                  {isLoadingHistory && <span className="text-xs text-muted">Cargando…</span>}
+                  {isLoadingHistory && <AvisoCarga texto="Cargando conversaciones…" />}
                 </div>
                 <nav aria-label="Historial de chats" className="flex flex-col gap-0.5">
                   {sessions.map((session) => (
@@ -443,7 +451,22 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
                     <p className="m-0 px-3 py-2 text-xs text-faint">Aún no hay conversaciones.</p>
                   )}
                   {historyError && (
-                    <p className="m-0 px-3 py-2 text-xs text-danger" role="alert">{historyError}</p>
+                    <div className="flex flex-col items-start gap-1 px-3 py-2">
+                      <p className="m-0 text-xs text-danger" role="alert">{historyError}</p>
+                      <button
+                        className="inline-flex min-h-11 items-center text-xs text-accent underline hover:text-accent-hover shell:min-h-0"
+                        onClick={() => void refreshSessions().catch(() => undefined)}
+                        type="button"
+                      >
+                        Reintentar
+                      </button>
+                    </div>
+                  )}
+                  {isLoadingHistory && sessions.length === 0 && (
+                    <div aria-hidden="true" className="flex flex-col gap-2 px-3 py-2">
+                      <Esqueleto className="h-3.5 w-4/5" />
+                      <Esqueleto className="h-3.5 w-3/5" />
+                    </div>
                   )}
                 </nav>
               </div>

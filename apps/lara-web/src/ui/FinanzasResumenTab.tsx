@@ -14,7 +14,7 @@ interface FinanzasResumenTabProps {
 
 const coloresBarra = ["bg-chart-1", "bg-chart-2", "bg-chart-3", "bg-chart-4", "bg-chart-5"];
 const maximoMovimientos = 5;
-const textoSinDatos = "Sin datos todavía · Fuente: finanzas · Pendiente: totales mensuales";
+const textoSinDatos = "Aún no disponible: el servicio de finanzas todavía no entrega los totales mensuales.";
 const enlaceClase = `inline-flex min-h-11 items-center text-compact text-accent underline hover:text-accent-hover shell:min-h-0 ${claseFoco}`;
 
 /**
@@ -22,6 +22,7 @@ const enlaceClase = `inline-flex min-h-11 items-center text-compact text-accent 
  * Los totales que requieren calcular importes quedan en estado vacío hasta que el servicio los expone.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-10-10 Textos sin jerga de backlog.
  */
 export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTabProps) {
   const proximoPago = datos.eventos.find((evento) => evento.tipo === "PAGO");
@@ -66,7 +67,7 @@ export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTa
             Ingresos vs gastos · 6 meses
           </h2>
           <p className="m-0 text-sm text-faint">
-            Sin datos todavía · Fuente: finanzas · Pendiente: serie mensual
+            Aún no disponible: el servicio de finanzas todavía no entrega la serie de los últimos meses.
           </p>
         </Card>
 

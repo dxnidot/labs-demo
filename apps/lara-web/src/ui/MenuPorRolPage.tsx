@@ -4,6 +4,8 @@ import type { MenuOpcion } from "../domain/MenuOpcion";
 import type { Usuario } from "../domain/Usuario";
 import { adaptadores } from "../infrastructure/composition";
 import { Card } from "./components/Card";
+import { AvisoCarga, EsqueletoLineas } from "./components/Esqueleto";
+import { EstadoError } from "./components/EstadoError";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { PageLayout } from "./components/PageLayout";
 import { Pill } from "./components/Pill";
@@ -17,10 +19,12 @@ const obtenerMenu = new ObtenerMenu(adaptadores.menu);
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
  * @modified Daniel Tovar 2026-10-10 Adaptador desde el composition root (VITE_USE_MOCKS).
+ * @modified Daniel Tovar 2026-10-10 Esqueleto de carga, vacío sin jerga y error con reintento.
  */
 export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
   const [opciones, setOpciones] = useState<MenuOpcion[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [intento, setIntento] = useState(0);
 
   useEffect(() => {
     let activo = true;
@@ -39,7 +43,13 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
     return () => {
       activo = false;
     };
-  }, []);
+  }, [intento]);
+
+  function reintentar() {
+    setError(null);
+    setOpciones(null);
+    setIntento((actual) => actual + 1);
+  }
 
   return (
     <PageLayout
@@ -68,9 +78,12 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
           <div className="font-mono text-xs text-muted">
             {`roles: ${usuario.kcMenuRoles.length > 0 ? usuario.kcMenuRoles.join(", ") : "sin roles de kc-menu"}`}
           </div>
-          {error && <p className="m-0 text-sm text-danger" role="alert">{error}</p>}
+          {error && <EstadoError mensaje={error} onReintentar={reintentar} />}
           {!error && opciones === null && (
-            <p className="m-0 text-sm text-muted" role="status">Cargando menú…</p>
+            <>
+              <AvisoCarga texto="Cargando menú…" />
+              <EsqueletoLineas cantidad={3} />
+            </>
           )}
           {opciones?.length === 0 && (
             <p className="m-0 text-sm text-muted">El backend no devolvió opciones para este usuario.</p>
@@ -100,8 +113,7 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
         </Card>
         <EstadoVacio
           className="self-start"
-          fuente="kc-demo · GET /api/menu solo devuelve el usuario actual"
-          pendiente="UI-07"
+          mensaje="Solo se muestra el usuario actual: el servicio de menú no lista a otros usuarios."
         />
       </div>
       <p className="m-0 text-compact text-faint">La acción también se valida en el backend.</p>

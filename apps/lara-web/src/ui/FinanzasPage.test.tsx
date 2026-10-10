@@ -186,7 +186,8 @@ describe("FinanzasPage · carga y resumen", () => {
     expect(within(ultimos).getByText("manual")).toBeTruthy();
     expect(within(ultimos).getByText("notificación")).toBeTruthy();
 
-    expect(screen.getAllByText(/Sin datos todavía/).length).toBeGreaterThanOrEqual(4);
+    expect(screen.getAllByText(/Aún no disponible: el servicio de finanzas/).length).toBeGreaterThanOrEqual(4);
+    expect(screen.queryByText(/Pendiente:|Sin datos todavía/)).toBeNull();
     expect(screen.getByRole("link", { name: "Ver tarjetas" }).getAttribute("href")).toBe(
       "/finanzas/tarjetas",
     );
@@ -208,6 +209,37 @@ describe("FinanzasPage · carga y resumen", () => {
     });
     expect(within(categoriasUsd).getByText("Viajes USD")).toBeTruthy();
     expect(within(categoriasUsd).queryByText("Vivienda")).toBeNull();
+  });
+
+  it("mientras carga muestra esqueletos y un aviso accesible, sin 'Cargando' visible como texto suelto", async () => {
+    vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>(() => {})));
+
+    const { container } = renderizar();
+
+    expect((await screen.findByRole("status")).textContent).toBe(
+      "Cargando movimientos, resumen y tarjetas…",
+    );
+    expect(container.querySelectorAll(".animate-pulse").length).toBeGreaterThan(0);
+  });
+
+  it("el asistente reintenta abrir la conversación si falla", async () => {
+    chatFake.finanzasSessionId = "sesion-finanzas";
+    chatFake.obtenerSesion
+      .mockRejectedValueOnce(new Error("No se pudo abrir la conversación."))
+      .mockResolvedValueOnce([{ rol: "usuario", texto: "Mensaje del asistente recuperado", fecha: new Date() }]);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => respuestaFinanzas(String(input), datosBase)),
+    );
+
+    renderizar();
+
+    const panel = await screen.findByRole("complementary", { name: "Asistente de finanzas" });
+    expect((await within(panel).findByRole("alert")).textContent).toBe("No se pudo abrir la conversación.");
+    fireEvent.click(within(panel).getByRole("button", { name: "Reintentar" }));
+
+    expect(await within(panel).findByText("Mensaje del asistente recuperado")).toBeTruthy();
+    chatFake.finanzasSessionId = null;
   });
 
   it("muestra el error de carga y permite reintentar", async () => {

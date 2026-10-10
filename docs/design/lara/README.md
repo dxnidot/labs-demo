@@ -297,3 +297,4 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 - Vistas de administración (BD, usuarios, BPM, herramientas) **solo lectura** desde Lara.
 - Finanzas: datos en el servicio finanzas (Postgres local); al LLM solo le llegan resultados calculados.
 - Botones reales (`<button>`, `<a>`), `aria-label` en botones de solo ícono, contraste AA.
+- Estados comunes de las vistas que cargan datos: carga con esqueletos (`animate-pulse`, quieto con `prefers-reduced-motion`) y un aviso `role="status"` para lectores de pantalla; vacío con una frase en lenguaje claro (nunca claves del backlog ni "Pendiente:"); error con `role="alert"` y botón **Reintentar**.

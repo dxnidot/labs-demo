@@ -6,6 +6,7 @@ import { PageLayout } from "./components/PageLayout";
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Vacío sin jerga.
  */
 export function MemoriaPage() {
   return (
@@ -13,7 +14,7 @@ export function MemoriaPage() {
       subtitulo="Busca por significado en la documentación y en lo que Lara recuerda de tus sesiones."
       titulo="Memoria vectorizada"
     >
-      <EstadoVacio fuente="memory service / RAG" pendiente="EXT-01" />
+      <EstadoVacio mensaje="La memoria vectorizada aún no está conectada: todavía no hay nada que buscar." />
     </PageLayout>
   );
 }

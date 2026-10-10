@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MessageCircle, RefreshCw } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { Link, Navigate, useParams } from "react-router";
 import {
   ObtenerResumenFinanciero,
@@ -9,6 +9,9 @@ import type { Moneda } from "../domain/MovimientoFinanciero";
 import type { Tarjeta } from "../domain/Tarjeta";
 import { adaptadores } from "../infrastructure/composition";
 import { Button } from "./components/Button";
+import { Card } from "./components/Card";
+import { AvisoCarga, Esqueleto, EsqueletoTabla } from "./components/Esqueleto";
+import { EstadoError } from "./components/EstadoError";
 import { claseFocoInterno } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
 import { FinanzasChatPanel } from "./FinanzasChatPanel";
@@ -50,6 +53,7 @@ function esPestana(valor: string | undefined): valor is PestanaId {
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (pestañas fijas, único scroll), botón Asistente siempre visible en angosto y pestañas con scroll.
  * @modified Daniel Tovar 2026-10-10 Pestañas con flechas y tabindex itinerante, MXN/USD de 44px en angosto y lista de pestañas compartida.
  * @modified Daniel Tovar 2026-10-10 Adaptador de finanzas desde el composition root (VITE_USE_MOCKS).
+ * @modified Daniel Tovar 2026-10-10 Esqueleto de carga y error con el componente común.
  */
 export function FinanzasPage() {
   const { tab } = useParams();
@@ -224,22 +228,23 @@ export function FinanzasPage() {
       >
         <div aria-labelledby={idPestana(tab)} id={idPanelPestanas} role="tabpanel">
           {cargando && (
-            <p className="m-0 rounded-card border border-border bg-surface p-5 text-sm text-muted" role="status">
-              Cargando movimientos, resumen y tarjetas…
-            </p>
+            <>
+              <AvisoCarga texto="Cargando movimientos, resumen y tarjetas…" />
+              <div aria-hidden="true" className="flex flex-col gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 wide:grid-cols-4">
+                  {Array.from({ length: 4 }, (_, indice) => (
+                    <Card key={indice}>
+                      <Esqueleto className="h-4 w-1/2" />
+                      <Esqueleto className="h-7 w-3/4" />
+                    </Card>
+                  ))}
+                </div>
+                <EsqueletoTabla />
+              </div>
+            </>
           )}
           {!cargando && error && (
-            <div className="flex flex-col gap-3 rounded-card border border-border bg-surface-active p-5 sm:flex-row sm:items-center sm:justify-between">
-              <p className="m-0 text-sm text-danger" role="alert">{error}</p>
-              <Button
-                className="shrink-0"
-                onClick={() => void cargar(periodo, false)}
-                variant="ghost"
-              >
-                <RefreshCw aria-hidden="true" className="size-4" />
-                Reintentar
-              </Button>
-            </div>
+            <EstadoError mensaje={error} onReintentar={() => void cargar(periodo, false)} />
           )}
           {datos && tab === "resumen" && (
             <FinanzasResumenTab datos={datos} moneda={moneda} periodo={periodo} />

@@ -45,6 +45,6 @@ export const herramientasConfig: readonly HerramientaConfig[] = [
 
 /** Agentes del plan que aún no existen: la vista muestra su tarjeta vacía con la historia que los habilita. */
 export const agentesPendientes = [
-  { nombre: "calculos-financieros", detalle: "Java · A2A · :8002", pendiente: "AG-02" },
-  { nombre: "traductor", detalle: "TypeScript · A2A · :8003", pendiente: "AG-03" },
+  { nombre: "calculos-financieros", detalle: "Java · A2A · :8002" },
+  { nombre: "traductor", detalle: "TypeScript · A2A · :8003" },
 ] as const;

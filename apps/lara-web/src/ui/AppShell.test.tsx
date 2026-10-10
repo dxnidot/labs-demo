@@ -140,6 +140,94 @@ describe("login", () => {
   });
 });
 
+describe("estados de carga y error con reintento", () => {
+  it("Estado del lab muestra esqueletos con aviso mientras comprueba los servicios", async () => {
+    prepararFetch();
+    vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>(() => {})));
+
+    montar("/estado");
+
+    expect(await screen.findByText("Comprobando servicios…")).toBeTruthy();
+    expect(document.querySelectorAll("main .animate-pulse").length).toBeGreaterThan(0);
+  });
+
+  it("Base de datos: si falla la carga ofrece Reintentar y luego muestra las sesiones", async () => {
+    let llamadas = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        if (String(input).endsWith("/sessions")) {
+          llamadas += 1;
+          // Las dos primeras llamadas son la del historial del shell y la de la página; fallan ambas.
+          return llamadas <= 2
+            ? new Response("", { status: 500 })
+            : new Response(
+                JSON.stringify([{ id: "3f9c0000000000000000a21e", lastUpdateTime: 1_790_000_000, state: { titulo: "Sesión recuperada" } }]),
+                { status: 200 },
+              );
+        }
+        return new Response("[]", { status: 200 });
+      }),
+    );
+
+    montar("/base-de-datos");
+
+    const panel = await screen.findByRole("tabpanel");
+    const alerta = await within(panel).findByRole("alert");
+    expect(alerta.textContent).toBeTruthy();
+    fireEvent.click(within(panel).getByRole("button", { name: "Reintentar" }));
+
+    expect(await within(panel).findByText("Sesión recuperada")).toBeTruthy();
+    expect(within(panel).queryByRole("alert")).toBeNull();
+  });
+
+  it("Menú por rol: si falla ofrece Reintentar y luego muestra las opciones", async () => {
+    let llamadas = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        if (String(input) === "/api/menu") {
+          llamadas += 1;
+          return llamadas === 1 ? new Response("", { status: 503 }) : new Response(JSON.stringify(menu), { status: 200 });
+        }
+        return new Response("[]", { status: 200 });
+      }),
+    );
+
+    montar("/menu-por-rol");
+
+    expect(await screen.findByRole("alert")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Reintentar" }));
+
+    expect(await screen.findByText("Reportes")).toBeTruthy();
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("Recientes: si falla el historial ofrece Reintentar y lo recupera", async () => {
+    let llamadas = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        if (String(input).endsWith("/sessions")) {
+          llamadas += 1;
+          return llamadas === 1
+            ? new Response("", { status: 500 })
+            : new Response(JSON.stringify([{ id: "a1", lastUpdateTime: 1_790_000_000, state: { titulo: "Chat recuperado" } }]), { status: 200 });
+        }
+        return new Response("[]", { status: 200 });
+      }),
+    );
+
+    montar("/estado");
+
+    const nav = await screen.findByRole("navigation", { name: "Historial de chats" });
+    expect(await within(nav).findByRole("alert")).toBeTruthy();
+    fireEvent.click(within(nav).getByRole("button", { name: "Reintentar" }));
+
+    expect(await within(nav).findByText("Chat recuperado")).toBeTruthy();
+  });
+});
+
 describe("accesibilidad del shell", () => {
   it("el skip link es lo primero que se alcanza con Tab y manda el foco al contenido principal", async () => {
     prepararFetch();
@@ -378,14 +466,37 @@ describe("sidebar y rutas", () => {
 });
 
 describe("pantallas con datos", () => {
-  it("estados vacíos con el texto exacto de la regla", async () => {
+  it("los estados vacíos explican la carencia en lenguaje claro", async () => {
     prepararFetch();
 
     montar("/memoria");
 
     expect(
-      await screen.findByText("Sin datos todavía · Fuente: memory service / RAG · Pendiente: EXT-01"),
+      await screen.findByText("La memoria vectorizada aún no está conectada: todavía no hay nada que buscar."),
     ).toBeTruthy();
+  });
+
+  it.each([
+    "/estado",
+    "/agentes",
+    "/base-de-datos",
+    "/memoria",
+    "/herramientas",
+    "/menu-por-rol",
+    "/usuarios",
+    "/sincronizacion-bpm",
+    "/gastos-fijos",
+    "/finanzas/resumen",
+  ])("%s no muestra claves del backlog ni 'Pendiente:' al usuario", async (ruta) => {
+    prepararFetch();
+
+    montar(ruta);
+
+    await screen.findByRole("heading", { level: 1 });
+    await waitFor(() => expect(screen.queryByText(/^(Cargando|Comprobando)/)).toBeNull());
+    const texto = document.querySelector("main")?.textContent ?? "";
+    expect(texto).not.toMatch(/\b(?:AG|UI|EXT|FIN|BPM|KC|FE|QA|OBS)-\d{2}\b/);
+    expect(texto).not.toMatch(/Pendiente:|Sin datos todavía/);
   });
 
   it("Estado del lab muestra un servicio arriba y otro sin respuesta", async () => {
@@ -411,9 +522,7 @@ describe("pantallas con datos", () => {
     const tarjetaFinanzas = screen.getByText("finanzas", { selector: "span" }).closest("section");
     expect(within(tarjetaFinanzas as HTMLElement).getByText("Sin respuesta")).toBeTruthy();
     expect(screen.queryByText("kc-front")).toBeNull();
-    expect(
-      screen.getByText("Sin datos todavía · Fuente: health check de Java A2A · Pendiente: AG-02"),
-    ).toBeTruthy();
+    expect(screen.getAllByText("Aún no hay comprobación de salud para este servicio.")).toHaveLength(3);
   });
 
   it("Base de datos lista las sesiones del usuario y deja vacías las demás tablas", async () => {
@@ -435,9 +544,7 @@ describe("pantallas con datos", () => {
 
     fireEvent.click(screen.getByRole("tab", { name: "events" }));
 
-    expect(
-      screen.getByText("Sin datos todavía · Fuente: ADK API server · tabla events · Pendiente: AG-05"),
-    ).toBeTruthy();
+    expect(screen.getByText("Esta tabla aún no se puede consultar desde Lara.")).toBeTruthy();
   });
 
   it("Menú por rol muestra las opciones de /api/menu del usuario actual", async () => {

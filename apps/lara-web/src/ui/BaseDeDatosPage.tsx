@@ -3,6 +3,8 @@ import { ListarSesiones } from "../application/use-cases/ListarSesiones";
 import type { SesionChat } from "../domain/SesionChat";
 import type { Usuario } from "../domain/Usuario";
 import { adaptadores } from "../infrastructure/composition";
+import { AvisoCarga, EsqueletoTabla } from "./components/Esqueleto";
+import { EstadoError } from "./components/EstadoError";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { claseFocoInterno } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
@@ -32,11 +34,13 @@ function formatearFecha(fecha: Date): string {
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  * @modified Daniel Tovar 2026-10-10 Pestañas de tablas con flechas, tabindex itinerante y relación tab-panel.
  * @modified Daniel Tovar 2026-10-10 Adaptador desde el composition root (VITE_USE_MOCKS).
+ * @modified Daniel Tovar 2026-10-10 Esqueleto de carga, vacíos sin jerga y error con reintento.
  */
 export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
   const [tabla, setTabla] = useState<Tabla>("sessions");
   const [sesiones, setSesiones] = useState<SesionChat[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [intento, setIntento] = useState(0);
   const listaTablas = useScrollPestanaActiva(tabla);
 
   useEffect(() => {
@@ -56,7 +60,13 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
     return () => {
       activo = false;
     };
-  }, [usuario.id]);
+  }, [usuario.id, intento]);
+
+  function reintentar() {
+    setError(null);
+    setSesiones(null);
+    setIntento((actual) => actual + 1);
+  }
 
   return (
     <PageLayout
@@ -103,16 +113,17 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
     >
       <div aria-labelledby={`pestana-tabla-${tabla}`} id="panel-tablas" role="tabpanel">
         {tabla !== "sessions" && (
-          <EstadoVacio fuente={`ADK API server · tabla ${tabla}`} pendiente="AG-05" />
+          <EstadoVacio mensaje="Esta tabla aún no se puede consultar desde Lara." />
         )}
-        {tabla === "sessions" && error && (
-          <p className="m-0 text-sm text-danger" role="alert">{error}</p>
-        )}
+        {tabla === "sessions" && error && <EstadoError mensaje={error} onReintentar={reintentar} />}
         {tabla === "sessions" && !error && sesiones === null && (
-          <p className="m-0 text-sm text-muted" role="status">Cargando sesiones…</p>
+          <>
+            <AvisoCarga texto="Cargando sesiones…" />
+            <EsqueletoTabla />
+          </>
         )}
         {tabla === "sessions" && sesiones?.length === 0 && (
-          <EstadoVacio fuente="ADK API server · sesiones del usuario" pendiente="AG-05" />
+          <EstadoVacio mensaje="Todavía no hay sesiones guardadas." />
         )}
         {tabla === "sessions" && sesiones && sesiones.length > 0 && (
           <div className="overflow-x-auto rounded-card border border-border">
