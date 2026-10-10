@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { ObtenerMenu } from "../application/use-cases/ObtenerMenu";
 import type { MenuOpcion } from "../domain/MenuOpcion";
 import type { Usuario } from "../domain/Usuario";
+import type { MenuPorRolPort } from "../application/ports/MenuPorRolPort";
+import type { UsuarioMenu } from "../domain/UsuarioMenu";
 import { adaptadores } from "../infrastructure/composition";
 import { Card } from "./components/Card";
 import { AvisoCarga, EsqueletoLineas } from "./components/Esqueleto";
@@ -19,12 +21,15 @@ const obtenerMenu = new ObtenerMenu(adaptadores.menu);
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
  * @modified Daniel Tovar 2026-10-10 Adaptador desde el composition root (VITE_USE_MOCKS).
- * @modified Daniel Tovar 2026-10-10 Esqueleto de carga, vacío sin jerga y error con reintento.
+ * @modified Daniel Tovar 2026-10-10 Añade tarjetas de usuarios de prueba consultadas por puerto.
  */
-export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
+export function MenuPorRolPage({ usuario, menuPorRol }: { usuario: Usuario; menuPorRol: MenuPorRolPort }) {
   const [opciones, setOpciones] = useState<MenuOpcion[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [intento, setIntento] = useState(0);
+  const [usuariosPrueba, setUsuariosPrueba] = useState<UsuarioMenu[] | null>(null);
+  const [errorPrueba, setErrorPrueba] = useState<string | null>(null);
+  const [intentoPrueba, setIntentoPrueba] = useState(0);
 
   useEffect(() => {
     let activo = true;
@@ -45,10 +50,31 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
     };
   }, [intento]);
 
+  useEffect(() => {
+    let activo = true;
+    menuPorRol
+      .listarPorUsuario()
+      .then((resultado) => {
+        if (activo) setUsuariosPrueba(resultado);
+      })
+      .catch((reason: unknown) => {
+        if (activo) setErrorPrueba(reason instanceof Error ? reason.message : "No se pudieron cargar los menús de prueba.");
+      });
+    return () => {
+      activo = false;
+    };
+  }, [intentoPrueba, menuPorRol]);
+
   function reintentar() {
     setError(null);
     setOpciones(null);
     setIntento((actual) => actual + 1);
+  }
+
+  function reintentarPrueba() {
+    setErrorPrueba(null);
+    setUsuariosPrueba(null);
+    setIntentoPrueba((actual) => actual + 1);
   }
 
   return (
@@ -111,10 +137,45 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
             </ul>
           )}
         </Card>
-        <EstadoVacio
-          className="self-start"
-          mensaje="Solo se muestra el usuario actual: el servicio de menú no lista a otros usuarios."
-        />
+        {errorPrueba ? (
+          <EstadoError mensaje={errorPrueba} onReintentar={reintentarPrueba} />
+        ) : usuariosPrueba === null ? (
+          <Card aria-label="Menús de usuarios de prueba">
+            <AvisoCarga texto="Cargando menús de usuarios de prueba…" />
+            <EsqueletoLineas cantidad={5} />
+          </Card>
+        ) : usuariosPrueba.length === 0 ? (
+          <EstadoVacio className="self-start" mensaje="No hay usuarios de prueba para mostrar." />
+        ) : (
+          usuariosPrueba.map((usuarioPrueba) => (
+            <Card aria-label={`Menú de ${usuarioPrueba.username}`} key={usuarioPrueba.username}>
+              <div className="flex items-center gap-3">
+                <span aria-hidden="true" className="inline-flex size-9 items-center justify-center rounded-full bg-surface-active font-semibold text-accent">
+                  {usuarioPrueba.username.slice(0, 1).toUpperCase()}
+                </span>
+                <div className="flex flex-col">
+                  <span className="font-semibold">{usuarioPrueba.username}</span>
+                  <span className="text-compact text-muted">usuario de prueba</span>
+                </div>
+              </div>
+              <div className="font-mono text-xs text-muted">{`roles: ${usuarioPrueba.roles.length ? usuarioPrueba.roles.join(", ") : "sin roles"}`}</div>
+              <ul className="m-0 flex list-none flex-col overflow-hidden rounded-button border border-border p-0">
+                {usuarioPrueba.opciones.map((opcion) => (
+                  <li className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 text-sm last:border-b-0" key={opcion.clave}>
+                    <span>{opcion.titulo}</span>
+                    <span className="flex flex-wrap gap-1.5">
+                      {opcion.acciones
+                        .filter((accion) => accion.toLowerCase() !== "aprobar" || usuarioPrueba.roles.includes("autorizar"))
+                        .map((accion) => (
+                          <span className="rounded-md bg-surface-active px-2 py-0.5 font-mono text-xs text-muted" key={accion}>{accion}</span>
+                        ))}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          ))
+        )}
       </div>
       <p className="m-0 text-compact text-faint">La acción también se valida en el backend.</p>
     </PageLayout>
