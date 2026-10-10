@@ -1,0 +1,261 @@
+{
+  "realm": "lab",
+  "displayName": "Lab",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "llm_basic",
+        "description": "Catálogo básico de modelos del orquestador"
+      },
+      {
+        "name": "llm_advanced",
+        "description": "Catálogo básico y avanzado de modelos del orquestador"
+      },
+      {
+        "name": "ver_agentes",
+        "description": "Sidebar de Lara: sección AGENTES"
+      },
+      {
+        "name": "ver_identidad",
+        "description": "Sidebar de Lara: sección IDENTIDAD"
+      },
+      {
+        "name": "usar_finanzas",
+        "description": "Sidebar de Lara: sección PERSONAL (Finanzas y Gastos fijos)"
+      },
+      {
+        "name": "admin",
+        "description": "Acceso completo en Lara y catálogo avanzado de modelos"
+      }
+    ],
+    "client": {
+      "chat-api": [
+        {
+          "name": "ver-menu",
+          "description": "Ver el menú"
+        },
+        {
+          "name": "autorizar",
+          "description": "Bandeja de autorizaciones"
+        },
+        {
+          "name": "admin-seguridad",
+          "description": "Administración de seguridad"
+        }
+      ],
+      "finanzas-agent": [
+        {
+          "name": "usar-finanzas",
+          "description": "El agente puede llamar a kc-finanzas en nombre de un usuario"
+        }
+      ]
+    }
+  },
+  "groups": [
+    {
+      "name": "ejecutivo",
+      "clientRoles": {
+        "chat-api": [
+          "ver-menu"
+        ]
+      }
+    },
+    {
+      "name": "supervisor",
+      "clientRoles": {
+        "chat-api": [
+          "ver-menu",
+          "autorizar"
+        ]
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "chat-api",
+      "name": "API de menú",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${KC_CHAT_API_SECRET}",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true
+    },
+    {
+      "clientId": "agents-ui",
+      "name": "Lara (UI)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true,
+      "redirectUris": [
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "+"
+      },
+      "protocolMappers": [
+        {
+          "name": "audience-agents-ui",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "agents-ui",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "chat-front",
+      "name": "Front Angular (retirado)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true,
+      "redirectUris": [
+        "http://localhost:4200/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "finanzas-agent",
+      "name": "Agente de finanzas",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${FINANZAS_AGENT_CLIENT_SECRET}",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "fullScopeAllowed": false
+    }
+  ],
+  "clientScopeMappings": {
+    "finanzas-agent": [
+      {
+        "client": "finanzas-agent",
+        "roles": [
+          "usar-finanzas"
+        ]
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "service-account-finanzas-agent",
+      "enabled": true,
+      "serviceAccountClientId": "finanzas-agent",
+      "clientRoles": {
+        "finanzas-agent": [
+          "usar-finanzas"
+        ]
+      }
+    },
+    {
+      "username": "ana",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Ana",
+      "lastName": "Prueba",
+      "email": "ana@lab.invalid",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${KC_ANA_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/ejecutivo"
+      ],
+      "realmRoles": [
+        "llm_basic",
+        "usar_finanzas"
+      ]
+    },
+    {
+      "username": "beto",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Beto",
+      "lastName": "Prueba",
+      "email": "beto@lab.invalid",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${KC_BETO_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/supervisor"
+      ],
+      "realmRoles": [
+        "llm_advanced",
+        "ver_agentes",
+        "ver_identidad",
+        "usar_finanzas"
+      ]
+    },
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "Prueba",
+      "email": "admin@lab.invalid",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${KC_LAB_ADMIN_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin",
+        "llm_advanced",
+        "ver_agentes",
+        "ver_identidad",
+        "usar_finanzas"
+      ],
+      "clientRoles": {
+        "chat-api": [
+          "ver-menu",
+          "autorizar",
+          "admin-seguridad"
+        ]
+      }
+    }
+  ]
+}

@@ -27,7 +27,7 @@
     | Client `chat-front` | Eliminar | Ningún código lo usa; puede seguir existiendo en el realm |
     | Rol de client `usar-finanzas` frente a rol de realm `usar_finanzas` | Unificar en `kebab-case` | `OwnerSubResolver` de kc-finanzas exige `usar-finanzas`; `AppShell.tsx` y sus tests usan `usar_finanzas` |
 
-    Por revisar, fuera de esa lista: el client `finanzas-agent` (no sigue la regla de nombrarlo como el servicio) y el volumen `kc-pgdata` de Keycloak (no sigue `<servicio>-pgdata`; renombrarlo implica migrar datos).
+    Por revisar, fuera de esa lista: el client `finanzas-agent` (no sigue la regla de nombrarlo como el servicio). El volumen de Keycloak ya se llama `keycloak-pgdata` (renombrado el 2026-10-10 al reiniciar con una base nueva).
   - **Cuándo se corrige la deuda:** después del export del realm (KC-03), uno por uno. Cada renombre toca código, tests y configuración del realm a la vez, así que va en su propio cambio, con sus pruebas y un plan para el realm existente.
 - Alternativas consideradas: renombrar todo de una vez ahora, lo que obliga a tocar a la vez el realm, los servicios, el front, el orquestador y los tests sin un export del realm que permita reproducirlo; y no fijar convención, lo que mantiene los estilos mezclados. Se descartan para evitar roturas y dejar una regla clara desde ahora.
 - Consecuencias: lo nuevo nace con nombres coherentes y la deuda queda visible y acotada. Mientras no se haga el renombre, conviven nombres viejos y nuevos (por ejemplo, la carpeta `lara-web` frente al client `agents-ui`) y hay que consultar este ADR antes de asumir que coinciden.

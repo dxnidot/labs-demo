@@ -8,11 +8,17 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - kc-pgdata:/var/lib/postgresql/data
+      - keycloak-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.7.4
-    command: start-dev
+    # --import-realm importa ./import/*-realm.json solo si el realm no existe.
+    command: start-dev --import-realm
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
@@ -20,10 +26,20 @@ services:
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+      # Marcadores ${VAR} de import/lab-realm.json. Sin valor, Compose se detiene:
+      # un marcador sin resolver quedaría como texto literal en el secret.
+      KC_CHAT_API_SECRET: ${KC_CHAT_API_SECRET:?define KC_CHAT_API_SECRET en infra/keycloak/.env}
+      FINANZAS_AGENT_CLIENT_SECRET: ${FINANZAS_AGENT_CLIENT_SECRET:?define FINANZAS_AGENT_CLIENT_SECRET en infra/keycloak/.env}
+      KC_ANA_PASSWORD: ${KC_ANA_PASSWORD:?define KC_ANA_PASSWORD en infra/keycloak/.env}
+      KC_BETO_PASSWORD: ${KC_BETO_PASSWORD:?define KC_BETO_PASSWORD en infra/keycloak/.env}
+      KC_LAB_ADMIN_PASSWORD: ${KC_LAB_ADMIN_PASSWORD:?define KC_LAB_ADMIN_PASSWORD en infra/keycloak/.env}
+    volumes:
+      - ./import:/opt/keycloak/data/import:ro
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
 volumes:
-  kc-pgdata:
+  keycloak-pgdata:

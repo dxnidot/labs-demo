@@ -24,12 +24,13 @@ kc-menu y kc-finanzas leen el emisor del JWT de la variable `KEYCLOAK_ISSUER_URI
 ## Realm y datos de prueba
 
 - Realm: `lab` (confirmar arriba a la izquierda que no estás en `master`).
-- Usuarios: `ana` (ejecutivo, rol `ver-menu`) y `beto` (supervisor, roles `ver-menu` y `autorizar`).
+- El realm se crea al primer arranque desde `infra/keycloak/import/lab-realm.json` (`--import-realm`); si el realm ya existe, la importación se omite.
+- Usuarios de prueba: `ana` (grupo `ejecutivo`, rol `ver-menu`), `beto` (grupo `supervisor`, roles `ver-menu` y `autorizar`) y `admin` (todos los roles). Sus contraseñas salen de `KC_ANA_PASSWORD`, `KC_BETO_PASSWORD` y `KC_LAB_ADMIN_PASSWORD` en `infra/keycloak/.env`. Tu usuario real lo creas tú en la consola de admin.
 - Clients:
   - `chat-api`: API de kc-menu; sus roles llegan en `resource_access.chat-api.roles`.
   - `agents-ui`: client público de Lara (PKCE, redirect `http://localhost:5173/*`), hecho en KC-02. Lleva un mapper de audiencia para que el access token traiga `aud=agents-ui` (KC-04).
   - `finanzas-agent`: client confidencial con service account que usa el orquestador para llamar a kc-finanzas; su client role es `usar-finanzas` (FIN-13).
-- Las contraseñas y los secrets de los clients **no están en el repo**. Se leen de variables de entorno; nunca las escribas en archivos ni en respuestas.
+- Las contraseñas y los secrets de los clients **no están en el repo**: el JSON del realm solo trae marcadores `${VAR}` y los valores viven en `infra/keycloak/.env` (`KC_CHAT_API_SECRET`, `FINANZAS_AGENT_CLIENT_SECRET`, y las tres contraseñas). Nunca las escribas en archivos versionados ni en respuestas.
 
 ## Arrancar el lab
 
@@ -93,7 +94,7 @@ Invoke-RestMethod -Uri 'http://localhost:8081/api/menu' -Headers @{ Authorizatio
 ## Reglas que no se rompen
 
 - **Nunca** `docker compose down -v`: `-v` borra los volúmenes de datos y con ellos el realm, usuarios y permisos (Keycloak) o los datos de finanzas. Para apagar usa `stop` (o `down` sin `-v`).
-- El nombre del proyecto Compose está fijado con `name:` al inicio de cada `compose.yaml` (`keycloak` y `finanzas`), así que mover o renombrar la carpeta ya no cambia el nombre de los volúmenes. Los volúmenes deberían ser `keycloak_kc-pgdata` y `finanzas_finanzas-pgdata` (inferido; confírmalo con `docker volume ls`). Si cambias el `name:`, levantas una BD vacía.
+- El nombre del proyecto Compose está fijado con `name:` al inicio de cada `compose.yaml` (`keycloak` y `finanzas`), así que mover o renombrar la carpeta ya no cambia el nombre de los volúmenes. Los volúmenes deberían ser `keycloak_keycloak-pgdata` y `finanzas_finanzas-pgdata` (inferido; confírmalo con `docker volume ls`). Si cambias el `name:`, levantas una BD vacía.
 - El puerto 8080 está atado a `127.0.0.1`; no exponerlo a la red.
 - No imprimir ni guardar tokens, secrets ni contraseñas. Si hace falta mostrar un token, solo sus claims decodificados.
 

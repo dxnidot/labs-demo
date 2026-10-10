@@ -9,7 +9,7 @@ Laboratorio personal de Keycloak + Spring Boot: roles por grupo, Authorization S
 
 ## Levantar
 
-1. `cd infra/keycloak`, copia `.env.example` a `.env` y ajusta las contrasenas.
+1. `cd infra/keycloak`, copia `.env.example` a `.env` y pon tus propios secrets y contrasenas (el realm `lab` se importa de `import/lab-realm.json`).
 2. `docker compose up -d` y entra a http://localhost:8080/admin.
 3. `cd ../../services/kc-menu` y `.\mvnw.cmd spring-boot:run` (puerto 8081).
 

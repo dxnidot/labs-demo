@@ -1,6 +1,6 @@
 # KC-03 · Realm como código (export/import)
 
-- Estado: Pendiente
+- Estado: En curso (realm escrito en infra/keycloak/import; falta probar el import)
 - Prioridad: Baja
 - Parte del lab: keycloak
 - Depende de: —
@@ -11,9 +11,15 @@
   - `ls /tmp/keycloak-export` muestra un conjunto de archivos del realm `lab` y no solo un snapshot del contenedor.
   - Un segundo `docker compose up` re-crea el realm sin pérdida de configuración o con un cambio documentado en el flujo del lab.
 - Archivos relevantes:
-  - keycloak/
+  - infra/keycloak/import/lab-realm.json
+  - infra/keycloak/compose.yaml
+  - infra/keycloak/.env.example
   - docs/plans/estado-lab.md
 - Notas:
   - Confirmado: el realm debe poder reproducirse sin hacerlo a mano cada vez.
   - Inferido: esta tarea es posterior a la validación del entorno raíz y a la UI.
-  - Pendiente: elegir la estrategia de export/import del realm según la versión final de Keycloak.
+  - Confirmado: estrategia elegida: `--import-realm` al arrancar con `infra/keycloak/import/lab-realm.json` (nombre `<realm>-realm.json`); si el realm existe, se omite el import (guía de Keycloak 26.7.4, importExport).
+  - Confirmado: secrets y contraseñas solo como marcadores `${VAR}`; Compose exige las variables con `:?`.
+  - Inferido: los marcadores funcionan en campos anidados (la guía dice "any realm configuration" y el reemplazo de Keycloak opera sobre el texto del archivo).
+  - Pendiente: probar el import en Docker (clients, roles, mapper de audiencia, service account y login de los usuarios de prueba).
+  - Pendiente: reconstruir Authorization Services (RPT) de la prueba original.

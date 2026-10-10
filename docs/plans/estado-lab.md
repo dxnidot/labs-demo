@@ -35,7 +35,7 @@ Sin cambios: puertos, nombres de BD, variables de entorno, clients de Keycloak (
 - [x] ✅ Authorization Services (RPT)
 - [ ] ⏳ KC-01 · Subir Keycloak a 26.7.5 (parche)
 - [x] ✅ KC-02 · Client público `agents-ui`
-- [ ] ⏳ KC-03 · Realm como código (export/import) — Track de identidad: solo para pruebas
+- [ ] 🔄 KC-03 · En curso: realm `lab` en `infra/keycloak/import/lab-realm.json`; falta probar el import — Track de identidad: solo para pruebas
 
 ## kc-menu, antes kc-demo (Spring Boot, puerto 8081)
 
