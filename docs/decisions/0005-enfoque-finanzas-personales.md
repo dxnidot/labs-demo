@@ -10,4 +10,4 @@
   - Las recomendaciones son educativas y no constituyen asesoría financiera personalizada.
 - Alternativas consideradas: mantener identidad como caso principal; enviar movimientos al LLM para que calcule; retirar también la traducción. Se descartan para priorizar el uso personal con privacidad local, resultados numéricos reproducibles y traducción ocasional.
 - Consecuencias: Lara prioriza finanzas personales y las vistas de inspección; los cálculos son verificables con pruebas deterministas. El laboratorio debe preservar los datos en disco local y separar las operaciones de cálculo de la generación de texto.
-- Estado: Aceptada
+- Estado: Parcialmente reemplazada por ADR-0007 (política de datos hacia el proveedor del modelo)

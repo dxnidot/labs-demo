@@ -1,0 +1,25 @@
+# ADR-0007: Política de datos hacia el proveedor del modelo
+
+- Contexto: ADR-0005 afirma que el LLM recibe solo agregados y resultados ya calculados, y que los datos viven en `agents/data/`. El código de `agents/orquestador` (revisado el 2026-10-10) muestra otra cosa:
+  - El chat usa modelos en la nube (Gemini y DeepSeek, mediante LiteLLM); el agente `finanzas` usa un `deepseek/deepseek-flash` fijo.
+  - Al proveedor se envían el mensaje del usuario, el historial de la conversación y el resultado de cada herramienta.
+  - Las consultas devuelven el resumen mensual (categoría, tipo, moneda y total) y el calendario (fecha, tipo y alias de tarjeta).
+  - Los registros envían la vista previa y el registro creado (fecha, monto, moneda, comercio, categoría, alias y últimos cuatro dígitos), porque el modelo los arma a partir de lo que el usuario escribe.
+  - Solo se elimina `ownerSub`; no hay enmascarado de comercios, alias ni montos.
+  - Los datos financieros persisten en la PostgreSQL local de `kc-finanzas`, no en `agents/data/`.
+- Decisión (opción B, documentar y reducir lo que se envía):
+  - **Documentar el flujo real** de datos hacia el modelo: lo descrito arriba pasa a ser la referencia, en `PRODUCT.md` y en este ADR, y se mantiene al día cuando cambien las herramientas.
+  - **Enviar menos en las herramientas** (cambio propuesto, **sin aplicar todavía**), en `agents/orquestador/finanzas.py`:
+    - Pasar de eliminar solo `ownerSub` a una lista de campos permitidos por herramienta: `consultar_resumen` (categoría, tipo, moneda, total) y `consultar_calendario` (fecha, tipo y alias, porque sin alias no se puede decir qué tarjeta paga).
+    - No devolver nunca `ultimos4` al modelo en ninguna respuesta.
+    - Tras una escritura confirmada, devolver al modelo solo el estado y el `id`, sin repetir el registro creado.
+    - Alcance real: lo que el usuario escribe en el chat (incluidos comercio, alias y últimos cuatro dígitos al registrar) sigue yendo al proveedor y queda en el historial; este cambio solo evita repetirlo y ampliarlo.
+  - **Aviso visible en Lara** de que lo escrito en el chat se envía al proveedor del modelo (tarea en UI-09).
+  - **Revisar los términos de retención** de cada proveedor y plan usados: retención, uso para entrenamiento y ubicación de los datos. Registrar el resultado aquí con la fecha; no asumir nada hasta leer los términos oficiales.
+  - **Verificación TLS siempre activa:** `SSL_VERIFY=False` y `PYTHONHTTPSVERIFY=0` quedan comentados con advertencia en `agents/orquestador/.env.example`, porque desactivan la verificación de certificados en las llamadas al proveedor.
+- Alternativas consideradas:
+  - Mantener ADR-0005 tal cual: descarta, porque su afirmación no coincide con el código.
+  - Pseudonimizar o enmascarar comercio, alias y montos antes de enviarlos: protege más, pero el modelo necesita esos datos para redactar las vistas previas y respuestas; queda como mejora futura.
+  - Usar un modelo local para las finanzas: evita enviar datos fuera, pero implica otro runtime y menor calidad; no se decide ahora.
+- Consecuencias: el aviso en la UI y la documentación hacen visible lo que sale del equipo; la lista de campos permitidos reduce lo enviado en consultas y respuestas y evita que una herramienta nueva exponga campos por omisión. El texto de ADR-0005 sobre qué recibe el modelo queda reemplazado por este ADR; el resto de ADR-0005 sigue vigente. Costo: mantener la lista de campos al día y confiar en los términos del proveedor mientras no se revisen.
+- Estado: Propuesta
