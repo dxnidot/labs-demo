@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { ListarSesiones } from "../application/use-cases/ListarSesiones";
 import type { SesionChat } from "../domain/SesionChat";
 import type { Usuario } from "../domain/Usuario";
-import { AdkAgenteAdapter } from "../infrastructure/adapters/AdkAgenteAdapter";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import { adaptadores } from "../infrastructure/composition";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { claseFocoInterno } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
@@ -11,7 +10,7 @@ import { Pill } from "./components/Pill";
 import { alPulsarTeclaEnPestanas } from "./pestanasTeclado";
 import { useScrollPestanaActiva } from "./useScrollPestanaActiva";
 
-const listarSesiones = new ListarSesiones(new AdkAgenteAdapter(keycloakAuthAdapter));
+const listarSesiones = new ListarSesiones(adaptadores.agente);
 const tablas = ["sessions", "events", "app_states", "user_states"] as const;
 type Tabla = (typeof tablas)[number];
 const columnas = ["id", "título", "origen", "última actualización"];
@@ -32,6 +31,7 @@ function formatearFecha(fecha: Date): string {
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  * @modified Daniel Tovar 2026-10-10 Pestañas de tablas con flechas, tabindex itinerante y relación tab-panel.
+ * @modified Daniel Tovar 2026-10-10 Adaptador desde el composition root (VITE_USE_MOCKS).
  */
 export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
   const [tabla, setTabla] = useState<Tabla>("sessions");

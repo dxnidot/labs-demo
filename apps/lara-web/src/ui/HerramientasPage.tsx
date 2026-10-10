@@ -1,4 +1,4 @@
-import { herramientasConfig, type PermisoHerramienta } from "../agentesConfig";
+import { herramientasConfig, type PermisoHerramienta } from "../domain/catalogoLab";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { PageLayout } from "./components/PageLayout";
 import { Pill, type PillTone } from "./components/Pill";
@@ -14,6 +14,7 @@ const tonoPermiso: Record<PermisoHerramienta, PillTone> = {
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Catálogo importado de domain/catalogoLab.
  */
 export function HerramientasPage() {
   return (

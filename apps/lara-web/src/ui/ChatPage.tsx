@@ -6,9 +6,7 @@ import { ListarModelos } from "../application/use-cases/ListarModelos";
 import type { Mensaje } from "../domain/Mensaje";
 import type { Modelo } from "../domain/Modelo";
 import type { Usuario } from "../domain/Usuario";
-import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
-import { HttpModeloAdapter } from "../infrastructure/adapters/HttpModeloAdapter";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import { adaptadores } from "../infrastructure/composition";
 import { Button } from "./components/Button";
 import { claseFoco, claseFocoContenedor } from "./components/foco";
 import { AvisoProveedorModelo } from "./components/AvisoProveedorModelo";
@@ -16,11 +14,11 @@ import { LaraLogo } from "./components/LaraLogo";
 import { PageLayout } from "./components/PageLayout";
 import { PuntoEstado } from "./components/PuntoEstado";
 import { SelectorModelo } from "./components/SelectorModelo";
-import { modeloOrquestador } from "../agentesConfig";
+import { modeloOrquestador } from "../domain/catalogoLab";
 import { comportamientoDeScroll } from "./movimientoReducido";
 import { useChatSessions } from "./useChatSessions";
 
-const listarModelos = new ListarModelos(new HttpModeloAdapter(new ApiHttpClient(keycloakAuthAdapter)));
+const listarModelos = new ListarModelos(adaptadores.modelo);
 const modelosDeRespaldo: Modelo[] = [
   { id: modeloOrquestador, nombre: modeloOrquestador.split("/")[1], tier: "basic" },
 ];
@@ -105,6 +103,7 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
  * @modified Daniel Tovar 2026-10-02 Logs de consola del catálogo cargado y del modelo elegido por envío.
  * @modified Daniel Tovar 2026-10-10 Aviso fijo de ADR-0007 junto al campo de mensaje.
  * @modified Daniel Tovar 2026-10-10 "Ir al final" respeta prefers-reduced-motion.
+ * @modified Daniel Tovar 2026-10-10 Catálogo de domain/catalogoLab y catálogo de modelos desde el composition root.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {

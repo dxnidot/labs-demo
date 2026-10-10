@@ -21,11 +21,12 @@ import {
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router";
 import type { Usuario } from "../domain/Usuario";
 import { IniciarSesion } from "../application/use-cases/IniciarSesion";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import { adaptadores, usarMocks } from "../infrastructure/composition";
 import { DialogoApariencia } from "./apariencia/DialogoApariencia";
 import { AccesoDenegado } from "./components/AccesoDenegado";
 import { claseFoco } from "./components/foco";
 import { IconButton } from "./components/IconButton";
+import { IndicadorMock } from "./components/IndicadorMock";
 import { LaraLogo } from "./components/LaraLogo";
 import { PageLayout } from "./components/PageLayout";
 import { idBarraLateral, Sidebar } from "./components/Sidebar";
@@ -63,7 +64,7 @@ const UsuariosRolesPage = lazy(() =>
   import("./UsuariosRolesPage").then((m) => ({ default: m.UsuariosRolesPage })),
 );
 
-const iniciarSesion = new IniciarSesion(keycloakAuthAdapter);
+const iniciarSesion = new IniciarSesion(adaptadores.auth);
 const idContenidoPrincipal = "contenido-principal";
 const iconoNav = "size-4.5 shrink-0";
 
@@ -79,6 +80,7 @@ const iconoNav = "size-4.5 shrink-0";
  * @modified Daniel Tovar 2026-10-10 El shell usa PageLayout libre: sin el marco de 32/24/32 px alrededor de la barra lateral.
  * @modified Daniel Tovar 2026-10-10 Botón y diálogo "Apariencia" en el pie de la barra lateral.
  * @modified Daniel Tovar 2026-10-10 Skip link, contenido principal enfocable y título del documento por vista.
+ * @modified Daniel Tovar 2026-10-10 Adaptadores desde el composition root e indicador MOCK.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -237,7 +239,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
 
   async function cerrarSesion() {
     try {
-      await keycloakAuthAdapter.logout();
+      await adaptadores.auth.logout();
     } catch (reason: unknown) {
       setError(reason instanceof Error ? reason.message : "No se pudo cerrar sesión.");
     }
@@ -265,6 +267,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
       <div className="flex items-center gap-2.5">
         <LaraLogo />
         <span className="text-brand font-semibold">Lara</span>
+                <IndicadorMock activo={usarMocks} />
       </div>
     </header>
   );
@@ -293,6 +296,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
               <div className="flex items-center gap-2.5">
                 <LaraLogo />
                 <span className="text-brand font-semibold">Lara</span>
+                <IndicadorMock activo={usarMocks} />
               </div>
               {estrecha ? (
                 <IconButton

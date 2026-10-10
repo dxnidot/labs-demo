@@ -1,4 +1,4 @@
-// Actualizar a mano si cambian agents/orquestador/agent.py o finanzas.py
+// Catálogo estático de agentes y herramientas. Actualizar a mano si cambian agents/orquestador/agent.py o finanzas.py.
 
 export interface AgenteConfig {
   nombre: string;
@@ -42,3 +42,9 @@ export const herramientasConfig: readonly HerramientaConfig[] = [
   { nombre: "consultar_resumen", origen: "function tool · finanzas", permiso: "solo lectura" },
   { nombre: "consultar_calendario", origen: "function tool · finanzas", permiso: "solo lectura" },
 ];
+
+/** Agentes del plan que aún no existen: la vista muestra su tarjeta vacía con la historia que los habilita. */
+export const agentesPendientes = [
+  { nombre: "calculos-financieros", detalle: "Java · A2A · :8002", pendiente: "AG-02" },
+  { nombre: "traductor", detalle: "TypeScript · A2A · :8003", pendiente: "AG-03" },
+] as const;

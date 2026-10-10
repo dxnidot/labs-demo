@@ -7,9 +7,7 @@ import {
 } from "../application/use-cases/ObtenerResumenFinanciero";
 import type { Moneda } from "../domain/MovimientoFinanciero";
 import type { Tarjeta } from "../domain/Tarjeta";
-import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
-import { HttpFinanzasAdapter } from "../infrastructure/adapters/HttpFinanzasAdapter";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import { adaptadores } from "../infrastructure/composition";
 import { Button } from "./components/Button";
 import { claseFocoInterno } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
@@ -24,7 +22,7 @@ import { alPulsarTeclaEnPestanas } from "./pestanasTeclado";
 import { useScrollPestanaActiva } from "./useScrollPestanaActiva";
 import { useVistaEstrecha } from "./useVistaEstrecha";
 
-const finanzasPort = new HttpFinanzasAdapter(new ApiHttpClient(keycloakAuthAdapter));
+const finanzasPort = adaptadores.finanzas;
 const obtenerResumenFinanciero = new ObtenerResumenFinanciero(finanzasPort);
 const monedas: readonly Moneda[] = ["MXN", "USD"];
 const periodoValido = /^\d{4}-\d{2}$/;
@@ -51,6 +49,7 @@ function esPestana(valor: string | undefined): valor is PestanaId {
  * @modified Daniel Tovar 2026-09-30 La pestaña activa lleva solo la línea inferior (.ftab de la maqueta).
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (pestañas fijas, único scroll), botón Asistente siempre visible en angosto y pestañas con scroll.
  * @modified Daniel Tovar 2026-10-10 Pestañas con flechas y tabindex itinerante, MXN/USD de 44px en angosto y lista de pestañas compartida.
+ * @modified Daniel Tovar 2026-10-10 Adaptador de finanzas desde el composition root (VITE_USE_MOCKS).
  */
 export function FinanzasPage() {
   const { tab } = useParams();

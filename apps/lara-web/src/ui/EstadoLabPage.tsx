@@ -1,20 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { ComprobarServicios } from "../application/use-cases/ComprobarServicios";
-import type { Disponibilidad, EstadoServicio } from "../domain/ServicioLab";
-import { HttpEstadoLabAdapter } from "../infrastructure/adapters/HttpEstadoLabAdapter";
+import { serviciosPendientes, type Disponibilidad, type EstadoServicio } from "../domain/ServicioLab";
+import { adaptadores } from "../infrastructure/composition";
 import { Card } from "./components/Card";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { claseFoco } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
 import { PuntoEstado, type EstadoPunto } from "./components/PuntoEstado";
 
-const comprobarServicios = new ComprobarServicios(new HttpEstadoLabAdapter());
-
-const serviciosPendientes = [
-  { nombre: "Java A2A", detalle: ":8002 · Java A2A", pendiente: "AG-02" },
-  { nombre: "TypeScript A2A", detalle: ":8003 · TypeScript A2A", pendiente: "AG-03" },
-  { nombre: "Open WebUI", detalle: ":3000 · RAG", pendiente: "EXT-01" },
-] as const;
+const comprobarServicios = new ComprobarServicios(adaptadores.estadoLab);
 
 const leyenda: Record<Disponibilidad, { texto: string; estado: EstadoPunto }> = {
   arriba: { texto: "Arriba", estado: "ok" },
@@ -26,6 +20,7 @@ const leyenda: Record<Disponibilidad, { texto: string; estado: EstadoPunto }> = 
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Adaptador desde el composition root y servicios pendientes en domain/ServicioLab.
  */
 export function EstadoLabPage() {
   const [estados, setEstados] = useState<EstadoServicio[] | null>(null);

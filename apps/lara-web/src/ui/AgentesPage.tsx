@@ -1,19 +1,15 @@
-import { agentesConfig } from "../agentesConfig";
+import { agentesConfig, agentesPendientes } from "../domain/catalogoLab";
 import { Card } from "./components/Card";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { PageLayout } from "./components/PageLayout";
 import { Pill } from "./components/Pill";
-
-const agentesPendientes = [
-  { nombre: "calculos-financieros", detalle: "Java · A2A · :8002", pendiente: "AG-02" },
-  { nombre: "traductor", detalle: "TypeScript · A2A · :8003", pendiente: "AG-03" },
-] as const;
 
 /**
  * Pantalla "Agentes": orquestador y subagente de finanzas desde la configuración estática.
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Datos pendientes en domain/catalogoLab (sin datos en el componente).
  */
 export function AgentesPage() {
   return (

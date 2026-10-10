@@ -1,16 +1,17 @@
 import { ObtenerClaimsToken } from "../application/use-cases/ObtenerClaimsToken";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import { adaptadores } from "../infrastructure/composition";
 import { Card } from "./components/Card";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { PageLayout } from "./components/PageLayout";
 
-const obtenerClaims = new ObtenerClaimsToken(keycloakAuthAdapter);
+const obtenerClaims = new ObtenerClaimsToken(adaptadores.auth);
 
 /**
  * Pantalla "Usuarios y roles": inspector de los claims del token en memoria; tabla vacía.
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Adaptador de auth desde el composition root (VITE_USE_MOCKS).
  */
 export function UsuariosRolesPage() {
   const claims = obtenerClaims.ejecutar();

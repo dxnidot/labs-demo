@@ -293,6 +293,7 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 
 - Arquitectura hexagonal ligera: `AuthPort`, `AgentePort` y un puerto por fuente de datos de cada vista.
 - Tokens solo en memoria. Nada en `localStorage`, con dos excepciones: la clave `lara.fuente` (fuente elegida en "Apariencia") y la clave `lara.tema` (`sistema` | `claro` | `oscuro`, por defecto `sistema`). Son preferencias visuales, no sensibles, y se usan siempre con `try/catch` y valor por defecto. Ningún otro dato puede ir a `localStorage`.
+- Datos de relleno: un único composition root (`src/infrastructure/composition.ts`) elige los adaptadores. Con `VITE_USE_MOCKS=true` usa los mock de `src/infrastructure/mocks/` (ficticios, solo en memoria, marcados `// MOCK`) para `AuthPort`, `AgentePort`, `ModeloPort`, `EstadoLabPort`, `MenuPort` y `FinanzasPort`, y Lara abre sin Keycloak ni backend con una pill "MOCK" junto al logo. Sin la variable (o con `false`) usa los servicios reales. Para activarlo copia `apps/lara-web/.env.example` a `.env.local` (ignorado por Git) o, en PowerShell, `$env:VITE_USE_MOCKS = "true"; npm run dev`.
 - Vistas de administración (BD, usuarios, BPM, herramientas) **solo lectura** desde Lara.
 - Finanzas: datos en el servicio finanzas (Postgres local); al LLM solo le llegan resultados calculados.
 - Botones reales (`<button>`, `<a>`), `aria-label` en botones de solo ícono, contraste AA.

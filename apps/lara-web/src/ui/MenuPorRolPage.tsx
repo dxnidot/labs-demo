@@ -2,15 +2,13 @@ import { useEffect, useState } from "react";
 import { ObtenerMenu } from "../application/use-cases/ObtenerMenu";
 import type { MenuOpcion } from "../domain/MenuOpcion";
 import type { Usuario } from "../domain/Usuario";
-import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
-import { HttpMenuAdapter } from "../infrastructure/adapters/HttpMenuAdapter";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import { adaptadores } from "../infrastructure/composition";
 import { Card } from "./components/Card";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { PageLayout } from "./components/PageLayout";
 import { Pill } from "./components/Pill";
 
-const obtenerMenu = new ObtenerMenu(new HttpMenuAdapter(new ApiHttpClient(keycloakAuthAdapter)));
+const obtenerMenu = new ObtenerMenu(adaptadores.menu);
 
 /**
  * Pantalla "Menú por rol": opciones reales de GET /api/menu para el usuario actual.
@@ -18,6 +16,7 @@ const obtenerMenu = new ObtenerMenu(new HttpMenuAdapter(new ApiHttpClient(keyclo
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
  * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
+ * @modified Daniel Tovar 2026-10-10 Adaptador desde el composition root (VITE_USE_MOCKS).
  */
 export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
   const [opciones, setOpciones] = useState<MenuOpcion[] | null>(null);

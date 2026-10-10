@@ -27,8 +27,8 @@
   - [x] 4. Tokens semánticos, escala tipográfica y `Pill` con 4 tonos; sin alias muertos, escalas crudas ni medidas arbitrarias (`src/tokens.test.ts`).
   - [~] 4b. Tema claro y oscuro: implementado y publicado como WIP; falta el ok a la paleta clara antes de seguir.
   - [x] Aviso fijo de ADR-0007 junto al campo del chat (inicio, conversación y asistente de Finanzas).
-  - [ ] 5. Accesibilidad: foco, switch, áreas de 44 px, pestañas con flechas, skip link, título por vista, favicon y `prefers-reduced-motion`.
-  - [ ] 6. Mocks (`VITE_USE_MOCKS`, `.env.example`, composition root, pill MOCK).
+  - [x] 5. Accesibilidad: foco, switch, áreas de 44 px, pestañas con flechas, skip link, título por vista, favicon y `prefers-reduced-motion`.
+  - [x] 6. Mocks (`VITE_USE_MOCKS`, `.env.example`, composition root, pill MOCK) para `AuthPort`, `AgentePort`, `ModeloPort`, `EstadoLabPort`, `MenuPort` y `FinanzasPort`; catálogo de agentes y servicios pendientes movido a `domain/`.
   - [ ] 7. Estados comunes: carga con esqueleto, vacío sin jerga de backlog, error con reintento.
   - [ ] 8. Finanzas (12 y 14) según el mockup.
 - Archivos relevantes:
@@ -47,6 +47,7 @@
   - Confirmado: plan aprobado el 2026-10-10 para las fases B y C1; la fuente por defecto es IBM Plex Sans (la de los PNG y de `index.css`).
   - Confirmado: `localStorage` admite solo `lara.fuente` y `lara.tema` (sistema, claro, oscuro; por defecto sistema), con `try/catch` y valor por defecto; reglas actualizadas en `copilot-instructions.md` y en el README de diseño.
   - Confirmado: el tema se define con `light-dark()` y `color-scheme` (MDN: Chrome y Edge 123, Firefox 120, Safari 17.5); el oscuro conserva los valores de la guía y el claro sale de la misma paleta.
+  - Confirmado: sin `VITE_USE_MOCKS` (o con `false`) Lara usa los adaptadores reales, igual que antes; en modo mock no hay peticiones a Keycloak ni a ningún backend (verificado en navegador).
   - Pendiente: ok de quien mantiene el lab a la paleta clara (checkpoint de 4b) antes de seguir con el resto de las vistas.
   - Pendiente: defecto previo, sin arreglar: en Finanzas > Resumen la columna "monto" de "Últimos movimientos" queda cortada por el scroll horizontal cuando el panel del asistente está abierto (1440 px).
   - Pendiente: defecto previo, sin arreglar: el estado vacío del chat a 320x640 aparece desplazado hacia abajo (el saludo y parte del campo quedan fuera de vista), probablemente por el efecto que baja el scroll al final.
