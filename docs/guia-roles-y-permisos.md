@@ -31,23 +31,23 @@ Si el rol todavía no existe, créalo primero en **Realm roles → Create role**
 | `llm_advanced` | + modelos básicos y avanzados | `_ADVANCED_ROLES` → `_BASIC_MODELS + _ADVANCED_MODELS` — `model_router.py:25` y `:65` (`deepseek-v4-pro`, `gemini-3.1-pro`) |
 | `admin` o `premium` | Igual que `llm_advanced` | Ya están incluidos en `_ADVANCED_ROLES` (`model_router.py:25`) — no hace falta asignar `llm_advanced` aparte si el usuario ya es `admin`/`premium` |
 
-Flujo completo: `auth.py: extract_roles()` lee `realm_access.roles` + todos los `resource_access.*.roles` del JWT → `api.py` arma el `ModelContext` con esos roles → `model_router.get_allowed_models(roles)` decide el catálogo → el endpoint `GET /api/llm/available-models` (`api.py`, handler `listar_modelos_disponibles`) se lo manda al front → `agents-ui/src/ui/ChatPage.tsx` lo pinta en el `<SelectorModelo>` del header del chat.
+Flujo completo: `auth.py: extract_roles()` lee `realm_access.roles` + todos los `resource_access.*.roles` del JWT → `api.py` arma el `ModelContext` con esos roles → `model_router.get_allowed_models(roles)` decide el catálogo → el endpoint `GET /api/llm/available-models` (`api.py`, handler `listar_modelos_disponibles`) se lo manda al front → `apps/lara-web/src/ui/ChatPage.tsx` lo pinta en el `<SelectorModelo>` del header del chat.
 
-Cuando el usuario envía un mensaje, el modelo elegido viaja en la cabecera `X-LLM-Model` (`agents-ui/src/infrastructure/adapters/AdkAgenteAdapter.ts`, método `enviarMensaje`) y el middleware de `api.py` lo vuelve a validar contra el catálogo del usuario antes de dejarlo pasar — un usuario no puede forzar un modelo fuera de su catálogo editando el front.
+Cuando el usuario envía un mensaje, el modelo elegido viaja en la cabecera `X-LLM-Model` (`apps/lara-web/src/infrastructure/adapters/AdkAgenteAdapter.ts`, método `enviarMensaje`) y el middleware de `api.py` lo vuelve a validar contra el catálogo del usuario antes de dejarlo pasar — un usuario no puede forzar un modelo fuera de su catálogo editando el front.
 
 ### Secciones del Sidebar
 
 | Rol en Keycloak | Qué desbloquea | Dónde está en el código |
 | --- | --- | --- |
-| `ver_agentes` (o `admin`) | Sección **AGENTES**: Agentes, Base de datos, Memoria vectorizada, Herramientas MCP | `agents-ui/src/ui/AppShell.tsx:164` (`puedeVerAgentes`), usado en el Sidebar (`:309`) y en las rutas (`:466`–`:472`) |
+| `ver_agentes` (o `admin`) | Sección **AGENTES**: Agentes, Base de datos, Memoria vectorizada, Herramientas MCP | `apps/lara-web/src/ui/AppShell.tsx:164` (`puedeVerAgentes`), usado en el Sidebar (`:309`) y en las rutas (`:466`–`:472`) |
 | `ver_identidad` (o `admin`) | Sección **IDENTIDAD**: Menú por rol, Usuarios y roles, Sincronización BPM | `AppShell.tsx:165` (`puedeVerIdentidad`), Sidebar (`:342`), rutas (`:475`–`:480`) |
 | `usar_finanzas` (o `admin`) | Sección **PERSONAL · SOLO LOCAL**: Finanzas, Gastos fijos | `AppShell.tsx:166` (`puedeVerPersonal`), Sidebar (`:368`), rutas (`:482`–`:491`) |
 
-El hook que hace la comparación es `agents-ui/src/ui/useHasRole.ts` — recibe el `Usuario` (con `roles: string[]`, ya mezclando `realm_access` + todos los `resource_access` gracias a `KeycloakAuthAdapter.ts`) y una lista de roles aceptados, devuelve `true` si hay intersección.
+El hook que hace la comparación es `apps/lara-web/src/ui/useHasRole.ts` — recibe el `Usuario` (con `roles: string[]`, ya mezclando `realm_access` + todos los `resource_access` gracias a `KeycloakAuthAdapter.ts`) y una lista de roles aceptados, devuelve `true` si hay intersección.
 
 **Dos capas de protección, no una:**
 1. **Sidebar**: si `puedeVerX` es `false`, la sección entera no se renderiza (`{puedeVerAgentes && (...)}`) — ni el link existe en el DOM.
-2. **Ruta**: cada `<Route>` de esas secciones está envuelta en un helper `protegido(permitido, elemento)` dentro de `AppShell.tsx`. Si el usuario entra por URL directa sin el rol, ve el componente `AccesoDenegado` (`agents-ui/src/ui/components/AccesoDenegado.tsx`) en vez de la página real.
+2. **Ruta**: cada `<Route>` de esas secciones está envuelta en un helper `protegido(permitido, elemento)` dentro de `AppShell.tsx`. Si el usuario entra por URL directa sin el rol, ve el componente `AccesoDenegado` (`apps/lara-web/src/ui/components/AccesoDenegado.tsx`) en vez de la página real.
 
 ## 4. Nombres exactos de los 5 roles
 

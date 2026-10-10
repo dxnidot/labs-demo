@@ -14,5 +14,5 @@ Sigue las reglas del repo:
 - Medidas exactas: docs/design/lara/html/src/<NN>-<pantalla>.html y docs/design/lara/html/src/_shell.css (fuente legible; lara-canvas.html es el original empaquetado). Aspecto: docs/design/lara/png/<NN>-<pantalla>.png.
 - Antes de construir una pantalla lee su PNG de docs/design/lara/png/ y compara el resultado contra él; lista las diferencias.
 - Capturas de la app en ejecución: .capturas/<nombre>.png (ignorado por git).
-- Tokens solo desde agents-ui/src/index.css; nunca colores sueltos en componentes.
+- Tokens solo desde apps/lara-web/src/index.css; nunca colores sueltos en componentes.
 - localStorage: prohibido, con una única excepción: la clave "lara.fuente" (fuente elegida en Apariencia; preferencia visual no sensible), siempre con try/catch y valor por defecto IBM Plex Mono. Nada más puede ir a localStorage.

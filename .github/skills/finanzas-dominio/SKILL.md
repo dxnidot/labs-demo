@@ -1,6 +1,6 @@
 ---
 name: finanzas-dominio
-description: Reglas de dominio para las funciones de finanzas personales de Lara (calendario de tarjetas, portafolio, aportaciones, rebalanceo y privacidad). Úsala al programar cualquier elemento en services/kc-finanzas/, las vistas de finanzas de agents-ui/ o las herramientas financieras de agents/.
+description: Reglas de dominio para las funciones de finanzas personales de Lara (calendario de tarjetas, portafolio, aportaciones, rebalanceo y privacidad). Úsala al programar cualquier elemento en services/kc-finanzas/, las vistas de finanzas de apps/lara-web/ o las herramientas financieras de agents/.
 ---
 
 # Dominio de finanzas personales de Lara

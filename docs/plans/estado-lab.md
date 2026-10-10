@@ -1,8 +1,21 @@
 ﻿# Estado del lab
 
-Última actualización: 2026-09-30
+Última actualización: 2026-10-10
 
 Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
+
+## Reorganización del monorepo (2026-10-10)
+
+Equivalencia de nombres. Los docs históricos (`docs/backlog`, `docs/decisions`, `docs/bugs`) conservan los nombres de antes.
+
+| Antes | Ahora |
+| --- | --- |
+| `keycloak/` | `infra/keycloak/` |
+| `finanzas/` | `services/kc-finanzas/` |
+| `kc-demo/` | `services/kc-menu/` |
+| `agents-ui/` | `apps/lara-web/` |
+
+Sin cambios: puertos, nombres de BD, variables de entorno, clients de Keycloak (`agents-ui`, `finanzas-agent`), rutas HTTP y paquetes Java. Los compose fijan `name: keycloak` y `name: finanzas` para conservar los volúmenes de datos.
 
 ## Repo y documentación
 
@@ -57,7 +70,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [ ] ⏳ AG-06 · MCP filesystem de solo lectura (opcional)
 - [x] ❌ AG-08 · Cancelada: fusionada en FIN-14
 
-## agents-ui / Lara (React, puerto 5173)
+## lara-web (antes agents-ui) / Lara (React, puerto 5173)
 
 - [x] ✅ UI-01 · API server de ADK (8010)
 - [x] ✅ UI-02 · Chat con login de Keycloak y streaming — login Keycloak, run_sse, Enter, razonamiento oculto y Markdown seguro

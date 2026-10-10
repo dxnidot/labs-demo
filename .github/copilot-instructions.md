@@ -11,7 +11,7 @@ Laboratorio personal en Windows (`D:\dev\labs`, PowerShell). Repo **público**. 
 | `kc-front/`  | Front Angular (se va a absorber en Lara, ver ADR-0002)                                                    | 4200   |
 | `bpm-sync/`  | Sincronización BPM → Keycloak (pendiente)                                                                 | —      |
 | `agents/`    | Agentes ADK: orquestador Python (8000, API server 8010), cálculos financieros Java (8002), traductor TypeScript (8003) | varios |
-| `agents-ui/` | Lara: UI en React + Vite + Tailwind con login de Keycloak                                                 | 5173   |
+| `apps/lara-web/` | Lara: UI en React + Vite + Tailwind con login de Keycloak                                                 | 5173   |
 | `docs/`      | Backlog, ADR, planes y guía de UI                                                                         | —      |
 
 ## Reglas de trabajo
@@ -71,8 +71,8 @@ No la leas completa; abre solo el archivo que la tarea necesita.
 | `clean-architecture`          | Diseñar capas, puertos y dependencias (respetando la convención hexagonal) |
 | `system-design`               | Decisiones entre servicios: A2A, API server, persistencia, flujos          |
 | `python-design-patterns`      | Código del orquestador y agentes en Python                                 |
-| `typescript-advanced-types`   | Tipos en `agents-ui`, `kc-front` o el agente TypeScript                    |
-| `vercel-react-best-practices` | Componentes, hooks y rendimiento en `agents-ui`                            |
+| `typescript-advanced-types`   | Tipos en `lara-web`, `kc-front` o el agente TypeScript                    |
+| `vercel-react-best-practices` | Componentes, hooks y rendimiento en `lara-web`                            |
 | `finanzas-dominio`          | Reglas de finanzas personales para el servicio, vistas y herramientas de Lara |
 | `find-skills`                 | Buscar una skill nueva cuando ninguna de estas aplica                      |
 

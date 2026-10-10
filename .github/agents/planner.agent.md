@@ -27,7 +27,7 @@ handoffs:
 
 Analiza únicamente el archivo de backlog que indique el usuario y los archivos necesarios para comprender esa historia. No explores el repositorio de forma amplia.
 
-Entrega un plan separado por las carpetas afectadas, por ejemplo `services/kc-menu/`, `agents/` y `agents-ui/`. Para cada parte, enumera los archivos exactos que habría que cambiar; no inventes rutas. Distingue entre **Confirmado**, **Inferido** y **Pendiente**.
+Entrega un plan separado por las carpetas afectadas, por ejemplo `services/kc-menu/`, `agents/` y `apps/lara-web/`. Para cada parte, enumera los archivos exactos que habría que cambiar; no inventes rutas. Distingue entre **Confirmado**, **Inferido** y **Pendiente**.
 
 Este agente es de solo lectura: nunca edites archivos, ejecutes comandos ni implementes el plan. Usa `web` solo cuando necesites verificar información técnica en documentación oficial y cita la URL consultada.
 

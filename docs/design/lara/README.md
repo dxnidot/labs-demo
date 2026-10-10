@@ -1,6 +1,6 @@
-# Lara · Guía de UI para `agents-ui`
+# Lara · Guía de UI para `lara-web`
 
-Referencia visual y de diseño para construir Lara (carpeta `agents-ui`, React + Vite + Tailwind).
+Referencia visual y de diseño para construir Lara (carpeta `apps/lara-web`, React + Vite + Tailwind).
 Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda la captura**.
 
 > Todos los datos de las pantallas son de ejemplo. Nada de esto es información real.
