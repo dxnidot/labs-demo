@@ -29,3 +29,5 @@ Precedencia: la guía visual de Lara (README, PNG de mockups, tokens de index.cs
 Motion: CSS, duraciones cortas, easing coherente y respeto a `prefers-reduced-motion`. No agregues una librería de animación sin preguntar.
 
 Verificación visual: compara antes y después con capturas en .capturas/ cuando sea posible.
+
+No subas capturas, videos ni trazas a PRs, issues ni al repo; viven en `.capturas/` (ignorada).
