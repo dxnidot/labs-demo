@@ -16,11 +16,13 @@ Sigue las reglas del repo:
 
 ## Skills de diseño
 
-Instaladas con `npx skills` (verifica con /skills cuáles están disponibles; si una no está, dilo y no la inventes).
+Versionadas en `.claude/skills/` y registradas en `skills-lock.json` (licencias en `.claude/licenses/`). Si una no aparece en /skills, dilo y no la inventes.
 
-- **Impeccable** (pbakaus/impeccable): base del sistema visual y revisión. Úsala para auditar, criticar y pulir. Ejecuta `/teach-impeccable` una sola vez con este contexto: producto de finanzas personales de uso diario, tono sobrio y claro, tema claro y oscuro, un solo usuario.
-- **Emil Kowalski** (emilkowalski/skills): animación e interacción fina. Solo en la fase de motion, después de que el diseño base esté cerrado.
-- **Taste** (Leonxlnx/taste-skill): usa solo `redesign-skill` (auditar antes de cambiar) y `output-skill` (no dejar código a medias ni placeholders). NO uses su skill principal junto con Impeccable: fijan dirección visual y se contradicen.
+- **Impeccable** (pbakaus/impeccable, v4.5.2): base del sistema visual y revisión. Úsala para auditar, criticar y pulir. Su comando de contexto es `.claude/skills/impeccable/scripts/impeccable context`; el de producto es `init` (alias `teach`), que se invoca como `/impeccable init` y solo genera PRODUCT.md. No generes DESIGN.md (la fuente visual es docs/design/lara/) y no ejecutes su comando `hooks`.
+- **Emil Kowalski** (emilkowalski/skills): animación e interacción fina, solo en la fase de motion y después de que el diseño base esté cerrado. Instaladas: `animate`, `review-animations`, `improve-animations`, `find-animation-opportunities`, `emil-design-eng`, `animation-vocabulary`, `break-ui`, `prototype` y `apple-design`.
+- **Taste** (Leonxlnx/taste-skill): usa solo `redesign-existing-projects` (auditar antes de cambiar) y `full-output-enforcement` (no dejar código a medias ni placeholders). NO instales ni uses su skill principal junto con Impeccable: fijan dirección visual y se contradicen.
+
+Ignora el tono "go all out / dream big and bold" de Impeccable: Lara es sobria; manda la guía visual de docs/design/lara/ y los tokens de index.css.
 
 Precedencia: la guía visual de Lara (README, PNG de mockups, tokens de index.css) manda sobre cualquier skill. Si una skill sugiere algo que contradice esa guía, no lo apliques en silencio: repórtalo y pregunta.
 

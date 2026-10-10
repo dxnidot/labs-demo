@@ -85,7 +85,7 @@ No la leas completa; abre solo el archivo que la tarea necesita.
 | `finanzas-dominio`            | Reglas de finanzas personales para el servicio, vistas y herramientas de Lara |
 | `find-skills`                 | Buscar una skill nueva cuando ninguna de estas aplica                         |
 
-Las skills de diseño (Impeccable, Emil Kowalski, y `redesign-skill` y `output-skill` de Taste) son para Claude Code: se instalan con `npx skills` fuera del repo, en `~/.claude/skills/`, y sus reglas de uso están en `CLAUDE.md`. La guía visual de Lara (README, PNG de mockups y tokens de `index.css`) manda sobre cualquier skill.
+Las skills de diseño (Impeccable, nueve de Emil Kowalski y, de Taste, `redesign-existing-projects` y `full-output-enforcement`) viven en `.claude/skills/`, están versionadas y registradas en `skills-lock.json`, y son para Claude Code; el comando de contexto de Impeccable es `impeccable context` (`.claude/skills/impeccable/scripts/impeccable`) y sus reglas de uso están en `CLAUDE.md`. La guía visual de Lara (README, PNG de mockups y tokens de `index.css`) manda sobre cualquier skill.
 
 ## Commits (cuando el autor los pida o el prompt de la tarea los autorice)
 
