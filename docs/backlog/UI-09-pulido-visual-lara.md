@@ -1,6 +1,6 @@
 # UI-09 · Pulido visual de Lara con skills de diseño y datos de relleno
 
-- Estado: Pendiente
+- Estado: En curso
 - Prioridad: Media
 - Parte del lab: C.5
 - Depende de: UI-08
@@ -15,10 +15,22 @@
 - Criterio de aceptación:
   - La fase A entrega un informe con diferencias por pantalla (contra su PNG) y no deja archivos modificados (`git status` limpio).
   - Tras la fase B, `grep -rnE "#[0-9a-fA-F]{3,8}\b" apps/lara-web/src --include=*.tsx` no encuentra colores sueltos en componentes.
-  - Tras la fase C, `VITE_USE_MOCKS=true` en `.env.example`, cada mock marcado con `// MOCK`, indicador visual discreto en modo mock, y ningún componente con datos inline ni uso de `localStorage` fuera de la clave `"lara.fuente"`.
+  - Tras la fase C, `VITE_USE_MOCKS=true` en `.env.example`, cada mock marcado con `// MOCK`, indicador visual discreto en modo mock, y ningún componente con datos inline ni uso de `localStorage` fuera de las claves `"lara.fuente"` y `"lara.tema"`.
   - Tras la fase D, no hay librería de animación nueva y existe una regla `prefers-reduced-motion`.
   - El chat muestra un aviso visible, antes de enviar el primer mensaje de la sesión y accesible desde el compositor, que dice que lo escrito se envía al proveedor del modelo; tiene prueba de componente y usa solo tokens de `index.css`.
   - `npm run build` y `npm test` terminan sin errores desde `apps/lara-web/`.
+- Tareas (fases B y C1; rama `feat/lara-ui-polish`):
+  - [x] Fase A: informe de auditoría entregado (2026-10-10), sin archivos modificados.
+  - [x] 1. `EnviarMensaje.test.ts` a UTF-8.
+  - [x] 2. Marco de 32/24/32 px del shell corregido (`libre`), con prueba y medición.
+  - [x] 3. Fuentes con Fontsource, `data-font` y diálogo Apariencia (`lara.fuente`).
+  - [x] 4. Tokens semánticos, escala tipográfica y `Pill` con 4 tonos; sin alias muertos, escalas crudas ni medidas arbitrarias (`src/tokens.test.ts`).
+  - [~] 4b. Tema claro y oscuro: implementado y publicado como WIP; falta el ok a la paleta clara antes de seguir.
+  - [x] Aviso fijo de ADR-0007 junto al campo del chat (inicio, conversación y asistente de Finanzas).
+  - [ ] 5. Accesibilidad: foco, switch, áreas de 44 px, pestañas con flechas, skip link, título por vista, favicon y `prefers-reduced-motion`.
+  - [ ] 6. Mocks (`VITE_USE_MOCKS`, `.env.example`, composition root, pill MOCK).
+  - [ ] 7. Estados comunes: carga con esqueleto, vacío sin jerga de backlog, error con reintento.
+  - [ ] 8. Finanzas (12 y 14) según el mockup.
 - Archivos relevantes:
   - apps/lara-web/src/index.css
   - apps/lara-web/src/ui/
@@ -29,7 +41,14 @@
   - Confirmado: el repo es público; los datos de relleno son ficticios, sin datos reales ni "parecidos".
   - Confirmado: las etiquetas de la UI "kc-demo" → "kc-menu" y "finanzas" → "kc-finanzas" (`ServicioLab.ts`, `HttpEstadoLabAdapter.ts`, `MenuPorRolPage.tsx` y su test) se cambian en un commit aparte, fuera de las fases.
   - Inferido: Impeccable y las skills de Emil Kowalski sirven para la auditoría y el motion; la skill principal de Taste no debe convivir con Impeccable.
-  - Pendiente: instalar las skills de diseño a nivel de proyecto (`.claude/skills/`).
-  - Confirmado: el aviso se pide porque el chat y los resultados de las herramientas se envían al proveedor del modelo (ADR-0007, propuesta).
-  - Pendiente: redactar el texto exacto del aviso y decidir si se puede descartar o es permanente.
-  - Pendiente: aprobar el plan antes de pasar la historia a "En curso".
+  - Confirmado: las skills de diseño están instaladas a nivel de proyecto (`.claude/skills/`, registradas en `skills-lock.json`).
+  - Confirmado: el aviso se pide porque el chat y los resultados de las herramientas se envían al proveedor del modelo (ADR-0007).
+  - Confirmado: el aviso es una línea fija junto al campo del chat, sin botón de cerrar y sin `localStorage`; texto: "Lo que escribas aquí se envía al proveedor del modelo para generar la respuesta. No incluyas datos reales que no quieras compartir con él." (`AvisoProveedorModelo`).
+  - Confirmado: plan aprobado el 2026-10-10 para las fases B y C1; la fuente por defecto es IBM Plex Sans (la de los PNG y de `index.css`).
+  - Confirmado: `localStorage` admite solo `lara.fuente` y `lara.tema` (sistema, claro, oscuro; por defecto sistema), con `try/catch` y valor por defecto; reglas actualizadas en `copilot-instructions.md` y en el README de diseño.
+  - Confirmado: el tema se define con `light-dark()` y `color-scheme` (MDN: Chrome y Edge 123, Firefox 120, Safari 17.5); el oscuro conserva los valores de la guía y el claro sale de la misma paleta.
+  - Pendiente: ok de quien mantiene el lab a la paleta clara (checkpoint de 4b) antes de seguir con el resto de las vistas.
+  - Pendiente: defecto previo, sin arreglar: en Finanzas > Resumen la columna "monto" de "Últimos movimientos" queda cortada por el scroll horizontal cuando el panel del asistente está abierto (1440 px).
+  - Pendiente: defecto previo, sin arreglar: el estado vacío del chat a 320x640 aparece desplazado hacia abajo (el saludo y parte del campo quedan fuera de vista), probablemente por el efecto que baja el scroll al final.
+  - Pendiente: Lato y NTR, que la guía visual citaba como fuentes alternativas, no están instaladas; requieren decidir y autorizar sus paquetes `@fontsource`.
+  - Pendiente: el `Estado` del backlog de UI-09 pasará a "Hecho" solo al cerrar las fases C y D.

@@ -61,6 +61,7 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 | `chart-2`  | `#AFBECA` |
 | `chart-3`  | `#839BAD` |
 | `chart-4`  | `#678398` |
+| `chart-5`  | `#4F667A` |
 
 #### Estados
 
@@ -70,7 +71,46 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 | `warn`     | `#A5A5A5` | Pendiente, parcial, solo lectura         |
 | `danger`   | `#D6D6D6` | Error, bloqueado, rechazado              |
 
-**Regla:** el estado nunca se comunica solo con color. Siempre va con texto ("Arriba", "Pendiente", "bloqueada").
+**Regla:** el estado nunca se comunica solo con color. Siempre va con texto ("Arriba", "Pendiente", "bloqueada") y, en los puntos de estado, con forma: círculo lleno (ok), rombo (warn) y anillo hueco (danger).
+
+#### Tema claro
+
+Los PNG solo definen el oscuro. El claro se deriva de la misma paleta (neutral + hoki) con los papeles invertidos: el botón primario y el bloque "Próximo pago" pasan a ser oscuros. **Pendiente del ok de quien mantiene el lab.**
+
+En `index.css` cada token semántico se define una sola vez con `light-dark(claro, oscuro)`. `:root` declara `color-scheme: light dark` (sigue `prefers-color-scheme`) y `data-theme="claro" | "oscuro"` en `<html>` lo fuerza; la preferencia (`sistema` | `claro` | `oscuro`) se guarda en `lara.tema` y se aplica antes del primer render. `light-dark()` funciona desde Chrome y Edge 123, Firefox 120 y Safari 17.5.
+
+| Token | Claro | Oscuro |
+| ----- | ----- | ------ |
+| `bg` | #ECEFF2 | #14171B |
+| `sidebar` | #FAFAFA | #1A1A1A |
+| `surface` | #FAFAFA | #1A1A1A |
+| `surface-hover` | #D4DCE3 | #292929 |
+| `surface-active` | #D4DCE3 | #292929 |
+| `border` | #D6D6D6 | #292929 |
+| `divider` | #D6D6D6 | #292929 |
+| `border-strong` | #A5A5A5 | #434343 |
+| `border-control` | #767676 | #767676 |
+| `control-off` | #767676 | #767676 |
+| `text` | #14171B | #FAFAFA |
+| `text-2` | #292929 | #E6E6E6 |
+| `muted` | #384754 | #AFBECA |
+| `faint` | #415363 | #839BAD |
+| `accent` | #415363 | #AFBECA |
+| `accent-hover` | #384754 | #D4DCE3 |
+| `accent-ink` | #FAFAFA | #212830 |
+| `highlight` | #384754 | #D4DCE3 |
+| `highlight-ink` | #F6F7F9 | #212830 |
+| `highlight-muted` | #D4DCE3 | #415363 |
+| `chart-1` | #323D48 | #D4DCE3 |
+| `chart-2` | #384754 | #AFBECA |
+| `chart-3` | #415363 | #839BAD |
+| `chart-4` | #4F667A | #678398 |
+| `chart-5` | #678398 | #4F667A |
+| `ok` | #415363 | #839BAD |
+| `warn` | #575757 | #A5A5A5 |
+| `danger` | #1A1A1A | #D6D6D6 |
+
+Contraste calculado desde estos tokens y verificado en `src/contraste.test.ts`: texto >= 4.5:1 y controles y estados >= 3:1 en ambos temas. La única excepción es `chart-5`, que siempre va con etiqueta y valor en texto. `ok` y `danger` se distinguen además por forma y por texto.
 
 ### Tipografía
 
@@ -237,7 +277,7 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 ![Gastos fijos](png/13-gastos-fijos.png)
 
 - Tabla de fijos detectados: confirmados y por confirmar (Confirmar / Descartar).
-- Proyección de 6 meses en barras; el pico va en durazno con su explicación en texto.
+- Proyección de 6 meses en barras; el pico se resalta con `chart-4` (más oscuro que el resto de las barras) y su explicación va en texto; no hay un color extra en los tokens.
 - La proyección se calcula en código, no con el LLM.
 
 ### 14 · Tarjetas y pagos

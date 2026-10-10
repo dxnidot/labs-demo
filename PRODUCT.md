@@ -40,7 +40,7 @@ Política vigente: [ADR-0007](docs/decisions/0007-politica-de-datos-hacia-el-pro
 ## Capabilities and Constraints
 
 - Confirmado: chat con streaming, finanzas (tarjetas, movimientos, resumen mensual y calendario de pagos), gastos fijos y vistas de inspección (agentes, base de datos, memoria, herramientas, menú por rol, usuarios y roles).
-- Restricciones: el repo es público, así que no puede contener datos reales, secretos ni tokens; los datos de relleno son ficticios. Los tokens viven solo en memoria. `localStorage` solo guarda la fuente elegida (`lara.fuente`).
+- Restricciones: el repo es público, así que no puede contener datos reales, secretos ni tokens; los datos de relleno son ficticios. Los tokens viven solo en memoria. `localStorage` solo guarda dos preferencias visuales: la fuente elegida (`lara.fuente`) y el tema (`lara.tema`: sistema, claro u oscuro).
 - Idioma de la interfaz: español.
 - Por decidir: qué vistas conservarán su forma actual cuando haya backend real en lugar de mocks.
 - Por decidir: qué datos pueden enviarse al proveedor del modelo y si se enmascaran comercio, alias y montos antes de enviarlos.
