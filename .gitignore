@@ -45,3 +45,7 @@ Thumbs.db
 
 # Datos privados locales
 data/private/
+
+# Archivos locales de Impeccable y de Claude Code (por máquina)
+.claude/settings.local.json
+.impeccable/config.local.json
