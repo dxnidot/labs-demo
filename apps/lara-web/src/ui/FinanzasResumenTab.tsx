@@ -12,10 +12,10 @@ interface FinanzasResumenTabProps {
   periodo: string;
 }
 
-const coloresBarra = ["bg-chart-1", "bg-chart-2", "bg-chart-3", "bg-chart-4", "bg-hoki-600"];
+const coloresBarra = ["bg-chart-1", "bg-chart-2", "bg-chart-3", "bg-chart-4", "bg-chart-5"];
 const maximoMovimientos = 5;
 const textoSinDatos = "Sin datos todavía · Fuente: finanzas · Pendiente: totales mensuales";
-const enlaceClase = `text-[13px] text-accent underline hover:text-accent-hover ${claseFoco}`;
+const enlaceClase = `text-compact text-accent underline hover:text-accent-hover ${claseFoco}`;
 
 /**
  * Resumen de finanzas: próximo pago, gastos por categoría, próximos pagos y últimos movimientos.
@@ -36,31 +36,31 @@ export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTa
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1180px]:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 wide:grid-cols-4">
         {["Ingresos del mes", "Gastos del mes", "Te queda"].map((titulo) => (
           <Card key={titulo}>
-            <span className="text-[13px] text-muted">{titulo}</span>
-            <span className="font-mono text-[26px] font-medium text-faint">—</span>
+            <span className="text-compact text-muted">{titulo}</span>
+            <span className="font-mono text-title font-medium text-faint">—</span>
             <span className="text-xs text-faint">{textoSinDatos}</span>
           </Card>
         ))}
         <section className="flex min-w-0 flex-col gap-3 rounded-card border border-highlight bg-highlight p-5 text-highlight-ink">
-          <span className="text-[13px] text-hoki-700">Próximo pago</span>
+          <span className="text-compact text-highlight-muted">Próximo pago</span>
           {proximoPago ? (
             <>
-              <span className="text-[22px] font-semibold">{fechaCorta(proximoPago.fecha)}</span>
-              <span className="text-xs text-hoki-700">{proximoPago.alias}</span>
+              <span className="text-stat font-semibold">{fechaCorta(proximoPago.fecha)}</span>
+              <span className="text-xs text-highlight-muted">{proximoPago.alias}</span>
             </>
           ) : (
             <>
-              <span className="text-[22px] font-semibold">—</span>
-              <span className="text-xs text-hoki-700">Sin pagos en los próximos 30 días</span>
+              <span className="text-stat font-semibold">—</span>
+              <span className="text-xs text-highlight-muted">Sin pagos en los próximos 30 días</span>
             </>
           )}
         </section>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 min-[1180px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 wide:grid-cols-2">
         <Card aria-labelledby="serie-titulo">
           <h2 className="m-0 text-base font-semibold" id="serie-titulo">
             Ingresos vs gastos · 6 meses
@@ -85,13 +85,13 @@ export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTa
             >
               {categorias.map((fila, indice) => (
                 <li
-                  className="grid grid-cols-[110px_minmax(0,1fr)_72px] items-center gap-3 text-[13px]"
+                  className="grid grid-cols-[110px_minmax(0,1fr)_72px] items-center gap-3 text-compact"
                   key={fila.categoria}
                 >
                   <span className="truncate">{fila.categoria}</span>
-                  <div aria-hidden="true" className="h-2.5 rounded-[5px] bg-surface-active">
+                  <div aria-hidden="true" className="h-2.5 rounded-md bg-surface-active">
                     <div
-                      className={`h-full rounded-[5px] ${coloresBarra[indice % coloresBarra.length]}`}
+                      className={`h-full rounded-md ${coloresBarra[indice % coloresBarra.length]}`}
                       style={{ width: `${mayor > 0 ? (fila.total / mayor) * 100 : 0}%` }}
                     />
                   </div>
@@ -105,7 +105,7 @@ export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTa
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 min-[1180px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 wide:grid-cols-2">
         <Card aria-labelledby="proximos-pagos-titulo">
           <div className="flex items-center justify-between">
             <h2 className="m-0 text-base font-semibold" id="proximos-pagos-titulo">
@@ -154,7 +154,7 @@ export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTa
             </p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left text-[13px]">
+              <table className="w-full border-collapse text-left text-compact">
                 <caption className="sr-only">Últimos movimientos en {moneda}</caption>
                 <thead className="bg-surface">
                   <tr className="border-b border-divider text-muted">

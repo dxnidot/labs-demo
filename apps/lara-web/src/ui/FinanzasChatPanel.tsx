@@ -44,9 +44,9 @@ const componentesMarkdown: Components = {
   p: ({ children }) => <p className="m-0">{children}</p>,
   ul: ({ children }) => <ul className="my-1 list-disc space-y-1 pl-5">{children}</ul>,
   ol: ({ children }) => <ol className="my-1 list-decimal space-y-1 pl-5">{children}</ol>,
-  code: ({ children }) => <code className="font-mono text-[13px] text-text">{children}</code>,
+  code: ({ children }) => <code className="font-mono text-compact text-text">{children}</code>,
   table: ({ children }) => (
-    <div className="my-2 overflow-x-auto rounded-[10px] border border-border">
+    <div className="my-2 overflow-x-auto rounded-button border border-border">
       <table className="w-full border-collapse text-left text-xs">{children}</table>
     </div>
   ),
@@ -301,8 +301,8 @@ export function FinanzasChatPanel({
           cabecera={
             <header className="flex h-15 shrink-0 items-center justify-between gap-2 border-b border-border pl-4.5 pr-3">
               <div className="flex min-w-0 flex-col gap-0.5">
-                <h2 className="m-0 text-[15px] font-semibold">Asistente de finanzas</h2>
-                <span className="font-mono text-[11px] text-faint">
+                <h2 className="m-0 text-body font-semibold">Asistente de finanzas</h2>
+                <span className="font-mono text-label text-faint">
                   agente finanzas · confirma antes de guardar
                 </span>
               </div>
@@ -375,12 +375,12 @@ export function FinanzasChatPanel({
                   >
                     <Paperclip aria-hidden="true" className="size-4.5" />
                   </IconButton>
-                  <span className="flex-1 text-[11px] text-faint">
+                  <span className="flex-1 text-label text-faint">
                     CSV · se procesa en finanzas
                   </span>
                   <button
                     aria-label="Enviar"
-                    className={`inline-flex size-11 shrink-0 items-center justify-center rounded-[10px] bg-accent text-accent-ink transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 min-[980px]:size-10 ${claseFoco}`}
+                    className={`inline-flex size-11 shrink-0 items-center justify-center rounded-button bg-accent text-accent-ink transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 shell:size-10 ${claseFoco}`}
                     disabled={!texto.trim() || cargandoChat || cargandoSesion}
                     type="submit"
                   >
@@ -403,7 +403,7 @@ export function FinanzasChatPanel({
             {mensajes.map((mensaje, index) =>
               mensaje.rol === "usuario" ? (
                 <article
-                  className="max-w-[88%] self-end whitespace-pre-wrap rounded-[14px] bg-surface-active px-3.5 py-2.5 text-sm leading-normal"
+                  className="max-w-11/12 self-end whitespace-pre-wrap rounded-card bg-surface-active px-3.5 py-2.5 text-sm leading-normal"
                   key={`${mensaje.fecha.getTime()}-${index}`}
                 >
                   <p className="sr-only">Tú</p>
@@ -411,7 +411,7 @@ export function FinanzasChatPanel({
                 </article>
               ) : (
                 <article
-                  className="flex flex-col gap-2.5 wrap-break-word text-sm leading-[1.55] text-text"
+                  className="flex flex-col gap-2.5 wrap-break-word text-sm leading-body text-text"
                   key={`${mensaje.fecha.getTime()}-${index}`}
                 >
                   <p className="sr-only">Lara</p>
@@ -428,7 +428,7 @@ export function FinanzasChatPanel({
 
             {importacion && (
               <div className="flex flex-col gap-2.5">
-                <div className="inline-flex items-center gap-2 self-end rounded-[10px] border border-border bg-bg px-3 py-2 text-[13px]">
+                <div className="inline-flex items-center gap-2 self-end rounded-button border border-border bg-bg px-3 py-2 text-compact">
                   <FileText aria-hidden="true" className="size-4 text-accent" />
                   <span className="font-mono">{importacion.nombre}</span>
                 </div>
@@ -436,7 +436,7 @@ export function FinanzasChatPanel({
                   <p className="m-0 text-sm text-muted" role="status">Previsualizando…</p>
                 )}
                 {preview && (
-                  <div className="flex flex-col gap-2.5 text-sm leading-[1.55]">
+                  <div className="flex flex-col gap-2.5 text-sm leading-body">
                     <p className="m-0">
                       Finanzas leyó <span className="font-mono">{preview.totalRegistros}</span>{" "}
                       movimientos del archivo, sin pasarlo por el modelo. Todavía{" "}
@@ -495,7 +495,7 @@ interface TablaPreviewProps {
 
 function TablaPreview({ movimientos }: TablaPreviewProps) {
   return (
-    <div className="max-h-64 shrink-0 overflow-auto rounded-[10px] border border-border">
+    <div className="max-h-64 shrink-0 overflow-auto rounded-button border border-border">
       <table className="w-full min-w-105 border-collapse text-left text-xs">
         <caption className="sr-only">Previsualización de movimientos</caption>
         <thead className="sticky top-0 bg-surface text-muted">

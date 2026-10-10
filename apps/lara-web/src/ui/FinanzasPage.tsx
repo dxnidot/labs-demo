@@ -151,7 +151,7 @@ export function FinanzasPage() {
     <div className="flex flex-wrap items-center gap-2">
       <label className="sr-only" htmlFor="periodo-finanzas">Periodo</label>
       <input
-        className="min-h-11 rounded-pill border border-border bg-transparent px-3 text-[13px] text-text-2 scheme-dark min-[980px]:min-h-8"
+        className="min-h-11 rounded-pill border border-border bg-transparent px-3 text-compact text-text-2 scheme-dark shell:min-h-8"
         id="periodo-finanzas"
         onChange={(event) => {
           const nuevoPeriodo = event.currentTarget.value;
@@ -170,7 +170,7 @@ export function FinanzasPage() {
         {monedas.map((opcion) => (
           <button
             aria-pressed={moneda === opcion}
-            className={`min-h-9 rounded-pill px-3 font-mono text-xs min-[980px]:min-h-7.5 ${claseFocoInterno} ${
+            className={`min-h-9 rounded-pill px-3 font-mono text-xs shell:min-h-7.5 ${claseFocoInterno} ${
               moneda === opcion ? "bg-accent text-accent-ink" : "text-muted"
             }`}
             key={opcion}
@@ -206,7 +206,7 @@ export function FinanzasPage() {
         <Link
           aria-controls={idPanelPestanas}
           aria-selected={pestana.id === tab}
-          className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-none border-b-2 bg-transparent px-3.5 text-sm hover:text-text min-[980px]:min-h-10 ${claseFocoInterno} ${
+          className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-none border-b-2 bg-transparent px-3.5 text-sm hover:text-text shell:min-h-10 ${claseFocoInterno} ${
             pestana.id === tab ? "border-accent text-text" : "border-transparent text-muted"
           }`}
           id={idPestana(pestana.id)}
@@ -235,7 +235,7 @@ export function FinanzasPage() {
             </p>
           )}
           {!cargando && error && (
-            <div className="flex flex-col gap-3 rounded-card border border-border bg-surface-active p-5 min-[600px]:flex-row min-[600px]:items-center min-[600px]:justify-between">
+            <div className="flex flex-col gap-3 rounded-card border border-border bg-surface-active p-5 sm:flex-row sm:items-center sm:justify-between">
               <p className="m-0 text-sm text-danger" role="alert">{error}</p>
               <Button
                 className={`shrink-0 ${claseFoco}`}

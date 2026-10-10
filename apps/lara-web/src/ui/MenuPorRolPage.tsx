@@ -8,6 +8,7 @@ import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdap
 import { Card } from "./components/Card";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { PageLayout } from "./components/PageLayout";
+import { Pill } from "./components/Pill";
 
 const obtenerMenu = new ObtenerMenu(new HttpMenuAdapter(new ApiHttpClient(keycloakAuthAdapter)));
 
@@ -44,14 +45,14 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
   return (
     <PageLayout
       acciones={
-        <span className="rounded-pill border border-border px-3 py-1.5 font-mono text-xs text-text-2">
+        <Pill contorno mono>
           kc-demo · GET /api/menu
-        </span>
+        </Pill>
       }
       subtitulo="Lo que ve cada usuario según los roles de su token."
       titulo="Menú por rol"
     >
-      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 shell:grid-cols-2">
         <Card aria-label={`Menú de ${usuario.username}`}>
           <div className="flex items-center gap-3">
             <span
@@ -62,7 +63,7 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
             </span>
             <div className="flex flex-col">
               <span className="font-semibold">{usuario.username}</span>
-              <span className="text-[13px] text-muted">usuario actual</span>
+              <span className="text-compact text-muted">usuario actual</span>
             </div>
           </div>
           <div className="font-mono text-xs text-muted">
@@ -76,7 +77,7 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
             <p className="m-0 text-sm text-muted">El backend no devolvió opciones para este usuario.</p>
           )}
           {opciones && opciones.length > 0 && (
-            <ul className="m-0 flex list-none flex-col overflow-hidden rounded-[10px] border border-border p-0">
+            <ul className="m-0 flex list-none flex-col overflow-hidden rounded-button border border-border p-0">
               {opciones.map((opcion) => (
                 <li
                   className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 text-sm last:border-b-0"
@@ -104,7 +105,7 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
           pendiente="UI-07"
         />
       </div>
-      <p className="m-0 text-[13px] text-faint">La acción también se valida en el backend.</p>
+      <p className="m-0 text-compact text-faint">La acción también se valida en el backend.</p>
     </PageLayout>
   );
 }

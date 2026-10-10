@@ -8,7 +8,7 @@ interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 
   tono?: "normal" | "atenuado";
 }
 
-const clasesTamano = { normal: "size-11", compacto: "size-11 min-[980px]:size-10" } as const;
+const clasesTamano = { normal: "size-11", compacto: "size-11 shell:size-10" } as const;
 const clasesTono = { normal: "text-text-2", atenuado: "text-muted" } as const;
 
 /**

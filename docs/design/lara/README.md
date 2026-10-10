@@ -80,6 +80,21 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 - Las fuentes se sirven desde el repo con Fontsource; no se carga Google Fonts en ejecución.
 - Tamaños: título de pantalla 26px/600 · subtítulo 14px muted · cuerpo del chat 15px/1.6 · tablas 13px · etiquetas de sección 11px mono con `letter-spacing: .08em`.
 
+#### Escala tipográfica y cortes (tokens de `index.css`)
+
+| Token / utilidad              | Valor     | Uso                                         |
+| ----------------------------- | --------- | ------------------------------------------- |
+| `text-label`                  | 11px      | Etiquetas de sección en mono, `.08em`        |
+| `text-compact`                | 13px      | Tablas, notas, mensajes de estado            |
+| `text-body`                   | 15px/1.6  | Cuerpo del chat y controles de texto         |
+| `text-heading`                | 17px      | Título de tarjeta                            |
+| `text-brand` · `text-stat`    | 19px · 22px | Marca en la barra lateral · cifra destacada |
+| `text-title` · `text-hero`    | 26px · 34px | Título de pantalla · saludo del chat        |
+| `text-display`                | 44px      | Titular del login                            |
+| `shell:` · `wide:`            | 980px · 1180px | Barra lateral fija · cuadrículas anchas |
+
+Los componentes no usan valores arbitrarios (`text-[13px]`, `rounded-[10px]`…) ni las escalas crudas `neutral-*` / `hoki-*`: solo tokens semánticos (lo verifica `src/tokens.test.ts`).
+
 ### Medidas
 
 - Radios: botones 8–10px · tarjetas 12–14px · composer 16px · pills 999px.

@@ -27,12 +27,12 @@ export function SidebarItem({
   to,
 }: SidebarItemProps) {
   const base = reciente
-    ? "min-h-11 py-2 text-[13px] text-muted min-[980px]:min-h-9"
+    ? "min-h-11 py-2 text-compact text-muted shell:min-h-9"
     : "min-h-11 gap-3 text-sm text-text-2";
   return (
     <Link
       aria-current={active ? "page" : undefined}
-      className={`flex w-full items-center truncate rounded-[8px] px-3 text-left transition-colors ${claseFocoInterno} ${base} ${
+      className={`flex w-full items-center truncate rounded-button px-3 text-left transition-colors ${claseFocoInterno} ${base} ${
         active ? "bg-surface-active text-text" : "hover:bg-surface-hover hover:text-text"
       }`}
       onClick={onClick}

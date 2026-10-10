@@ -47,7 +47,7 @@ export function FinanzasMovimientosTab({
   return (
     <Card className="overflow-hidden" relleno="ninguno">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[620px] border-collapse text-left text-[13px]">
+        <table className="w-full min-w-155 border-collapse text-left text-compact">
           <caption className="sr-only">
             {esGasto ? "Gastos" : "Ingresos"} del periodo en {moneda}
           </caption>
@@ -74,7 +74,7 @@ export function FinanzasMovimientosTab({
                   <td className="whitespace-nowrap px-3.5 py-3 font-mono">
                     {fechaCorta(movimiento.fecha)}
                   </td>
-                  <th className="max-w-[260px] truncate px-3.5 py-3 font-normal" scope="row">
+                  <th className="max-w-65 truncate px-3.5 py-3 font-normal" scope="row">
                     {movimiento.comercio}
                   </th>
                   <td className="px-3.5 py-3">{movimiento.categoria}</td>

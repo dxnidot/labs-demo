@@ -69,7 +69,7 @@ const sugerencias = [
 
 function ChipAgente() {
   return (
-    <span className="inline-flex min-h-8 items-center gap-2 rounded-pill border border-border px-3 text-[13px] text-text-2">
+    <span className="inline-flex min-h-8 items-center gap-2 rounded-pill border border-border px-3 text-compact text-text-2">
       <span aria-hidden="true" className="size-2 rounded-full bg-ok" />
       Agente: orquestador
     </span>
@@ -80,11 +80,11 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
   return (
     <button
       aria-label="Enviar"
-      className={`inline-flex size-11 shrink-0 items-center justify-center rounded-[10px] bg-accent text-accent-ink transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 min-[980px]:size-10 ${claseFoco}`}
+      className={`inline-flex size-11 shrink-0 items-center justify-center rounded-button bg-accent text-accent-ink transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 shell:size-10 ${claseFoco}`}
       disabled={deshabilitado}
       type="submit"
     >
-      <ArrowUp aria-hidden="true" className="size-[18px]" />
+      <ArrowUp aria-hidden="true" className="size-4.5" />
     </button>
   );
 }
@@ -276,7 +276,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
         mensajes.length > 0 || cargandoSesion ? (
           <header className="flex h-15 items-center justify-between gap-4 border-b border-divider px-4 sm:px-6">
             <div className="flex min-w-0 items-center gap-3">
-              <h1 className="m-0 truncate text-[15px] font-medium">
+              <h1 className="m-0 truncate text-body font-medium">
                 {sesionActiva?.titulo ?? "Nuevo chat"}
               </h1>
               <span className="whitespace-nowrap rounded-pill border border-border bg-surface px-2.5 py-0.5 font-mono text-xs text-muted">
@@ -321,7 +321,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
       pie={
         mensajes.length > 0 || cargandoSesion ? (
           <footer className="px-4 pb-4 sm:px-6 sm:pb-5">
-            <div className="mx-auto flex w-full max-w-[760px] flex-col gap-2.5">
+            <div className="mx-auto flex w-full max-w-190 flex-col gap-2.5">
               <form
                 className={`flex flex-col gap-3 rounded-composer border border-border bg-surface py-3.5 pl-4 pr-3.5 ${claseFocoContenedor}`}
                 onSubmit={enviar}
@@ -330,7 +330,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                   Mensaje para Lara
                 </label>
                 <textarea
-                  className="w-full resize-none bg-transparent text-[15px] text-text outline-none placeholder:text-faint"
+                  className="w-full resize-none bg-transparent text-body text-text outline-none placeholder:text-faint"
                   disabled={cargando || cargandoSesion}
                   id="mensaje-chat"
                   onChange={(event) => setTexto(event.target.value)}
@@ -360,10 +360,10 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     >
       <div className="mx-auto flex min-h-full w-full max-w-190 flex-col gap-6">
         {mensajes.length === 0 && !cargandoSesion && (
-          <div className="m-auto flex w-full max-w-[760px] flex-col gap-7 py-6">
+          <div className="m-auto flex w-full max-w-190 flex-col gap-7 py-6">
             <div className="flex items-center gap-3.5">
               <LaraLogo tamano={36} />
-              <h1 className="m-0 text-2xl font-medium tracking-[-0.02em] sm:text-[2.125rem]">
+              <h1 className="m-0 text-2xl font-medium tracking-tight sm:text-hero">
                 Hola, {usuario.username}. ¿En qué te ayudo?
               </h1>
             </div>
@@ -375,7 +375,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                 Mensaje para Lara
               </label>
               <textarea
-                className="w-full resize-none bg-transparent text-[15px] text-text outline-none placeholder:text-faint"
+                className="w-full resize-none bg-transparent text-body text-text outline-none placeholder:text-faint"
                 disabled={cargando}
                 id="mensaje"
                 onChange={(event) => setTexto(event.target.value)}
@@ -395,10 +395,10 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                 <BotonEnviar deshabilitado={cargando || !texto.trim()} />
               </div>
             </form>
-            <div className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1100px]:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 wide:grid-cols-4">
               {sugerencias.map((sugerencia) => (
                 <button
-                  className={`flex flex-col gap-1.5 rounded-[12px] border border-border bg-surface p-4 text-left text-sm transition-colors hover:border-neutral-700 hover:bg-surface-hover ${claseFoco}`}
+                  className={`flex flex-col gap-1.5 rounded-card border border-border bg-surface p-4 text-left text-sm transition-colors hover:border-border-strong hover:bg-surface-hover ${claseFoco}`}
                   key={sugerencia}
                   onClick={() => setTexto(sugerencia)}
                   type="button"
@@ -417,13 +417,13 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
           <article
             className={
               mensaje.rol === "usuario"
-                ? "max-w-[80%] self-end rounded-[14px] bg-surface-active px-4 py-3 text-[15px] leading-[1.55]"
-                : "flex w-full gap-3.5 text-[15px] leading-[1.6]"
+                ? "max-w-4/5 self-end rounded-card bg-surface-active px-4 py-3 text-body"
+                : "flex w-full gap-3.5 text-body leading-body"
             }
             key={`${mensaje.fecha.getTime()}-${index}`}
           >
             {mensaje.rol === "agente" && (
-              <span className="inline-flex size-7.5 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface">
+              <span className="inline-flex size-7.5 shrink-0 items-center justify-center rounded-button border border-border bg-surface">
                 <LaraLogo soloL tamano={18} />
               </span>
             )}

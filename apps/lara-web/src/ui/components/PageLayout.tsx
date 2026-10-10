@@ -64,7 +64,7 @@ export function PageLayout({
             data-slot="page-header"
           >
             <div className="flex min-w-0 flex-col gap-2">
-              <h1 className="m-0 text-[1.625rem] font-semibold">{titulo}</h1>
+              <h1 className="m-0 text-title font-semibold">{titulo}</h1>
               {subtitulo && <p className="m-0 text-sm text-muted">{subtitulo}</p>}
             </div>
             {acciones}

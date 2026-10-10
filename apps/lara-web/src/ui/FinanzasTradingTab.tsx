@@ -41,7 +41,7 @@ export function FinanzasTradingTab({ mercado }: FinanzasTradingTabProps) {
     <Card className="items-start" espacio="amplio" relleno="amplio">
       <Tag>{texto.etiqueta}</Tag>
       <h2 className="m-0 text-xl font-semibold">{texto.titulo}</h2>
-      <p className="m-0 max-w-[560px] text-sm leading-relaxed text-muted">{texto.descripcion}</p>
+      <p className="m-0 max-w-140 text-sm leading-relaxed text-muted">{texto.descripcion}</p>
       <ul className="m-0 flex list-disc flex-col gap-1.5 pl-5 text-sm text-text-2">
         {texto.puntos.map((punto) => (
           <li key={punto}>{punto}</li>

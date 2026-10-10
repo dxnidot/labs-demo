@@ -133,7 +133,7 @@ function SeccionNav({ titulo, children }: { titulo: string; children: ReactNode 
   return (
     <div aria-labelledby={idTitulo} className="flex flex-col gap-0.5" role="group">
       <h2
-        className="m-0 px-3 pb-1.5 font-mono text-[11px] font-normal tracking-[0.08em] text-faint"
+        className="m-0 px-3 pb-1.5 font-mono text-label font-normal tracking-label text-faint"
         id={idTitulo}
       >
         {titulo}
@@ -259,7 +259,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
       </IconButton>
       <div className="flex items-center gap-2.5">
         <LaraLogo />
-        <span className="text-[1.1875rem] font-semibold">Lara</span>
+        <span className="text-brand font-semibold">Lara</span>
       </div>
     </header>
   );
@@ -277,7 +277,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
             <div className="flex shrink-0 items-center justify-between px-1">
               <div className="flex items-center gap-2.5">
                 <LaraLogo />
-                <span className="text-[1.1875rem] font-semibold">Lara</span>
+                <span className="text-brand font-semibold">Lara</span>
               </div>
               {estrecha ? (
                 <IconButton
@@ -304,7 +304,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
             </div>
 
             <button
-              className={`flex min-h-11 w-full shrink-0 items-center gap-2.5 rounded-[10px] bg-accent px-3.5 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent-hover ${claseFoco}`}
+              className={`flex min-h-11 w-full shrink-0 items-center gap-2.5 rounded-button bg-accent px-3.5 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent-hover ${claseFoco}`}
               onClick={iniciarChatNuevo}
               type="button"
             >
@@ -403,7 +403,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
 
               <div className="flex shrink-0 flex-col gap-0.5">
                 <div className="flex items-center justify-between px-3 pb-1.5">
-                  <h2 className="m-0 font-mono text-[11px] font-normal tracking-[0.08em] text-faint">
+                  <h2 className="m-0 font-mono text-label font-normal tracking-label text-faint">
                     RECIENTES
                   </h2>
                   {isLoadingHistory && <span className="text-xs text-muted">Cargando…</span>}

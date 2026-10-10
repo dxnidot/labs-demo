@@ -46,7 +46,7 @@ export function EstadoLabPage() {
     <PageLayout
       acciones={
         <button
-          className={`inline-flex min-h-11 items-center rounded-pill border border-border px-3 text-[13px] text-text-2 hover:bg-surface-hover min-[980px]:min-h-8 ${claseFoco}`}
+          className={`inline-flex min-h-11 items-center rounded-pill border border-border px-3 text-compact text-text-2 hover:bg-surface-hover shell:min-h-8 ${claseFoco}`}
           onClick={() => void comprobar()}
           type="button"
         >
@@ -56,9 +56,9 @@ export function EstadoLabPage() {
       subtitulo="Qué está arriba en tu PC y qué sigue en el checklist."
       titulo="Estado del lab"
     >
-      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 shell:grid-cols-4">
         {estados === null && (
-          <p className="m-0 text-sm text-muted min-[980px]:col-span-4" role="status">
+          <p className="m-0 text-sm text-muted shell:col-span-4" role="status">
             Comprobando servicios…
           </p>
         )}
@@ -69,7 +69,7 @@ export function EstadoLabPage() {
               <span className="font-medium">{servicio.nombre}</span>
             </div>
             <span className="font-mono text-xs text-muted">{servicio.detalle}</span>
-            <span className="text-[13px] text-text-2">{leyenda[disponibilidad].texto}</span>
+            <span className="text-compact text-text-2">{leyenda[disponibilidad].texto}</span>
           </Card>
         ))}
         {serviciosPendientes.map((servicio) => (
@@ -81,12 +81,12 @@ export function EstadoLabPage() {
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-4 text-[13px] text-muted">
+      <div className="flex flex-wrap gap-4 text-compact text-muted">
         <span className="inline-flex items-center gap-2"><Punto clase="bg-ok" />Arriba</span>
         <span className="inline-flex items-center gap-2"><Punto clase="bg-danger" />Sin respuesta</span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 shell:grid-cols-2">
         <Card>
           <h2 className="m-0 text-base font-semibold">Avance por parte</h2>
           <EstadoVacio fuente="docs/plans/estado-lab.md" pendiente="UI-07" />

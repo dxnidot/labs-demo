@@ -7,6 +7,7 @@ import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdap
 import { EstadoVacio } from "./components/EstadoVacio";
 import { claseFocoInterno } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
+import { Pill } from "./components/Pill";
 import { useScrollPestanaActiva } from "./useScrollPestanaActiva";
 
 const listarSesiones = new ListarSesiones(new AdkAgenteAdapter(keycloakAuthAdapter));
@@ -60,12 +61,12 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
       pestanas={
         <>
           <div className="flex flex-wrap gap-2">
-            <span className="rounded-pill border border-border px-3 py-1.5 font-mono text-xs text-text-2">
+            <Pill contorno mono>
               ADK API server · sessions
-            </span>
-            <span className="rounded-pill bg-surface-active px-3 py-1.5 font-mono text-xs text-warn">
+            </Pill>
+            <Pill mono tone="warn">
               Solo lectura
-            </span>
+            </Pill>
           </div>
 
           <div
@@ -77,7 +78,7 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
             {tablas.map((nombre) => (
               <button
                 aria-selected={tabla === nombre}
-                className={`min-h-11 shrink-0 whitespace-nowrap rounded-[8px] px-3.5 font-mono text-[13px] min-[980px]:min-h-9 ${claseFocoInterno} ${
+                className={`min-h-11 shrink-0 whitespace-nowrap rounded-button px-3.5 font-mono text-compact shell:min-h-9 ${claseFocoInterno} ${
                   tabla === nombre ? "bg-surface-active text-text" : "text-muted"
                 }`}
                 key={nombre}
@@ -109,7 +110,7 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
         )}
         {tabla === "sessions" && sesiones && sesiones.length > 0 && (
           <div className="overflow-x-auto rounded-card border border-border">
-            <table className="w-full min-w-120 border-collapse font-mono text-[13px]">
+            <table className="w-full min-w-120 border-collapse font-mono text-compact">
               <thead>
                 <tr>
                   {columnas.map((columna) => (

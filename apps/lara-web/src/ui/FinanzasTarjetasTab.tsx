@@ -71,7 +71,7 @@ export function FinanzasTarjetasTab({
       ) : (
         <Card className="overflow-hidden" relleno="ninguno">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[620px] border-collapse text-left text-[13px]">
+            <table className="w-full min-w-155 border-collapse text-left text-compact">
               <caption className="sr-only">Tarjetas registradas</caption>
               <thead>
                 <tr className="border-b border-divider bg-surface text-muted">
@@ -101,7 +101,7 @@ export function FinanzasTarjetasTab({
                         aria-checked={tarjeta.activa}
                         aria-label={`${tarjeta.alias} activa`}
                         className={`relative h-6 w-10 rounded-pill border-0 p-0 transition-colors disabled:opacity-50 ${claseFocoInterno} ${
-                          tarjeta.activa ? "bg-accent" : "bg-neutral-700"
+                          tarjeta.activa ? "bg-accent" : "bg-control-off"
                         }`}
                         disabled={actualizando.has(tarjeta.id)}
                         onClick={() => void cambiarEstado(tarjeta)}
@@ -110,8 +110,8 @@ export function FinanzasTarjetasTab({
                       >
                         <span
                           aria-hidden="true"
-                          className={`absolute top-[3px] size-[18px] rounded-pill ${
-                            tarjeta.activa ? "left-[19px] bg-accent-ink" : "left-[3px] bg-text"
+                          className={`absolute top-0.75 size-4.5 rounded-pill ${
+                            tarjeta.activa ? "left-4.75 bg-accent-ink" : "left-0.75 bg-text"
                           }`}
                         />
                       </button>

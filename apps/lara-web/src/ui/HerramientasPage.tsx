@@ -1,11 +1,12 @@
 import { herramientasConfig, type PermisoHerramienta } from "../agentesConfig";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { PageLayout } from "./components/PageLayout";
+import { Pill, type PillTone } from "./components/Pill";
 
-const colorPermiso: Record<PermisoHerramienta, string> = {
-  permitida: "text-ok",
-  "solo lectura": "text-muted",
-  "escritura con confirmación": "text-warn",
+const tonoPermiso: Record<PermisoHerramienta, PillTone> = {
+  permitida: "ok",
+  "solo lectura": "accent",
+  "escritura con confirmación": "warn",
 };
 
 /**
@@ -21,7 +22,7 @@ export function HerramientasPage() {
       titulo="Herramientas MCP"
     >
       <div className="overflow-x-auto rounded-card border border-border">
-        <table className="w-full min-w-120 border-collapse text-[13px]">
+        <table className="w-full min-w-120 border-collapse text-compact">
           <thead>
             <tr>
               {["herramienta", "origen", "permiso"].map((columna) => (
@@ -43,11 +44,7 @@ export function HerramientasPage() {
                 </td>
                 <td className="border-b border-border px-3.5 py-3 text-text-2">{herramienta.origen}</td>
                 <td className="border-b border-border px-3.5 py-3">
-                  <span
-                    className={`rounded-pill bg-surface-active px-2.5 py-0.5 text-xs ${colorPermiso[herramienta.permiso]}`}
-                  >
-                    {herramienta.permiso}
-                  </span>
+                  <Pill tone={tonoPermiso[herramienta.permiso]}>{herramienta.permiso}</Pill>
                 </td>
               </tr>
             ))}

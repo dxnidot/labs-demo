@@ -22,7 +22,7 @@ export function UsuariosRolesPage() {
       subtitulo="Vista de consulta del realm lab. Los cambios se hacen en Keycloak."
       titulo="Usuarios y roles"
     >
-      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 shell:grid-cols-2">
         <EstadoVacio className="self-start" fuente="Keycloak Admin REST API" pendiente="UI-07" />
         <Card>
           <div className="flex items-center justify-between gap-3">
@@ -30,13 +30,13 @@ export function UsuariosRolesPage() {
             <span className="font-mono text-xs text-muted">{`${usuario} · access token`}</span>
           </div>
           {claims ? (
-            <pre className="m-0 overflow-auto whitespace-pre-wrap break-all rounded-[10px] bg-bg p-4 font-mono text-[13px] leading-[1.6] text-text-2">
+            <pre className="m-0 overflow-auto whitespace-pre-wrap break-all rounded-button bg-bg p-4 font-mono text-compact leading-body text-text-2">
               {JSON.stringify(claims, null, 2)}
             </pre>
           ) : (
             <p className="m-0 text-sm text-muted">No hay token en memoria.</p>
           )}
-          <p className="m-0 text-[13px] text-faint">
+          <p className="m-0 text-compact text-faint">
             Solo se decodifica en pantalla. El token nunca se guarda.
           </p>
         </Card>

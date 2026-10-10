@@ -33,7 +33,7 @@ export function Sidebar({ abierto = true, children, drawer = false, onCerrar, pa
         aria-label={drawer ? "Navegación" : "Barra lateral"}
         aria-modal={drawer ? true : undefined}
         className={`flex shrink-0 flex-col gap-4 border-r border-border bg-sidebar px-3 py-4 outline-none ${
-          drawer ? "fixed inset-y-0 left-0 z-30 w-68 max-w-[85vw]" : "h-full w-68"
+          drawer ? "fixed inset-y-0 left-0 z-30 w-68 max-w-5/6" : "h-full w-68"
         }`}
         hidden={drawer && !abierto}
         id={idBarraLateral}
