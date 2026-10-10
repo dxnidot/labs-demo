@@ -4,7 +4,7 @@ Requiere Java 21, Docker y un realm `lab` disponible en Keycloak local.
 
 ## Iniciar
 
-Desde `finanzas/`, copia la plantilla de entorno y configura credenciales locales ficticias:
+Desde `services/kc-finanzas/`, copia la plantilla de entorno y configura credenciales locales ficticias:
 
 ```powershell
 Copy-Item .env.example .env
@@ -16,7 +16,7 @@ Inicia PostgreSQL:
 docker compose up -d
 ```
 
-En otra terminal, desde `finanzas/`, inicia la aplicación:
+En otra terminal, desde `services/kc-finanzas/`, inicia la aplicación:
 
 ```powershell
 .\mvnw.cmd spring-boot:run
@@ -73,7 +73,7 @@ Invoke-RestMethod "$base/tarjetas/$id" -Method Delete -Headers $headers | Out-Nu
 
 ## Pruebas
 
-Desde `finanzas/`:
+Desde `services/kc-finanzas/`:
 
 ```powershell
 .\mvnw.cmd test

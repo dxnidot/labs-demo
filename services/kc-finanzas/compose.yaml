@@ -1,3 +1,5 @@
+name: finanzas
+
 services:
   finanzas-db:
     image: postgres:17

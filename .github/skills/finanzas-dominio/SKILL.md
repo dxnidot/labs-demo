@@ -5,7 +5,7 @@ description: Reglas de dominio para las funciones de finanzas personales de Lara
 
 # Dominio de finanzas personales de Lara
 
-Aplica estas reglas al implementar cálculos, herramientas o vistas financieras. Mantén las reglas financieras en el servicio `finanzas/`; las vistas presentan resultados calculados y no duplican cálculos de dominio.
+Aplica estas reglas al implementar cálculos, herramientas o vistas financieras. Mantén las reglas financieras en el servicio `services/kc-finanzas/`; las vistas presentan resultados calculados y no duplican cálculos de dominio.
 
 ## Cuentas y posiciones
 
@@ -34,7 +34,7 @@ Aplica estas reglas al implementar cálculos, herramientas o vistas financieras.
 
 ## Privacidad y recomendaciones
 
-- Los cálculos viven en el servicio `finanzas/`; el LLM recibe únicamente resultados ya calculados.
+- Los cálculos viven en el servicio `services/kc-finanzas/`; el LLM recibe únicamente resultados ya calculados.
 - Nunca almacenes números completos de tarjeta; conserva solo los últimos cuatro dígitos.
 - Los datos reales solo pueden residir en la base de datos o en `agents/data/`; no los incluyas en código, prompts, logs, pruebas, ejemplos ni documentación pública.
 - El repositorio es público: usa únicamente reglas y ejemplos genéricos, sin posiciones, importes, objetivos, ni nombres reales de intermediarios financieros o entidades bancarias.

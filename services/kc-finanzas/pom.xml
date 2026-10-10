@@ -9,10 +9,10 @@
         <relativePath/>
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>finanzas</artifactId>
+    <artifactId>kc-finanzas</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>finanzas</name>
-    <description>Microservicio local de finanzas personales</description>
+    <name>kc-finanzas</name>
+    <description>Microservicio de finanzas personales del lab: tarjetas, movimientos, importaciones y calendario de pagos, protegido con JWT de Keycloak</description>
     <properties>
         <java.version>21</java.version>
     </properties>
