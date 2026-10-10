@@ -15,22 +15,22 @@ const usuario: Usuario = {
     "default-roles-lab",
     "ver_agentes",
     "ver_identidad",
-    "usar_finanzas",
+    "ver-finanzas",
   ],
-  chatApiRoles: ["ver-menu"],
+  kcMenuRoles: ["ver-menu"],
 };
 const usuarioSinRolesPrivilegiados: Usuario = {
   id: "usuario-2",
   username: "beto",
   roles: ["offline_access", "uma_authorization", "default-roles-lab"],
-  chatApiRoles: [],
+  kcMenuRoles: [],
 };
 const menu: MenuOpcion[] = [
   { clave: "reportes", titulo: "Reportes", ruta: "/reportes", acciones: ["consultar", "exportar"] },
 ];
 const claims = {
   iss: "http://localhost:8080/realms/lab",
-  azp: "agents-ui",
+  azp: "lara-web",
   preferred_username: "ana",
 };
 const tokenCrudo = "token-crudo-secreto";
@@ -221,7 +221,7 @@ describe("sidebar y rutas", () => {
     expect(screen.getByRole("tab", { name: "Trading MX" }).getAttribute("aria-selected")).toBe("true");
   });
 
-  it("sin ver_agentes, ver_identidad ni usar_finanzas no renderiza esas secciones en el DOM", async () => {
+  it("sin ver_agentes, ver_identidad ni ver-finanzas no renderiza esas secciones en el DOM", async () => {
     auth.init.mockResolvedValue(usuarioSinRolesPrivilegiados);
     prepararFetch();
 
@@ -357,7 +357,7 @@ describe("pantallas con datos", () => {
 
     const { container } = montar("/usuarios");
 
-    expect(await screen.findByText(/"azp": "agents-ui"/)).toBeTruthy();
+    expect(await screen.findByText(/"azp": "lara-web"/)).toBeTruthy();
     expect(screen.getByText(/"preferred_username": "ana"/)).toBeTruthy();
     expect(container.textContent).not.toContain(tokenCrudo);
   });

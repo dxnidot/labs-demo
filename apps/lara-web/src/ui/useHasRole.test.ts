@@ -3,7 +3,7 @@ import type { Usuario } from "../domain/Usuario";
 import { useHasRole } from "./useHasRole";
 
 function usuarioConRoles(roles: string[]): Usuario {
-  return { id: "u1", username: "ana", roles, chatApiRoles: [] };
+  return { id: "u1", username: "ana", roles, kcMenuRoles: [] };
 }
 
 describe("useHasRole", () => {

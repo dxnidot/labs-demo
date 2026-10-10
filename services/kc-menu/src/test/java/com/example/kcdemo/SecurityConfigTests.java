@@ -22,7 +22,7 @@ class SecurityConfigTests {
 
     @Test
     void convertsOnlyStringRolesFromChatApiClient() {
-        Map<String, Object> claims = Map.of("resource_access", Map.of("chat-api", Map.of(
+        Map<String, Object> claims = Map.of("resource_access", Map.of("kc-menu", Map.of(
                 "roles", Arrays.asList("ver-menu", "autorizar", 42, null))));
 
         Set<String> authorities = authoritiesFor(claims);
@@ -47,7 +47,7 @@ class SecurityConfigTests {
 
     @Test
     void returnsNoAuthoritiesWhenClientRolesAreNotACollection() {
-        assertTrue(authoritiesFor(Map.of("resource_access", Map.of("chat-api", Map.of("roles", "invalid")))).isEmpty());
+        assertTrue(authoritiesFor(Map.of("resource_access", Map.of("kc-menu", Map.of("roles", "invalid")))).isEmpty());
     }
 
     private Set<String> authoritiesFor(Map<String, Object> claims) {

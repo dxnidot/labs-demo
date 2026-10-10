@@ -5,7 +5,7 @@ import type { Usuario } from "../../domain/Usuario";
 const keycloak = new Keycloak({
   url: "http://localhost:8080",
   realm: "lab",
-  clientId: "agents-ui",
+  clientId: "lara-web",
 });
 let initPromise: Promise<Usuario | null> | undefined;
 
@@ -14,6 +14,7 @@ let initPromise: Promise<Usuario | null> | undefined;
  * @author Daniel
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Usa check-sso con SSO silencioso, añade login y claims del token.
+ * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
  */
 export class KeycloakAuthAdapter implements AuthPort {
   init(): Promise<Usuario | null> {
@@ -77,13 +78,13 @@ export class KeycloakAuthAdapter implements AuthPort {
     const clientRoles = Object.values(keycloak.resourceAccess ?? {}).flatMap(
       (access) => access.roles ?? [],
     );
-    const chatApiRoles = keycloak.resourceAccess?.["chat-api"]?.roles ?? [];
+    const kcMenuRoles = keycloak.resourceAccess?.["kc-menu"]?.roles ?? [];
 
     return {
       id,
       username,
       roles: [...new Set([...realmRoles, ...clientRoles])],
-      chatApiRoles: [...new Set(chatApiRoles)],
+      kcMenuRoles: [...new Set(kcMenuRoles)],
     };
   }
 }

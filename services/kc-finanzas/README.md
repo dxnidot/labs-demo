@@ -26,10 +26,10 @@ La API escucha en `http://127.0.0.1:8083`.
 
 ## Probar los endpoints
 
-Define `KC_CHAT_API_SECRET` y `KC_ANA_PASSWORD` como variables de entorno con credenciales locales de prueba. El siguiente comando obtiene un token de Keycloak y lo conserva en memoria sin imprimirlo:
+Define `KC_MENU_CLIENT_SECRET` y `KC_ANA_PASSWORD` como variables de entorno con credenciales locales de prueba. El siguiente comando obtiene un token de Keycloak y lo conserva en memoria sin imprimirlo:
 
 ```powershell
-$body = @{ grant_type='password'; client_id='chat-api'; client_secret=$env:KC_CHAT_API_SECRET; username='ana'; password=$env:KC_ANA_PASSWORD }
+$body = @{ grant_type='password'; client_id='kc-menu'; client_secret=$env:KC_MENU_CLIENT_SECRET; username='ana'; password=$env:KC_ANA_PASSWORD }
 $env:KEYCLOAK_TOKEN = (Invoke-RestMethod -Method Post -Uri 'http://localhost:8080/realms/lab/protocol/openid-connect/token' -Body $body).access_token
 ```
 

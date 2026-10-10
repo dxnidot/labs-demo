@@ -27,10 +27,10 @@ kc-menu y kc-finanzas leen el emisor del JWT de la variable `KEYCLOAK_ISSUER_URI
 - El realm se crea al primer arranque desde `infra/keycloak/import/lab-realm.json` (`--import-realm`); si el realm ya existe, la importación se omite.
 - Usuarios de prueba: `ana` (grupo `ejecutivo`, rol `ver-menu`), `beto` (grupo `supervisor`, roles `ver-menu` y `autorizar`) y `admin` (todos los roles). Sus contraseñas salen de `KC_ANA_PASSWORD`, `KC_BETO_PASSWORD` y `KC_LAB_ADMIN_PASSWORD` en `infra/keycloak/.env`. Tu usuario real lo creas tú en la consola de admin.
 - Clients:
-  - `chat-api`: API de kc-menu; sus roles llegan en `resource_access.chat-api.roles`.
-  - `agents-ui`: client público de Lara (PKCE, redirect `http://localhost:5173/*`), hecho en KC-02. Lleva un mapper de audiencia para que el access token traiga `aud=agents-ui` (KC-04).
+  - `kc-menu`: API de kc-menu (antes `chat-api`); sus roles llegan en `resource_access.kc-menu.roles`.
+  - `lara-web`: client público de Lara (antes `agents-ui`; PKCE S256, redirect `http://localhost:5173/*`), hecho en KC-02. Lleva el mapper `audience-lara-web` para que el access token traiga `aud=lara-web` (KC-04).
   - `finanzas-agent`: client confidencial con service account que usa el orquestador para llamar a kc-finanzas; su client role es `usar-finanzas` (FIN-13).
-- Las contraseñas y los secrets de los clients **no están en el repo**: el JSON del realm solo trae marcadores `${VAR}` y los valores viven en `infra/keycloak/.env` (`KC_CHAT_API_SECRET`, `FINANZAS_AGENT_CLIENT_SECRET`, y las tres contraseñas). Nunca las escribas en archivos versionados ni en respuestas.
+- Las contraseñas y los secrets de los clients **no están en el repo**: el JSON del realm solo trae marcadores `${VAR}` y los valores viven en `infra/keycloak/.env` (`KC_MENU_CLIENT_SECRET`, `FINANZAS_AGENT_CLIENT_SECRET`, y las tres contraseñas). Nunca las escribas en archivos versionados ni en respuestas.
 
 ## Arrancar el lab
 
@@ -76,8 +76,8 @@ Requiere que el client tenga habilitado Direct access grants y las variables de 
 ```powershell
 $body = @{
   grant_type    = 'password'
-  client_id     = 'chat-api'
-  client_secret = $env:KC_CHAT_API_SECRET
+  client_id     = 'kc-menu'
+  client_secret = $env:KC_MENU_CLIENT_SECRET
   username      = 'ana'
   password      = $env:KC_ANA_PASSWORD
 }
@@ -103,4 +103,4 @@ Invoke-RestMethod -Uri 'http://localhost:8081/api/menu' -Headers @{ Authorizatio
 - **El login no carga:** revisar `docker compose ps` en `infra/keycloak/` y esperar a que Keycloak termine de arrancar.
 - **401 en kc-menu:** token vencido, o el client/realm no coincide con el emisor esperado por kc-menu.
 - **403 en kc-menu:** el usuario no tiene el rol que pide el endpoint (por ejemplo, `ana` no tiene `autorizar`).
-- **401 en el orquestador:** el access token no trae `aud=agents-ui`; revisar el mapper de audiencia del client `agents-ui` y volver a iniciar sesión en Lara.
+- **401 en el orquestador:** el access token no trae `aud=lara-web`; revisar el mapper de audiencia del client `lara-web` y volver a iniciar sesión en Lara.

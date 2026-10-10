@@ -8,8 +8,8 @@ import { AppShell } from "./AppShell";
 const usuario: Usuario = {
   id: "usuario-1",
   username: "ana",
-  roles: ["offline_access", "ver_agentes", "ver_identidad", "usar_finanzas"],
-  chatApiRoles: ["ver-menu"],
+  roles: ["offline_access", "ver_agentes", "ver_identidad", "ver-finanzas"],
+  kcMenuRoles: ["ver-menu"],
 };
 
 const auth = vi.hoisted(() => ({

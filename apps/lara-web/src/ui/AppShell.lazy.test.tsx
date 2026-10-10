@@ -9,7 +9,7 @@ const usuario: Usuario = {
   id: "usuario-1",
   username: "ana",
   roles: ["offline_access", "ver_agentes"],
-  chatApiRoles: [],
+  kcMenuRoles: [],
 };
 
 const auth = vi.hoisted(() => ({

@@ -9,7 +9,7 @@ describe("EnviarMensaje", () => {
       id: "usuario-1",
       username: "ana",
       roles: [],
-      chatApiRoles: [],
+      kcMenuRoles: [],
     };
     const auth: AuthPort = {
       init: async () => usuario,
@@ -38,7 +38,7 @@ describe("EnviarMensaje", () => {
   });
 
   it("propaga el origen finanzas al crear la sesión", async () => {
-    const usuario = { id: "usuario-1", username: "ana", roles: [], chatApiRoles: [] };
+    const usuario = { id: "usuario-1", username: "ana", roles: [], kcMenuRoles: [] };
     const auth: AuthPort = {
       init: async () => usuario,
       usuarioActual: () => usuario,

@@ -43,8 +43,8 @@ public class SecurityConfig {
             return List.of();
         }
 
-        Object chatApi = resources.get("chat-api");
-        if (!(chatApi instanceof Map<?, ?> client)) {
+        Object kcMenu = resources.get("kc-menu");
+        if (!(kcMenu instanceof Map<?, ?> client)) {
             return List.of();
         }
 

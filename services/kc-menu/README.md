@@ -2,7 +2,7 @@
 
 API Spring Boot 4 (Java 21) que valida el JWT de Keycloak y arma el menú de opciones según los roles del token. Escucha en el puerto 8081 y expone `GET /api/menu`.
 
-Requiere un realm `lab` disponible en Keycloak local (ver `infra/keycloak/`). Los roles se leen de `resource_access.chat-api.roles`.
+Requiere un realm `lab` disponible en Keycloak local (ver `infra/keycloak/`). Los roles se leen de `resource_access.kc-menu.roles`.
 
 ## Iniciar
 

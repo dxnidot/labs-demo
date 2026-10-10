@@ -18,17 +18,18 @@
     - Los clients nuevos se nombran como el servicio o la app que los usa (`kc-menu`, `lara-web`).
     - Los roles nuevos usan `kebab-case`.
     - No se crean dos roles que solo difieran en el separador (por ejemplo `usar-finanzas` y `usar_finanzas`).
-  - **Deuda de nombres actual (no se renombra ahora):**
+  - **Deuda de nombres (resuelta el 2026-10-10 al recrear el realm con una base nueva):**
 
-    | Hoy | Debería ser | Nota |
-    | --- | --- | --- |
-    | Client `chat-api` | `kc-menu` | `SecurityConfig` de kc-menu lee `resource_access.chat-api.roles`; también lo usan la skill `keycloak-lab` y `estado-lab.md` |
-    | Client `agents-ui` | `lara-web` | Lo usan `KeycloakAuthAdapter`, `LoginPage`, los tests de Lara, el mapper de audiencia y `KEYCLOAK_AUDIENCE` del orquestador |
-    | Client `chat-front` | Eliminar | Ningún código lo usa; puede seguir existiendo en el realm |
-    | Rol de client `usar-finanzas` frente a rol de realm `usar_finanzas` | Unificar en `kebab-case` | `OwnerSubResolver` de kc-finanzas exige `usar-finanzas`; `AppShell.tsx` y sus tests usan `usar_finanzas` |
+    | Antes | Ahora |
+    | --- | --- |
+    | Client `chat-api` | `kc-menu` |
+    | Client `agents-ui` | `lara-web` (también el mapper `audience-lara-web` y `KEYCLOAK_AUDIENCE`) |
+    | Client `chat-front` | Eliminado (ningún código lo usaba) |
+    | Rol de realm `usar_finanzas` frente al rol de client `usar-finanzas` | Rol de realm `ver-finanzas`; el rol de client `usar-finanzas` (agente) no cambia |
+    | Volumen `kc-pgdata` | `keycloak-pgdata` |
 
-    Por revisar, fuera de esa lista: el client `finanzas-agent` (no sigue la regla de nombrarlo como el servicio). El volumen de Keycloak ya se llama `keycloak-pgdata` (renombrado el 2026-10-10 al reiniciar con una base nueva).
-  - **Cuándo se corrige la deuda:** después del export del realm (KC-03), uno por uno. Cada renombre toca código, tests y configuración del realm a la vez, así que va en su propio cambio, con sus pruebas y un plan para el realm existente.
+    Deuda que queda: el client `finanzas-agent` (no sigue la regla de nombrarlo como el servicio) y los demás roles de realm en `snake_case` (`llm_basic`, `llm_advanced`, `ver_agentes`, `ver_identidad`), que cambiarían en `model_router.py` y `AppShell.tsx` con sus pruebas.
+  - **Cuándo se corrige la deuda restante:** uno por uno. Cada renombre toca código, tests y el JSON del realm a la vez, así que va en su propio cambio, con sus pruebas; un realm ya importado no cambia con el JSON (ver `infra/keycloak/README.md`).
 - Alternativas consideradas: renombrar todo de una vez ahora, lo que obliga a tocar a la vez el realm, los servicios, el front, el orquestador y los tests sin un export del realm que permita reproducirlo; y no fijar convención, lo que mantiene los estilos mezclados. Se descartan para evitar roturas y dejar una regla clara desde ahora.
 - Consecuencias: lo nuevo nace con nombres coherentes y la deuda queda visible y acotada. Mientras no se haga el renombre, conviven nombres viejos y nuevos (por ejemplo, la carpeta `lara-web` frente al client `agents-ui`) y hay que consultar este ADR antes de asumir que coinciden.
 - Estado: Propuesta

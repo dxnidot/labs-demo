@@ -15,7 +15,7 @@ Equivalencia de nombres. Los docs históricos (`docs/backlog`, `docs/decisions`,
 | `kc-demo/` | `services/kc-menu/` |
 | `agents-ui/` | `apps/lara-web/` |
 
-Sin cambios: puertos, nombres de BD, variables de entorno, clients de Keycloak (`agents-ui`, `finanzas-agent`), rutas HTTP y paquetes Java. Los compose fijan `name: keycloak` y `name: finanzas` para conservar los volúmenes de datos.
+Sin cambios: puertos, nombres de BD, rutas HTTP y paquetes Java. Clients de Keycloak (2026-10-10, realm recreado desde `infra/keycloak/import/lab-realm.json`): `chat-api` → `kc-menu`, `agents-ui` → `lara-web`, `chat-front` eliminado, `finanzas-agent` sin cambios; rol de realm `usar_finanzas` → `ver-finanzas`; volumen `kc-pgdata` → `keycloak-pgdata`; variable `KC_CHAT_API_SECRET` → `KC_MENU_CLIENT_SECRET`. Los compose fijan `name: keycloak` y `name: finanzas` para conservar los volúmenes de datos.
 
 ## Repo y documentación
 
@@ -31,15 +31,15 @@ Sin cambios: puertos, nombres de BD, variables de entorno, clients de Keycloak (
 ## keycloak (puerto 8080)
 
 - [x] ✅ Keycloak + PostgreSQL con Docker Compose, puerto atado a 127.0.0.1
-- [x] ✅ Realm `lab`, usuarios `ana` / `beto`, client `chat-api` con roles
+- [x] ✅ Realm `lab`, usuarios `ana` / `beto`, client `kc-menu` (antes `chat-api`) con roles
 - [x] ✅ Authorization Services (RPT)
 - [ ] ⏳ KC-01 · Subir Keycloak a 26.7.5 (parche)
-- [x] ✅ KC-02 · Client público `agents-ui`
+- [x] ✅ KC-02 · Client público `lara-web` (antes `agents-ui`)
 - [ ] 🔄 KC-03 · En curso: realm `lab` en `infra/keycloak/import/lab-realm.json`; falta probar el import — Track de identidad: solo para pruebas
 
 ## kc-menu, antes kc-demo (Spring Boot, puerto 8081)
 
-- [x] ✅ Valida JWT y roles de `resource_access.chat-api.roles`
+- [x] ✅ Valida JWT y roles de `resource_access.kc-menu.roles`
 - [x] ✅ `/api/menu` filtra opciones y acciones por rol
 - [x] ✅ Java 21 fijado en `pom.xml`
 - [x] ✅ API-01 · Pruebas unitarias de `MenuService` (JUnit 5 + Mockito, AAA)

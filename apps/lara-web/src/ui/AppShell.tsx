@@ -71,6 +71,7 @@ const iconoNav = "size-4.5 shrink-0";
  * @modified Daniel Tovar 2026-09-30 Shell sobre PageLayout, drawer de navegación bajo 980px, landmarks y carga diferida.
  * @modified Daniel Tovar 2026-10-01 Oculta del DOM las secciones AGENTES, IDENTIDAD y PERSONAL según los roles del usuario.
  * @modified Daniel Tovar 2026-10-02 Protege las rutas de esas secciones: sin el rol muestra AccesoDenegado.
+ * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -163,7 +164,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   const [rutaDrawer, setRutaDrawer] = useState<string | null>(null);
   const puedeVerAgentes = useHasRole(usuario, ["ver_agentes", "admin"]);
   const puedeVerIdentidad = useHasRole(usuario, ["ver_identidad", "admin"]);
-  const puedeVerPersonal = useHasRole(usuario, ["usar_finanzas", "admin"]);
+  const puedeVerPersonal = useHasRole(usuario, ["ver-finanzas", "admin"]);
 
   const panelNav = useRef<HTMLElement | null>(null);
   const botonMenu = useRef<HTMLButtonElement | null>(null);
@@ -424,7 +425,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
               <div className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate text-sm">{usuario.username}</span>
                 <span className="truncate text-xs text-muted">
-                  {`${usuario.chatApiRoles.length > 0 ? usuario.chatApiRoles.join(", ") : "sin rol"} · LOCAL`}
+                  {`${usuario.kcMenuRoles.length > 0 ? usuario.kcMenuRoles.join(", ") : "sin rol"} · LOCAL`}
                 </span>
               </div>
               <IconButton

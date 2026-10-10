@@ -4,7 +4,7 @@ Esta guía explica, de punta a punta, cómo un rol asignado a un usuario en Keyc
 
 ## 0. Requisito previo: el audience mapper
 
-Antes de que CUALQUIER rol importe, el token tiene que pasar la verificación de `agents/orquestador/auth.py`. Eso exige que el claim `aud` del JWT sea `agents-ui` — si el client `agents-ui` en Keycloak no tiene el mapper de Audience configurado (`Clients → agents-ui → Client scopes → agents-ui-dedicated → Mappers → Add mapper → By configuration → Audience`), **todo** falla con 401 sin importar los roles. Ver `KC-04` punto 1.
+Antes de que CUALQUIER rol importe, el token tiene que pasar la verificación de `agents/orquestador/auth.py`. Eso exige que el claim `aud` del JWT sea `lara-web` — si el client `lara-web` en Keycloak no tiene el mapper de Audience configurado (`Clients → lara-web → Client scopes → lara-web-dedicated → Mappers → Add mapper → By configuration → Audience`), **todo** falla con 401 sin importar los roles. Ver `KC-04` punto 1.
 
 ## 1. Crear un usuario en Keycloak
 
@@ -41,7 +41,7 @@ Cuando el usuario envía un mensaje, el modelo elegido viaja en la cabecera `X-L
 | --- | --- | --- |
 | `ver_agentes` (o `admin`) | Sección **AGENTES**: Agentes, Base de datos, Memoria vectorizada, Herramientas MCP | `apps/lara-web/src/ui/AppShell.tsx:164` (`puedeVerAgentes`), usado en el Sidebar (`:309`) y en las rutas (`:466`–`:472`) |
 | `ver_identidad` (o `admin`) | Sección **IDENTIDAD**: Menú por rol, Usuarios y roles, Sincronización BPM | `AppShell.tsx:165` (`puedeVerIdentidad`), Sidebar (`:342`), rutas (`:475`–`:480`) |
-| `usar_finanzas` (o `admin`) | Sección **PERSONAL · SOLO LOCAL**: Finanzas, Gastos fijos | `AppShell.tsx:166` (`puedeVerPersonal`), Sidebar (`:368`), rutas (`:482`–`:491`) |
+| `ver-finanzas` (o `admin`) | Sección **PERSONAL · SOLO LOCAL**: Finanzas, Gastos fijos | `AppShell.tsx:166` (`puedeVerPersonal`), Sidebar (`:368`), rutas (`:482`–`:491`) |
 
 El hook que hace la comparación es `apps/lara-web/src/ui/useHasRole.ts` — recibe el `Usuario` (con `roles: string[]`, ya mezclando `realm_access` + todos los `resource_access` gracias a `KeycloakAuthAdapter.ts`) y una lista de roles aceptados, devuelve `true` si hay intersección.
 
@@ -51,15 +51,15 @@ El hook que hace la comparación es `apps/lara-web/src/ui/useHasRole.ts` — rec
 
 ## 4. Nombres exactos de los 5 roles
 
-Todos en **snake_case** (no kebab-case como los roles viejos `ver-menu`/`autorizar`), porque así están escritos literalmente en el código ya implementado:
+Casi todos en **snake_case** (no kebab-case como los roles viejos `ver-menu`/`autorizar`), porque así están escritos literalmente en el código ya implementado; la excepción es `ver-finanzas` (kebab-case, 2026-10-10):
 
 - `llm_basic`
 - `llm_advanced`
 - `ver_agentes`
 - `ver_identidad`
-- `usar_finanzas`
+- `ver-finanzas` (antes `usar_finanzas`)
 
-Ver `KC-04` para el detalle de por qué, y la nota sobre el *client role* `usar-finanzas` (con guion) que ya existe para otra cosa (el service account de `finanzas-agent`, no tiene relación con este `usar_finanzas` de realm).
+Ver `KC-04` para el detalle de por qué, y la nota sobre el *client role* `usar-finanzas` (el service account de `finanzas-agent`). Desde 2026-10-10 el rol de realm se llama `ver-finanzas` para que no haya dos roles que solo difieran en el separador.
 
 ## 5. Verificar que funcionó
 

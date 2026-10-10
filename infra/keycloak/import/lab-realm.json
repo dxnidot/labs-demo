@@ -24,7 +24,7 @@
         "description": "Sidebar de Lara: sección IDENTIDAD"
       },
       {
-        "name": "usar_finanzas",
+        "name": "ver-finanzas",
         "description": "Sidebar de Lara: sección PERSONAL (Finanzas y Gastos fijos)"
       },
       {
@@ -33,7 +33,7 @@
       }
     ],
     "client": {
-      "chat-api": [
+      "kc-menu": [
         {
           "name": "ver-menu",
           "description": "Ver el menú"
@@ -59,7 +59,7 @@
     {
       "name": "ejecutivo",
       "clientRoles": {
-        "chat-api": [
+        "kc-menu": [
           "ver-menu"
         ]
       }
@@ -67,7 +67,7 @@
     {
       "name": "supervisor",
       "clientRoles": {
-        "chat-api": [
+        "kc-menu": [
           "ver-menu",
           "autorizar"
         ]
@@ -76,13 +76,13 @@
   ],
   "clients": [
     {
-      "clientId": "chat-api",
-      "name": "API de menú",
+      "clientId": "kc-menu",
+      "name": "API de menú (kc-menu)",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "${KC_CHAT_API_SECRET}",
+      "secret": "${KC_MENU_CLIENT_SECRET}",
       "standardFlowEnabled": false,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
@@ -90,8 +90,8 @@
       "fullScopeAllowed": true
     },
     {
-      "clientId": "agents-ui",
-      "name": "Lara (UI)",
+      "clientId": "lara-web",
+      "name": "Lara (lara-web)",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": true,
@@ -112,39 +112,18 @@
       },
       "protocolMappers": [
         {
-          "name": "audience-agents-ui",
+          "name": "audience-lara-web",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
           "consentRequired": false,
           "config": {
-            "included.client.audience": "agents-ui",
+            "included.client.audience": "lara-web",
             "id.token.claim": "false",
             "access.token.claim": "true",
             "introspection.token.claim": "true"
           }
         }
       ]
-    },
-    {
-      "clientId": "chat-front",
-      "name": "Front Angular (retirado)",
-      "enabled": true,
-      "protocol": "openid-connect",
-      "publicClient": true,
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
-      "fullScopeAllowed": true,
-      "redirectUris": [
-        "http://localhost:4200/*"
-      ],
-      "webOrigins": [
-        "http://localhost:4200"
-      ],
-      "attributes": {
-        "pkce.code.challenge.method": "S256"
-      }
     },
     {
       "clientId": "finanzas-agent",
@@ -201,7 +180,7 @@
       ],
       "realmRoles": [
         "llm_basic",
-        "usar_finanzas"
+        "ver-finanzas"
       ]
     },
     {
@@ -225,7 +204,7 @@
         "llm_advanced",
         "ver_agentes",
         "ver_identidad",
-        "usar_finanzas"
+        "ver-finanzas"
       ]
     },
     {
@@ -247,10 +226,10 @@
         "llm_advanced",
         "ver_agentes",
         "ver_identidad",
-        "usar_finanzas"
+        "ver-finanzas"
       ],
       "clientRoles": {
-        "chat-api": [
+        "kc-menu": [
           "ver-menu",
           "autorizar",
           "admin-seguridad"

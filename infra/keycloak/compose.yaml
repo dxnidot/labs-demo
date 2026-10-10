@@ -28,7 +28,7 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
       # Marcadores ${VAR} de import/lab-realm.json. Sin valor, Compose se detiene:
       # un marcador sin resolver quedaría como texto literal en el secret.
-      KC_CHAT_API_SECRET: ${KC_CHAT_API_SECRET:?define KC_CHAT_API_SECRET en infra/keycloak/.env}
+      KC_MENU_CLIENT_SECRET: ${KC_MENU_CLIENT_SECRET:?define KC_MENU_CLIENT_SECRET en infra/keycloak/.env}
       FINANZAS_AGENT_CLIENT_SECRET: ${FINANZAS_AGENT_CLIENT_SECRET:?define FINANZAS_AGENT_CLIENT_SECRET en infra/keycloak/.env}
       KC_ANA_PASSWORD: ${KC_ANA_PASSWORD:?define KC_ANA_PASSWORD en infra/keycloak/.env}
       KC_BETO_PASSWORD: ${KC_BETO_PASSWORD:?define KC_BETO_PASSWORD en infra/keycloak/.env}

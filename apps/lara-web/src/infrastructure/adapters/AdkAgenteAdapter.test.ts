@@ -13,7 +13,7 @@ describe("AdkAgenteAdapter", () => {
         id: "usuario-1",
         username: "ana",
         roles: [],
-        chatApiRoles: [],
+        kcMenuRoles: [],
       }),
       usuarioActual: () => null,
       token: () => null,
@@ -38,7 +38,7 @@ describe("AdkAgenteAdapter", () => {
 
   it("marca origen finanzas en el estado de la sesión del panel", async () => {
     const auth: AuthPort = {
-      init: async () => ({ id: "usuario-1", username: "ana", roles: [], chatApiRoles: [] }),
+      init: async () => ({ id: "usuario-1", username: "ana", roles: [], kcMenuRoles: [] }),
       usuarioActual: () => null,
       token: () => null,
       updateToken: async () => "test-token",
@@ -61,7 +61,7 @@ describe("AdkAgenteAdapter", () => {
 
   it("envía el modelo elegido en la cabecera X-LLM-Model", async () => {
     const auth: AuthPort = {
-      init: async () => ({ id: "usuario-1", username: "ana", roles: [], chatApiRoles: [] }),
+      init: async () => ({ id: "usuario-1", username: "ana", roles: [], kcMenuRoles: [] }),
       usuarioActual: () => null,
       token: () => null,
       updateToken: async () => "test-token",

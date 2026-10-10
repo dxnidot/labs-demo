@@ -16,6 +16,7 @@ const obtenerMenu = new ObtenerMenu(new HttpMenuAdapter(new ApiHttpClient(keyclo
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
  */
 export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
   const [opciones, setOpciones] = useState<MenuOpcion[] | null>(null);
@@ -65,7 +66,7 @@ export function MenuPorRolPage({ usuario }: { usuario: Usuario }) {
             </div>
           </div>
           <div className="font-mono text-xs text-muted">
-            {`roles: ${usuario.chatApiRoles.length > 0 ? usuario.chatApiRoles.join(", ") : "sin roles de chat-api"}`}
+            {`roles: ${usuario.kcMenuRoles.length > 0 ? usuario.kcMenuRoles.join(", ") : "sin roles de kc-menu"}`}
           </div>
           {error && <p className="m-0 text-sm text-danger" role="alert">{error}</p>}
           {!error && opciones === null && (

@@ -10,7 +10,7 @@ interface LoginPageProps {
 
 const datosLogin = [
   ["Realm", "lab"],
-  ["Client", "agents-ui"],
+  ["Client", "lara-web"],
   ["Flujo", "PKCE S256"],
 ] as const;
 
@@ -26,6 +26,7 @@ const areas = [
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Scroll propio en ventanas bajas (body no desplaza) y chip Finanzas con contraste AA.
+ * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
  */
 export function LoginPage({ comprobando, error, onLogin }: LoginPageProps) {
   return (
