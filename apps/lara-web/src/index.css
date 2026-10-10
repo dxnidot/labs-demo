@@ -28,37 +28,43 @@
   --color-hoki-800: #384754;
   --color-hoki-900: #323d48;
   --color-hoki-950: #212830;
-  --color-bg: var(--color-neutral-950);
-  --color-sidebar: var(--color-neutral-900);
-  --color-surface: var(--color-neutral-900);
-  --color-surface-hover: var(--color-neutral-800);
-  --color-surface-active: var(--color-neutral-800);
-  --color-border: var(--color-neutral-800);
-  --color-divider: var(--color-neutral-800);
-  --color-text: var(--color-neutral-50);
-  --color-text-2: var(--color-neutral-200);
-  --color-muted: var(--color-hoki-300);
-  --color-faint: var(--color-hoki-400);
-  --color-accent: var(--color-hoki-300);
-  --color-accent-hover: var(--color-hoki-200);
-  --color-accent-ink: var(--color-hoki-950);
-  --color-highlight: var(--color-hoki-200);
-  --color-highlight-ink: var(--color-hoki-950);
-  --color-chart-1: var(--color-hoki-200);
-  --color-chart-2: var(--color-hoki-300);
-  --color-chart-3: var(--color-hoki-400);
-  --color-chart-4: var(--color-hoki-500);
-  --color-ok: var(--color-hoki-400);
-  --color-warn: var(--color-neutral-400);
-  --color-danger: var(--color-neutral-300);
-
-  --color-chart-5: var(--color-hoki-600);
-  --color-highlight-muted: var(--color-hoki-700);
-  --color-control-off: var(--color-neutral-700);
-  --color-border-strong: var(--color-neutral-700);
+  /*
+   * Tokens semánticos: light-dark(claro, oscuro). El oscuro es el de la guía y los PNG; el claro sale
+   * de la misma paleta (neutral + hoki) con los papeles invertidos. Requiere color-scheme (ver :root).
+   */
+  --color-bg: light-dark(var(--color-hoki-100), var(--color-neutral-950));
+  --color-sidebar: light-dark(var(--color-neutral-50), var(--color-neutral-900));
+  --color-surface: light-dark(var(--color-neutral-50), var(--color-neutral-900));
+  --color-surface-hover: light-dark(var(--color-hoki-200), var(--color-neutral-800));
+  --color-surface-active: light-dark(var(--color-hoki-200), var(--color-neutral-800));
+  --color-border: light-dark(var(--color-neutral-300), var(--color-neutral-800));
+  --color-divider: light-dark(var(--color-neutral-300), var(--color-neutral-800));
+  --color-border-strong: light-dark(var(--color-neutral-400), var(--color-neutral-700));
+  /* Borde de controles (inputs, composer, radios) y pista del switch apagado: >= 3:1 sobre la superficie. */
+  --color-border-control: var(--color-neutral-500);
+  --color-control-off: var(--color-neutral-500);
+  --color-text: light-dark(var(--color-neutral-950), var(--color-neutral-50));
+  --color-text-2: light-dark(var(--color-neutral-800), var(--color-neutral-200));
+  --color-muted: light-dark(var(--color-hoki-800), var(--color-hoki-300));
+  --color-faint: light-dark(var(--color-hoki-700), var(--color-hoki-400));
+  --color-accent: light-dark(var(--color-hoki-700), var(--color-hoki-300));
+  --color-accent-hover: light-dark(var(--color-hoki-800), var(--color-hoki-200));
+  --color-accent-ink: light-dark(var(--color-neutral-50), var(--color-hoki-950));
+  --color-highlight: light-dark(var(--color-hoki-800), var(--color-hoki-200));
+  --color-highlight-ink: light-dark(var(--color-hoki-50), var(--color-hoki-950));
+  --color-highlight-muted: light-dark(var(--color-hoki-200), var(--color-hoki-700));
+  --color-chart-1: light-dark(var(--color-hoki-900), var(--color-hoki-200));
+  --color-chart-2: light-dark(var(--color-hoki-800), var(--color-hoki-300));
+  --color-chart-3: light-dark(var(--color-hoki-700), var(--color-hoki-400));
+  --color-chart-4: light-dark(var(--color-hoki-600), var(--color-hoki-500));
+  --color-chart-5: light-dark(var(--color-hoki-500), var(--color-hoki-600));
+  --color-ok: light-dark(var(--color-hoki-700), var(--color-hoki-400));
+  --color-warn: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+  --color-danger: light-dark(var(--color-neutral-900), var(--color-neutral-300));
 
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
   /* Escala tipográfica de la guía (README > Tipografía) y de las maquetas. */
   --text-label: 0.6875rem;
   --text-label--letter-spacing: 0.08em;
@@ -86,12 +92,23 @@
   --radius-pill: 999px;
 }
 
+/* "Apariencia" > Tema: data-theme en <html> (ver index.html y useApariencia). */
+:root[data-theme="claro"] {
+  color-scheme: light;
+}
+
+:root[data-theme="oscuro"] {
+  color-scheme: dark;
+}
+
 /* "Apariencia" > Fuente: data-font en <html> (ver index.html y useApariencia). */
 :root[data-font="ibm-plex-mono"] {
   --font-sans: var(--font-mono);
 }
 
 :root {
+  /* Sin data-theme sigue la preferencia del sistema (prefers-color-scheme); Apariencia la fuerza. */
+  color-scheme: light dark;
   color: var(--color-text);
   background: var(--color-bg);
   font-synthesis: none;

@@ -6,6 +6,7 @@ import { DialogoApariencia } from "./DialogoApariencia";
 beforeEach(() => {
   localStorage.clear();
   delete document.documentElement.dataset.font;
+  delete document.documentElement.dataset.theme;
 });
 
 afterEach(() => {
@@ -59,5 +60,25 @@ describe("DialogoApariencia", () => {
     fireEvent.click(screen.getByRole("dialog", { name: "Apariencia" }));
 
     expect(onCerrar).not.toHaveBeenCalled();
+  });
+
+  it("el tema por defecto es Sistema y al elegir Claro lo aplica a <html> y lo guarda en lara.tema", () => {
+    render(<DialogoApariencia onCerrar={vi.fn()} />);
+
+    expect((screen.getByRole("radio", { name: "Sistema" }) as HTMLInputElement).checked).toBe(true);
+
+    fireEvent.click(screen.getByRole("radio", { name: "Claro" }));
+
+    expect(document.documentElement.dataset.theme).toBe("claro");
+    expect(localStorage.getItem("lara.tema")).toBe("claro");
+  });
+
+  it("al volver a Sistema quita el atributo data-theme", () => {
+    render(<DialogoApariencia onCerrar={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole("radio", { name: "Oscuro" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Sistema" }));
+
+    expect(document.documentElement.dataset.theme).toBeUndefined();
   });
 });

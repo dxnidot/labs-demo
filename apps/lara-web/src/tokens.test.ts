@@ -56,4 +56,11 @@ describe("tokens de index.css en los componentes", () => {
       expect(corte).toMatch(/rem;$/);
     }
   });
+
+  it("define --font-sans (IBM Plex Sans por defecto) y --font-mono (IBM Plex Mono)", () => {
+    const css = readFileSync(new URL("./index.css", import.meta.url), "utf8");
+    expect(css).toMatch(/--font-sans:\s*"IBM Plex Sans"/);
+    expect(css).toMatch(/--font-mono:\s*"IBM Plex Mono"/);
+    expect(css).toMatch(/:root\[data-font="ibm-plex-mono"\]\s*\{\s*--font-sans:\s*var\(--font-mono\)/);
+  });
 });

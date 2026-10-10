@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import type { FuenteUi } from "../../domain/Apariencia";
+import type { FuenteUi, PreferenciaTema } from "../../domain/Apariencia";
 import { preferenciasVisuales } from "../../infrastructure/adapters/PreferenciasLocalStorageAdapter";
-import { aplicarFuente } from "./aplicarApariencia";
+import { aplicarFuente, aplicarTema } from "./aplicarApariencia";
 
 /**
  * Estado y acciones de las preferencias de "Apariencia": las lee del puerto, las aplica al documento y las guarda.
@@ -10,6 +10,7 @@ import { aplicarFuente } from "./aplicarApariencia";
  */
 export function useApariencia() {
   const [fuente, setFuente] = useState<FuenteUi>(() => preferenciasVisuales.leerFuente());
+  const [tema, setTema] = useState<PreferenciaTema>(() => preferenciasVisuales.leerTema());
 
   const cambiarFuente = useCallback((nueva: FuenteUi) => {
     preferenciasVisuales.guardarFuente(nueva);
@@ -17,5 +18,11 @@ export function useApariencia() {
     setFuente(nueva);
   }, []);
 
-  return { fuente, cambiarFuente };
+  const cambiarTema = useCallback((nuevo: PreferenciaTema) => {
+    preferenciasVisuales.guardarTema(nuevo);
+    aplicarTema(nuevo);
+    setTema(nuevo);
+  }, []);
+
+  return { fuente, cambiarFuente, tema, cambiarTema };
 }

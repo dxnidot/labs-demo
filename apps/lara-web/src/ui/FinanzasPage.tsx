@@ -151,7 +151,7 @@ export function FinanzasPage() {
     <div className="flex flex-wrap items-center gap-2">
       <label className="sr-only" htmlFor="periodo-finanzas">Periodo</label>
       <input
-        className="min-h-11 rounded-pill border border-border bg-transparent px-3 text-compact text-text-2 scheme-dark shell:min-h-8"
+        className="min-h-11 rounded-pill border border-border bg-transparent px-3 text-compact text-text-2 shell:min-h-8"
         id="periodo-finanzas"
         onChange={(event) => {
           const nuevoPeriodo = event.currentTarget.value;

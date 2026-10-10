@@ -13,6 +13,7 @@ import { Button } from "./components/Button";
 import { claseFoco, claseFocoContenedor } from "./components/foco";
 import { LaraLogo } from "./components/LaraLogo";
 import { PageLayout } from "./components/PageLayout";
+import { PuntoEstado } from "./components/PuntoEstado";
 import { SelectorModelo } from "./components/SelectorModelo";
 import { modeloOrquestador } from "../agentesConfig";
 import { useChatSessions } from "./useChatSessions";
@@ -70,7 +71,7 @@ const sugerencias = [
 function ChipAgente() {
   return (
     <span className="inline-flex min-h-8 items-center gap-2 rounded-pill border border-border px-3 text-compact text-text-2">
-      <span aria-hidden="true" className="size-2 rounded-full bg-ok" />
+      <PuntoEstado estado="ok" />
       Agente: orquestador
     </span>
   );

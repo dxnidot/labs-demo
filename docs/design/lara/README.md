@@ -252,7 +252,7 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 ## Reglas para implementar
 
 - Arquitectura hexagonal ligera: `AuthPort`, `AgentePort` y un puerto por fuente de datos de cada vista.
-- Tokens solo en memoria. Nada en `localStorage`, con una única excepción: la clave `lara.fuente` guarda la fuente elegida en "Apariencia" (preferencia visual, no sensible). Ningún otro dato puede ir a `localStorage`.
+- Tokens solo en memoria. Nada en `localStorage`, con dos excepciones: la clave `lara.fuente` (fuente elegida en "Apariencia") y la clave `lara.tema` (`sistema` | `claro` | `oscuro`, por defecto `sistema`). Son preferencias visuales, no sensibles, y se usan siempre con `try/catch` y valor por defecto. Ningún otro dato puede ir a `localStorage`.
 - Vistas de administración (BD, usuarios, BPM, herramientas) **solo lectura** desde Lara.
 - Finanzas: datos en el servicio finanzas (Postgres local); al LLM solo le llegan resultados calculados.
 - Botones reales (`<button>`, `<a>`), `aria-label` en botones de solo ícono, contraste AA.

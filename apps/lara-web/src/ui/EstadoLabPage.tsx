@@ -6,6 +6,7 @@ import { Card } from "./components/Card";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { claseFoco } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
+import { PuntoEstado, type EstadoPunto } from "./components/PuntoEstado";
 
 const comprobarServicios = new ComprobarServicios(new HttpEstadoLabAdapter());
 
@@ -15,14 +16,10 @@ const serviciosPendientes = [
   { nombre: "Open WebUI", detalle: ":3000 · RAG", pendiente: "EXT-01" },
 ] as const;
 
-const leyenda: Record<Disponibilidad, { texto: string; punto: string }> = {
-  arriba: { texto: "Arriba", punto: "bg-ok" },
-  "sin-respuesta": { texto: "Sin respuesta", punto: "bg-danger" },
+const leyenda: Record<Disponibilidad, { texto: string; estado: EstadoPunto }> = {
+  arriba: { texto: "Arriba", estado: "ok" },
+  "sin-respuesta": { texto: "Sin respuesta", estado: "danger" },
 };
-
-function Punto({ clase }: { clase: string }) {
-  return <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${clase}`} />;
-}
 
 /**
  * Pantalla "Estado del lab": comprobaciones reales de salud y pendientes marcados como vacíos.
@@ -65,7 +62,7 @@ export function EstadoLabPage() {
         {estados?.map(({ servicio, disponibilidad }) => (
           <Card key={servicio.clave}>
             <div className="flex items-center gap-2.5">
-              <Punto clase={leyenda[disponibilidad].punto} />
+              <PuntoEstado estado={leyenda[disponibilidad].estado} />
               <span className="font-medium">{servicio.nombre}</span>
             </div>
             <span className="font-mono text-xs text-muted">{servicio.detalle}</span>
@@ -82,8 +79,8 @@ export function EstadoLabPage() {
       </div>
 
       <div className="flex flex-wrap gap-4 text-compact text-muted">
-        <span className="inline-flex items-center gap-2"><Punto clase="bg-ok" />Arriba</span>
-        <span className="inline-flex items-center gap-2"><Punto clase="bg-danger" />Sin respuesta</span>
+        <span className="inline-flex items-center gap-2"><PuntoEstado estado="ok" />Arriba</span>
+        <span className="inline-flex items-center gap-2"><PuntoEstado estado="danger" />Sin respuesta</span>
       </div>
 
       <div className="grid grid-cols-1 gap-4 shell:grid-cols-2">

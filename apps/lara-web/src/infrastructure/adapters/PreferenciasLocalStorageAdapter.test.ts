@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
-import { PreferenciasLocalStorageAdapter, claveFuente } from "./PreferenciasLocalStorageAdapter";
+import { PreferenciasLocalStorageAdapter, claveFuente, claveTema } from "./PreferenciasLocalStorageAdapter";
 
 function almacenEnMemoria(inicial: Record<string, string> = {}): Storage {
   const datos = new Map(Object.entries(inicial));
@@ -81,6 +81,42 @@ describe("index.html", () => {
   it("aplica antes del primer render la misma clave que usa el adaptador", () => {
     const html = readFileSync(new URL("../../../index.html", import.meta.url), "utf8");
     expect(html).toContain(`localStorage.getItem("${claveFuente}")`);
+    expect(html).toContain(`localStorage.getItem("${claveTema}")`);
     expect(html).toContain("dataset.font");
+    expect(html).toContain("dataset.theme");
+  });
+});
+
+describe("PreferenciasLocalStorageAdapter (tema)", () => {
+  it("el tema por defecto es sistema", () => {
+    expect(new PreferenciasLocalStorageAdapter(() => almacenEnMemoria()).leerTema()).toBe("sistema");
+  });
+
+  it.each(["claro", "oscuro", "sistema"] as const)("guarda y lee %s con la clave lara.tema", (tema) => {
+    const almacen = almacenEnMemoria();
+    const adaptador = new PreferenciasLocalStorageAdapter(() => almacen);
+    adaptador.guardarTema(tema);
+    expect(almacen.getItem("lara.tema")).toBe(tema);
+    expect(adaptador.leerTema()).toBe(tema);
+  });
+
+  it("ignora un valor desconocido y no lanza con el almacenamiento bloqueado", () => {
+    expect(
+      new PreferenciasLocalStorageAdapter(() => almacenEnMemoria({ "lara.tema": "sepia" })).leerTema(),
+    ).toBe("sistema");
+    const bloqueado = new PreferenciasLocalStorageAdapter(almacenQueLanza);
+    expect(bloqueado.leerTema()).toBe("sistema");
+    expect(() => bloqueado.guardarTema("claro")).not.toThrow();
+  });
+
+  it("solo usa las claves lara.fuente y lara.tema", () => {
+    const almacen = almacenEnMemoria();
+    const adaptador = new PreferenciasLocalStorageAdapter(() => almacen);
+    adaptador.guardarFuente("ibm-plex-mono");
+    adaptador.guardarTema("oscuro");
+    expect(Array.from({ length: almacen.length }, (_, i) => almacen.key(i)).sort()).toEqual([
+      "lara.fuente",
+      "lara.tema",
+    ]);
   });
 });

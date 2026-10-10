@@ -3,18 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#111316" />
+    <!-- Iguales a --color-bg de index.css en cada tema (lo verifica src/tokens.test.ts). -->
+    <meta name="theme-color" content="#eceff2" media="(prefers-color-scheme: light)" data-tema="claro" data-media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#14171b" media="(prefers-color-scheme: dark)" data-tema="oscuro" data-media="(prefers-color-scheme: dark)" />
     <title>Lara · Chat</title>
     <script>
-      // Aplica la fuente elegida antes del primer render (misma clave que PreferenciasLocalStorageAdapter).
+      // Aplica tema y fuente antes del primer render, sin parpadeo (mismas claves y valores que
+      // PreferenciasLocalStorageAdapter y aplicarApariencia.ts).
       (function () {
+        var raiz = document.documentElement;
         try {
           var fuente = localStorage.getItem("lara.fuente");
           if (fuente === "ibm-plex-sans" || fuente === "ibm-plex-mono") {
-            document.documentElement.dataset.font = fuente;
+            raiz.dataset.font = fuente;
+          }
+          var tema = localStorage.getItem("lara.tema");
+          if (tema === "claro" || tema === "oscuro") {
+            raiz.dataset.theme = tema;
+            var metas = document.querySelectorAll('meta[name="theme-color"][data-tema]');
+            for (var i = 0; i < metas.length; i++) {
+              if (metas[i].dataset.tema !== tema) {
+                metas[i].setAttribute("media", "not all");
+              }
+            }
           }
         } catch (error) {
-          // Sin almacenamiento: se queda la fuente por defecto.
+          // Sin almacenamiento: se queda la preferencia por defecto (fuente Plex Sans, tema del sistema).
         }
       })();
     </script>

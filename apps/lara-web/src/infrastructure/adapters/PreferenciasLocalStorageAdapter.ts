@@ -1,10 +1,18 @@
 import type { PreferenciasVisualesPort } from "../../application/ports/PreferenciasVisualesPort";
-import { esFuenteUi, fuentePorDefecto, type FuenteUi } from "../../domain/Apariencia";
+import {
+  esFuenteUi,
+  esPreferenciaTema,
+  fuentePorDefecto,
+  temaPorDefecto,
+  type FuenteUi,
+  type PreferenciaTema,
+} from "../../domain/Apariencia";
 
 export const claveFuente = "lara.fuente";
+export const claveTema = "lara.tema";
 
 /**
- * Guarda las preferencias visuales en localStorage (única excepción permitida del repo), siempre con try/catch.
+ * Guarda las preferencias visuales en localStorage (únicas claves permitidas: lara.fuente y lara.tema), siempre con try/catch.
  * @author Daniel Tovar
  * @since 2026-10-10
  */
@@ -21,10 +29,27 @@ export class PreferenciasLocalStorageAdapter implements PreferenciasVisualesPort
   }
 
   guardarFuente(fuente: FuenteUi): void {
+    this.guardar(claveFuente, fuente);
+  }
+
+  leerTema(): PreferenciaTema {
     try {
-      this.almacen().setItem(claveFuente, fuente);
+      const valor = this.almacen().getItem(claveTema);
+      return esPreferenciaTema(valor) ? valor : temaPorDefecto;
     } catch {
-      // Sin almacenamiento disponible (modo privado, datos bloqueados): la fuente solo vale en esta sesión.
+      return temaPorDefecto;
+    }
+  }
+
+  guardarTema(tema: PreferenciaTema): void {
+    this.guardar(claveTema, tema);
+  }
+
+  private guardar(clave: string, valor: string): void {
+    try {
+      this.almacen().setItem(clave, valor);
+    } catch {
+      // Sin almacenamiento disponible (modo privado, datos bloqueados): la preferencia solo vale en esta sesión.
     }
   }
 }
