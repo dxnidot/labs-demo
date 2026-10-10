@@ -1,6 +1,6 @@
 ---
 name: keycloak-lab
-description: Cómo levantar, detener y probar el lab local de Keycloak (keycloak, kc-demo, kc-front) en D:\dev\labs, incluidos puertos, realm, usuarios de prueba, clients y cómo obtener un token con PowerShell. Úsala cuando pregunten cómo arrancar el lab, en qué puerto está algo, cómo sacar un token o por qué no carga el login.
+description: Cómo levantar, detener y probar el lab local de Keycloak (keycloak, kc-menu, kc-front) en D:\dev\labs, incluidos puertos, realm, usuarios de prueba, clients y cómo obtener un token con PowerShell. Úsala cuando pregunten cómo arrancar el lab, en qué puerto está algo, cómo sacar un token o por qué no carga el login.
 ---
 
 # Lab de Keycloak
@@ -12,7 +12,7 @@ Entorno solo local en Windows, monorepo `D:\dev\labs`. Terminal: PowerShell.
 | Servicio | Carpeta | Puerto | Cómo se levanta |
 | --- | --- | --- | --- |
 | Keycloak 26 + PostgreSQL | `infra/keycloak/` | 8080 | `docker compose up -d` |
-| kc-demo (Spring Boot 4, Java 21) | `kc-demo/` | 8081 | `.\mvnw.cmd spring-boot:run` |
+| kc-menu (Spring Boot 4, Java 21) | `services/kc-menu/` | 8081 | `.\mvnw.cmd spring-boot:run` |
 | kc-front (Angular) | `kc-front/` | 4200 | `npm start` |
 
 Consola de administración: http://localhost:8080/admin
@@ -29,7 +29,7 @@ Consola de administración: http://localhost:8080/admin
 ```powershell
 cd D:\dev\labs\infra\keycloak
 docker compose up -d
-cd D:\dev\labs\kc-demo
+cd D:\dev\labs\services\kc-menu
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -49,7 +49,7 @@ cd D:\dev\labs\infra\keycloak
 docker compose stop
 ```
 
-En kc-demo y kc-front: `Ctrl+C`.
+En kc-menu y kc-front: `Ctrl+C`.
 
 ## Obtener un token (solo lab)
 
@@ -83,5 +83,5 @@ Invoke-RestMethod -Uri 'http://localhost:8081/api/menu' -Headers @{ Authorizatio
 ## Problemas comunes
 
 - **El login no carga:** revisar `docker compose ps` en `infra/keycloak/` y esperar a que Keycloak termine de arrancar.
-- **401 en kc-demo:** token vencido, o el client/realm no coincide con el emisor esperado por kc-demo.
-- **403 en kc-demo:** el usuario no tiene el rol que pide el endpoint (por ejemplo, `ana` no tiene `autorizar`).
+- **401 en kc-menu:** token vencido, o el client/realm no coincide con el emisor esperado por kc-menu.
+- **403 en kc-menu:** el usuario no tiene el rol que pide el endpoint (por ejemplo, `ana` no tiene `autorizar`).

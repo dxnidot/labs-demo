@@ -24,7 +24,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 - [x] ✅ KC-02 · Client público `agents-ui`
 - [ ] ⏳ KC-03 · Realm como código (export/import) — Track de identidad: solo para pruebas
 
-## kc-demo (Spring Boot, puerto 8081)
+## kc-menu, antes kc-demo (Spring Boot, puerto 8081)
 
 - [x] ✅ Valida JWT y roles de `resource_access.chat-api.roles`
 - [x] ✅ `/api/menu` filtra opciones y acciones por rol

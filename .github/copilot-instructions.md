@@ -7,7 +7,7 @@ Laboratorio personal en Windows (`D:\dev\labs`, PowerShell). Repo **público**. 
 | Carpeta      | Qué es                                                                                                    | Puerto |
 | ------------ | --------------------------------------------------------------------------------------------------------- | ------ |
 | `infra/keycloak/` | Keycloak 26 + PostgreSQL (Docker Compose), realm `lab`                                                    | 8080   |
-| `kc-demo/`   | API Spring Boot 4, Java 21, valida JWT y arma el menú por rol                                             | 8081   |
+| `services/kc-menu/` | API Spring Boot 4, Java 21, valida JWT y arma el menú por rol                                             | 8081   |
 | `kc-front/`  | Front Angular (se va a absorber en Lara, ver ADR-0002)                                                    | 4200   |
 | `bpm-sync/`  | Sincronización BPM → Keycloak (pendiente)                                                                 | —      |
 | `agents/`    | Agentes ADK: orquestador Python (8000, API server 8010), cálculos financieros Java (8002), traductor TypeScript (8003) | varios |
@@ -67,7 +67,7 @@ No la leas completa; abre solo el archivo que la tarea necesita.
 | ----------------------------- | -------------------------------------------------------------------------- |
 | `keycloak-lab`                | Levantar o detener el lab, puertos, realm, usuarios, sacar tokens          |
 | `verificar-docs-oficiales`    | Antes de afirmar versiones, APIs o comandos de cualquier librería          |
-| `java-springboot`             | Código en `kc-demo`, `bpm-sync` o el agente Java                           |
+| `java-springboot`             | Código en `kc-menu`, `bpm-sync` o el agente Java                           |
 | `clean-architecture`          | Diseñar capas, puertos y dependencias (respetando la convención hexagonal) |
 | `system-design`               | Decisiones entre servicios: A2A, API server, persistencia, flujos          |
 | `python-design-patterns`      | Código del orquestador y agentes en Python                                 |

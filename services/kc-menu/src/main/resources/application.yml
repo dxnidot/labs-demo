@@ -1,6 +1,6 @@
 spring:
   application:
-    name: kc-demo
+    name: kc-menu
   security:
     oauth2:
       resourceserver:

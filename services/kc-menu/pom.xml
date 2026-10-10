@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>kc-demo</artifactId>
+	<artifactId>kc-menu</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>kc-menu</name>
+	<description>API Spring Boot que valida JWT de Keycloak y arma el menú de opciones según los roles del token</description>
 	<url/>
 	<licenses>
 		<license/>
