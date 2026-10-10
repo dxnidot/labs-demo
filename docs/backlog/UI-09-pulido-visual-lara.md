@@ -1,0 +1,31 @@
+# UI-09 · Pulido visual de Lara con skills de diseño y datos de relleno
+
+- Estado: Pendiente
+- Prioridad: Media
+- Parte del lab: C.5
+- Depende de: UI-08
+- Fecha: 2026-10-10
+- Contexto: Lara ya tiene todas las vistas y su layout responsive, pero falta una pasada de calidad visual sobre el sistema de diseño y cada pantalla. Se hará con las skills de diseño de Claude Code, siempre por debajo de la guía visual de Lara (README, PNG de mockups y tokens de `index.css`), y con datos de relleno ficticios donde falte backend.
+- Fases (cada una cierra con su propia revisión antes de pasar a la siguiente):
+  - A · Auditoría (solo lectura): revisar `apps/lara-web` contra la guía y los PNG de `docs/design/lara/png/` y listar diferencias, deuda de tokens y problemas de accesibilidad. No modifica archivos.
+  - B · Base del sistema de diseño: ajustar tokens de `apps/lara-web/src/index.css` y los componentes base según la auditoría; tema claro y oscuro.
+  - C · Vista por vista con mocks: pulir cada pantalla (01–14) comparando contra su PNG; los datos de relleno van en adaptadores mock que cumplen los mismos puertos que los reales, seleccionados con `VITE_USE_MOCKS`.
+  - D · Motion: transiciones y microinteracciones solo con CSS, duraciones cortas, easing coherente y respeto a `prefers-reduced-motion`, una vez cerrado el diseño base.
+- Criterio de aceptación:
+  - La fase A entrega un informe con diferencias por pantalla (contra su PNG) y no deja archivos modificados (`git status` limpio).
+  - Tras la fase B, `grep -rnE "#[0-9a-fA-F]{3,8}\b" apps/lara-web/src --include=*.tsx` no encuentra colores sueltos en componentes.
+  - Tras la fase C, `VITE_USE_MOCKS=true` en `.env.example`, cada mock marcado con `// MOCK`, indicador visual discreto en modo mock, y ningún componente con datos inline ni uso de `localStorage` fuera de la clave `"lara.fuente"`.
+  - Tras la fase D, no hay librería de animación nueva y existe una regla `prefers-reduced-motion`.
+  - `npm run build` y `npm test` terminan sin errores desde `apps/lara-web/`.
+- Archivos relevantes:
+  - apps/lara-web/src/index.css
+  - apps/lara-web/src/ui/
+  - docs/design/lara/README.md
+  - docs/design/lara/png/
+- Notas:
+  - Confirmado: la guía visual de Lara manda sobre cualquier skill; si una skill la contradice, se reporta y se pregunta.
+  - Confirmado: el repo es público; los datos de relleno son ficticios, sin datos reales ni "parecidos".
+  - Confirmado: las etiquetas de la UI "kc-demo" → "kc-menu" y "finanzas" → "kc-finanzas" (`ServicioLab.ts`, `HttpEstadoLabAdapter.ts`, `MenuPorRolPage.tsx` y su test) se cambian en un commit aparte, fuera de las fases.
+  - Inferido: Impeccable y las skills de Emil Kowalski sirven para la auditoría y el motion; la skill principal de Taste no debe convivir con Impeccable.
+  - Pendiente: instalar las skills de diseño a nivel de proyecto (`.claude/skills/`).
+  - Pendiente: aprobar el plan antes de pasar la historia a "En curso".

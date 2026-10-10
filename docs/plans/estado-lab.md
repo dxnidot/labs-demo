@@ -79,6 +79,7 @@ Sin cambios: puertos, nombres de BD, variables de entorno, clients de Keycloak (
 - [ ] ⏳ UI-06 · Eliminar y renombrar chats en Recientes (Media; depende de UI-04)
 - [ ] 🔄 UI-07 · En curso: todas las vistas 01–14, login propio e íconos
 - [ ] 🔄 UI-08 · En curso: responsive y layout de página único
+- [ ] ⏳ UI-09 · Pulido visual de Lara con skills de diseño y datos de relleno (Media; depende de UI-08)
 - [ ] ⏳ QA-01 · Capturas automáticas con Playwright para ui-reviewer (Baja; depende de UI-08)
 - [ ] 🔄 FE-01 · En curso: menú por rol implementado en Lara; kc-front ya no está en el monorepo, falta cerrar la historia en el backlog — Track de identidad: solo para pruebas
 
