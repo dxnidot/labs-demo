@@ -15,7 +15,7 @@ interface FinanzasResumenTabProps {
 const coloresBarra = ["bg-chart-1", "bg-chart-2", "bg-chart-3", "bg-chart-4", "bg-chart-5"];
 const maximoMovimientos = 5;
 const textoSinDatos = "Sin datos todavía · Fuente: finanzas · Pendiente: totales mensuales";
-const enlaceClase = `text-compact text-accent underline hover:text-accent-hover ${claseFoco}`;
+const enlaceClase = `inline-flex min-h-11 items-center text-compact text-accent underline hover:text-accent-hover shell:min-h-0 ${claseFoco}`;
 
 /**
  * Resumen de finanzas: próximo pago, gastos por categoría, próximos pagos y últimos movimientos.

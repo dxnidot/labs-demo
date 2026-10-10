@@ -140,6 +140,64 @@ describe("login", () => {
   });
 });
 
+describe("accesibilidad del shell", () => {
+  it("el skip link es lo primero que se alcanza con Tab y manda el foco al contenido principal", async () => {
+    prepararFetch();
+
+    montar("/estado");
+
+    const salto = await screen.findByRole("link", { name: "Saltar al contenido principal" });
+    expect(salto.getAttribute("href")).toBe("#contenido-principal");
+    fireEvent.click(salto);
+    const principal = screen.getByRole("main");
+    expect(principal.id).toBe("contenido-principal");
+    expect(document.activeElement).toBe(principal);
+  });
+
+  it.each([
+    ["/estado", "Estado del lab · Lara"],
+    ["/agentes", "Agentes · Lara"],
+    ["/finanzas/tarjetas", "Finanzas · Tarjetas y pagos · Lara"],
+    ["/chat", "Chat · Lara"],
+  ])("el título del documento de %s es %s", async (ruta, titulo) => {
+    prepararFetch();
+
+    montar(ruta);
+
+    await waitFor(() => expect(document.title).toBe(titulo));
+  });
+
+  it("el login tiene su propio título", async () => {
+    auth.init.mockResolvedValue(null);
+    prepararFetch();
+
+    montar("/chat");
+
+    await screen.findByRole("button", { name: "Continuar con Keycloak" });
+    expect(document.title).toBe("Iniciar sesión · Lara");
+  });
+
+  it("las pestañas de tablas de Base de datos usan tabindex itinerante, flechas y relación con su panel", async () => {
+    prepararFetch();
+
+    montar("/base-de-datos");
+
+    const lista = await screen.findByRole("tablist", { name: "Tablas" });
+    const [sessions, events] = within(lista).getAllByRole("tab");
+    expect(sessions.getAttribute("tabindex")).toBe("0");
+    expect(events.getAttribute("tabindex")).toBe("-1");
+
+    sessions.focus();
+    fireEvent.keyDown(sessions, { key: "ArrowRight" });
+
+    expect(events.getAttribute("aria-selected")).toBe("true");
+    expect(document.activeElement).toBe(events);
+    const panel = screen.getByRole("tabpanel");
+    expect(panel.getAttribute("aria-labelledby")).toBe(events.id);
+    expect(events.getAttribute("aria-controls")).toBe(panel.id);
+  });
+});
+
 describe("aviso de ADR-0007 junto al campo del chat", () => {
   function descripcionDe(campo: HTMLElement): string {
     const id = campo.getAttribute("aria-describedby");

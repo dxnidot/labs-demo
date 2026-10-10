@@ -35,6 +35,7 @@ import { FinanzasPage } from "./FinanzasPage";
 import { LoginPage } from "./LoginPage";
 import { ChatSessionsProvider, useChatSessions } from "./useChatSessions";
 import { useHasRole } from "./useHasRole";
+import { tituloDeRuta, useTituloDocumento } from "./tituloDocumento";
 import { useTrampaFoco } from "./useTrampaFoco";
 import { useVistaEstrecha } from "./useVistaEstrecha";
 
@@ -63,6 +64,7 @@ const UsuariosRolesPage = lazy(() =>
 );
 
 const iniciarSesion = new IniciarSesion(keycloakAuthAdapter);
+const idContenidoPrincipal = "contenido-principal";
 const iconoNav = "size-4.5 shrink-0";
 
 /**
@@ -76,6 +78,7 @@ const iconoNav = "size-4.5 shrink-0";
  * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
  * @modified Daniel Tovar 2026-10-10 El shell usa PageLayout libre: sin el marco de 32/24/32 px alrededor de la barra lateral.
  * @modified Daniel Tovar 2026-10-10 Botón y diálogo "Apariencia" en el pie de la barra lateral.
+ * @modified Daniel Tovar 2026-10-10 Skip link, contenido principal enfocable y título del documento por vista.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -167,6 +170,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   const [barraVisible, setBarraVisible] = useState(true);
   const [rutaDrawer, setRutaDrawer] = useState<string | null>(null);
   const [aparienciaAbierta, setAparienciaAbierta] = useState(false);
+  useTituloDocumento(tituloDeRuta(pathname));
   const puedeVerAgentes = useHasRole(usuario, ["ver_agentes", "admin"]);
   const puedeVerIdentidad = useHasRole(usuario, ["ver_identidad", "admin"]);
   const puedeVerPersonal = useHasRole(usuario, ["ver-finanzas", "admin"]);
@@ -176,6 +180,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   const botonContraer = useRef<HTMLButtonElement | null>(null);
   const botonMostrar = useRef<HTMLButtonElement | null>(null);
   const botonApariencia = useRef<HTMLButtonElement | null>(null);
+  const contenidoPrincipal = useRef<HTMLElement | null>(null);
   const aparienciaEstabaAbierta = useRef(false);
   const navEstabaAbierta = useRef(false);
   const focoPendiente = useRef<"contraer" | "mostrar" | null>(null);
@@ -271,6 +276,16 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
       desplazable={false}
       libre
     >
+      <a
+        className="sr-only z-50 rounded-button bg-accent px-4 py-2 text-sm font-medium text-accent-ink focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:inline-flex focus:min-h-11 focus:items-center"
+        href={`#${idContenidoPrincipal}`}
+        onClick={(event) => {
+          event.preventDefault();
+          contenidoPrincipal.current?.focus();
+        }}
+      >
+        Saltar al contenido principal
+      </a>
       <div className="flex min-h-0 min-w-0 flex-1">
         {barraCompleta ? (
           <Sidebar abierto={drawerActivo} drawer={estrecha} onCerrar={cerrarNav} panelRef={panelNav}>
@@ -478,7 +493,12 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
           </div>
         )}
 
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <main
+          className="flex min-h-0 min-w-0 flex-1 flex-col outline-none"
+          id={idContenidoPrincipal}
+          ref={contenidoPrincipal}
+          tabIndex={-1}
+        >
           {error && (
             <p className="m-0 shrink-0 border-b border-border bg-surface-active px-4 py-3 text-sm text-danger sm:px-6" role="alert">
               {error}

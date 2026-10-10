@@ -17,6 +17,7 @@ import { PageLayout } from "./components/PageLayout";
 import { PuntoEstado } from "./components/PuntoEstado";
 import { SelectorModelo } from "./components/SelectorModelo";
 import { modeloOrquestador } from "../agentesConfig";
+import { comportamientoDeScroll } from "./movimientoReducido";
 import { useChatSessions } from "./useChatSessions";
 
 const listarModelos = new ListarModelos(new HttpModeloAdapter(new ApiHttpClient(keycloakAuthAdapter)));
@@ -103,6 +104,7 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
  * @modified Daniel Tovar 2026-10-01 Agrega el selector de modelo de LLM en la cabecera.
  * @modified Daniel Tovar 2026-10-02 Logs de consola del catálogo cargado y del modelo elegido por envío.
  * @modified Daniel Tovar 2026-10-10 Aviso fijo de ADR-0007 junto al campo de mensaje.
+ * @modified Daniel Tovar 2026-10-10 "Ir al final" respeta prefers-reduced-motion.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {
@@ -255,7 +257,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
   function desplazarAlFinal() {
     const list = listaMensajesRef.current;
     if (list) {
-      list.scrollTo({ top: list.scrollHeight, behavior: "smooth" });
+      list.scrollTo({ top: list.scrollHeight, behavior: comportamientoDeScroll() });
       seguirAlFinal.current = true;
       setMostrarIrAlFinal(false);
     }

@@ -250,6 +250,57 @@ describe("FinanzasPage · pestañas por ruta", () => {
     await screen.findByRole("tabpanel");
   });
 
+  it("solo la pestaña activa entra en el orden de tabulación (tabindex itinerante)", async () => {
+    renderizar("/finanzas/gastos");
+
+    const lista = screen.getByRole("tablist", { name: "Secciones de finanzas" });
+    const tabIndex = within(lista)
+      .getAllByRole("tab")
+      .map((pestana) => `${pestana.textContent}:${pestana.getAttribute("tabindex")}`);
+    expect(tabIndex).toEqual([
+      "Resumen:-1",
+      "Gastos:0",
+      "Ingresos:-1",
+      "Tarjetas y pagos:-1",
+      "Trading MX:-1",
+      "Trading USA:-1",
+    ]);
+    await screen.findByRole("tabpanel");
+  });
+
+  it("las flechas, Inicio y Fin mueven el foco entre pestañas y las activan", async () => {
+    renderizar("/finanzas/gastos");
+    const lista = screen.getByRole("tablist", { name: "Secciones de finanzas" });
+
+    within(lista).getByRole("tab", { name: "Gastos" }).focus();
+    fireEvent.keyDown(within(lista).getByRole("tab", { name: "Gastos" }), { key: "ArrowRight" });
+    const ingresos = within(lista).getByRole("tab", { name: "Ingresos" });
+    expect(ingresos.getAttribute("aria-selected")).toBe("true");
+    expect(document.activeElement).toBe(ingresos);
+
+    fireEvent.keyDown(ingresos, { key: "End" });
+    expect(within(lista).getByRole("tab", { name: "Trading USA" }).getAttribute("aria-selected")).toBe("true");
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowRight" });
+    expect(within(lista).getByRole("tab", { name: "Resumen" }).getAttribute("aria-selected")).toBe("true");
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowLeft" });
+    expect(within(lista).getByRole("tab", { name: "Trading USA" }).getAttribute("aria-selected")).toBe("true");
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "Home" });
+    expect(within(lista).getByRole("tab", { name: "Resumen" }).getAttribute("aria-selected")).toBe("true");
+    await screen.findByRole("tabpanel");
+  });
+
+  it("MXN, USD y los enlaces de Resumen tienen área táctil de 44px en pantallas angostas", async () => {
+    renderizar("/finanzas/resumen");
+
+    expect(screen.getByRole("button", { name: "MXN" }).className).toContain("min-h-11");
+    expect(screen.getByRole("button", { name: "USD" }).className).toContain("min-w-11");
+    expect((await screen.findByRole("link", { name: "Ver tarjetas" })).className).toContain("min-h-11");
+    expect(screen.getByRole("link", { name: "Ver todos" }).className).toContain("min-h-11");
+  });
+
   it("una pestaña desconocida cae en resumen", async () => {
     renderizar("/finanzas/inexistente");
 

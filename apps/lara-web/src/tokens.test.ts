@@ -63,4 +63,17 @@ describe("tokens de index.css en los componentes", () => {
     expect(css).toMatch(/--font-mono:\s*"IBM Plex Mono"/);
     expect(css).toMatch(/:root\[data-font="ibm-plex-mono"\]\s*\{\s*--font-sans:\s*var\(--font-mono\)/);
   });
+
+  it("hay una regla global de foco visible con el token accent y una de movimiento reducido", () => {
+    const css = readFileSync(new URL("./index.css", import.meta.url), "utf8");
+    expect(css).toMatch(/:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--color-accent\)/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)/);
+    expect(css).toMatch(/animation:\s*none !important/);
+  });
+
+  it("index.html enlaza el favicon y parte de un título genérico", () => {
+    const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+    expect(html).toContain('rel="icon" href="/favicon.svg"');
+    expect(html).toContain("<title>Lara</title>");
+  });
 });

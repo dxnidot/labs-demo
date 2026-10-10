@@ -8,6 +8,7 @@ import { EstadoVacio } from "./components/EstadoVacio";
 import { claseFocoInterno } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
 import { Pill } from "./components/Pill";
+import { alPulsarTeclaEnPestanas } from "./pestanasTeclado";
 import { useScrollPestanaActiva } from "./useScrollPestanaActiva";
 
 const listarSesiones = new ListarSesiones(new AdkAgenteAdapter(keycloakAuthAdapter));
@@ -30,6 +31,7 @@ function formatearFecha(fecha: Date): string {
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Pestañas de tablas con flechas, tabindex itinerante y relación tab-panel.
  */
 export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
   const [tabla, setTabla] = useState<Tabla>("sessions");
@@ -72,18 +74,22 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
           <div
             aria-label="Tablas"
             className="flex shrink-0 gap-1 overflow-x-auto"
+            onKeyDown={alPulsarTeclaEnPestanas}
             ref={listaTablas}
             role="tablist"
           >
             {tablas.map((nombre) => (
               <button
+                aria-controls="panel-tablas"
                 aria-selected={tabla === nombre}
                 className={`min-h-11 shrink-0 whitespace-nowrap rounded-button px-3.5 font-mono text-compact shell:min-h-9 ${claseFocoInterno} ${
                   tabla === nombre ? "bg-surface-active text-text" : "text-muted"
                 }`}
+                id={`pestana-tabla-${nombre}`}
                 key={nombre}
                 onClick={() => setTabla(nombre)}
                 role="tab"
+                tabIndex={tabla === nombre ? 0 : -1}
                 type="button"
               >
                 {nombre}
@@ -95,7 +101,7 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
       subtitulo="Sesiones, eventos y estado que guarda el orquestador."
       titulo="Base de datos"
     >
-      <div role="tabpanel">
+      <div aria-labelledby={`pestana-tabla-${tabla}`} id="panel-tablas" role="tabpanel">
         {tabla !== "sessions" && (
           <EstadoVacio fuente={`ADK API server · tabla ${tabla}`} pendiente="AG-05" />
         )}

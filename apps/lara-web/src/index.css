@@ -142,3 +142,31 @@ textarea {
 *::-webkit-scrollbar {
   display: none;
 }
+
+/*
+ * Foco visible y consistente en todo control: anillo de 2px con --color-accent (>= 3:1 en ambos temas).
+ * Los componentes que lo necesitan hacia adentro (contenedores con overflow) lo sobrescriben con utilidades.
+ */
+@layer base {
+  :where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * Movimiento reducido: sin animaciones ni desplazamiento suave, y las transiciones se limitan a cambios de
+ * color (que no se perciben como movimiento), para conservar el feedback de hover y de estado.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+    transition-property: color, background-color, border-color, outline-color, opacity !important;
+  }
+}

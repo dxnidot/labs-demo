@@ -123,4 +123,10 @@ describe("theme-color de index.html", () => {
       expect(meta?.[1], `meta theme-color ${tema}`).toBe(resolverToken("bg", tema));
     }
   });
+
+  it("el favicon usa el accent de cada tema (no puede leer variables CSS)", () => {
+    const svg = readFileSync(new URL("../public/favicon.svg", import.meta.url), "utf8").toLowerCase();
+    expect(svg).toContain(`:root { color: ${resolverToken("accent", "claro")}; }`);
+    expect(svg).toContain(`:root { color: ${resolverToken("accent", "oscuro")}; }`);
+  });
 });

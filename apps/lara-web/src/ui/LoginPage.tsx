@@ -2,6 +2,7 @@ import { Lock } from "lucide-react";
 import { claseFoco } from "./components/foco";
 import { LaraLogo } from "./components/LaraLogo";
 import { Pill } from "./components/Pill";
+import { useTituloDocumento } from "./tituloDocumento";
 
 interface LoginPageProps {
   comprobando: boolean;
@@ -28,8 +29,10 @@ const areas = [
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Scroll propio en ventanas bajas (body no desplaza) y chip Finanzas con contraste AA.
  * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
+ * @modified Daniel Tovar 2026-10-10 Título del documento "Iniciar sesión · Lara".
  */
 export function LoginPage({ comprobando, error, onLogin }: LoginPageProps) {
+  useTituloDocumento("Iniciar sesión · Lara");
   return (
     <div className="h-dvh overflow-y-auto bg-bg font-sans text-text">
     <div className="grid min-h-full grid-cols-1 shell:grid-cols-[1.1fr_1fr]">

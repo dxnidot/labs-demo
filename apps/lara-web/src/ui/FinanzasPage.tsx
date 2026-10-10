@@ -11,14 +11,16 @@ import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
 import { HttpFinanzasAdapter } from "../infrastructure/adapters/HttpFinanzasAdapter";
 import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
 import { Button } from "./components/Button";
-import { claseFoco, claseFocoInterno } from "./components/foco";
+import { claseFocoInterno } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
 import { FinanzasChatPanel } from "./FinanzasChatPanel";
 import { fechaLocalActual, periodoActual } from "./finanzasFormato";
+import { pestanasFinanzas } from "./finanzasPestanas";
 import { FinanzasMovimientosTab } from "./FinanzasMovimientosTab";
 import { FinanzasResumenTab } from "./FinanzasResumenTab";
 import { FinanzasTarjetasTab } from "./FinanzasTarjetasTab";
 import { FinanzasTradingTab } from "./FinanzasTradingTab";
+import { alPulsarTeclaEnPestanas } from "./pestanasTeclado";
 import { useScrollPestanaActiva } from "./useScrollPestanaActiva";
 import { useVistaEstrecha } from "./useVistaEstrecha";
 
@@ -33,19 +35,10 @@ function idPestana(id: string): string {
   return `pestana-finanzas-${id}`;
 }
 
-const pestanas = [
-  { id: "resumen", etiqueta: "Resumen" },
-  { id: "gastos", etiqueta: "Gastos" },
-  { id: "ingresos", etiqueta: "Ingresos" },
-  { id: "tarjetas", etiqueta: "Tarjetas y pagos" },
-  { id: "trading-mx", etiqueta: "Trading MX" },
-  { id: "trading-usa", etiqueta: "Trading USA" },
-] as const;
-
-type PestanaId = (typeof pestanas)[number]["id"];
+type PestanaId = (typeof pestanasFinanzas)[number]["id"];
 
 function esPestana(valor: string | undefined): valor is PestanaId {
-  return pestanas.some((pestana) => pestana.id === valor);
+  return pestanasFinanzas.some((pestana) => pestana.id === valor);
 }
 
 /**
@@ -57,6 +50,7 @@ function esPestana(valor: string | undefined): valor is PestanaId {
  * @modified Daniel Tovar 2026-09-30 ARIA completo de pestañas, foco visible y retorno de foco del asistente.
  * @modified Daniel Tovar 2026-09-30 La pestaña activa lleva solo la línea inferior (.ftab de la maqueta).
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (pestañas fijas, único scroll), botón Asistente siempre visible en angosto y pestañas con scroll.
+ * @modified Daniel Tovar 2026-10-10 Pestañas con flechas y tabindex itinerante, MXN/USD de 44px en angosto y lista de pestañas compartida.
  */
 export function FinanzasPage() {
   const { tab } = useParams();
@@ -170,7 +164,7 @@ export function FinanzasPage() {
         {monedas.map((opcion) => (
           <button
             aria-pressed={moneda === opcion}
-            className={`min-h-9 rounded-pill px-3 font-mono text-xs shell:min-h-7.5 ${claseFocoInterno} ${
+            className={`min-h-11 min-w-11 rounded-pill px-3 font-mono text-xs shell:min-h-7.5 shell:min-w-0 ${claseFocoInterno} ${
               moneda === opcion ? "bg-accent text-accent-ink" : "text-muted"
             }`}
             key={opcion}
@@ -183,7 +177,6 @@ export function FinanzasPage() {
       </div>
       {(estrecha || !asistenteAbierto) && (
         <Button
-          className={claseFoco}
           id={idBotonAsistente}
           onClick={abrirAsistente}
           variant="primary"
@@ -199,10 +192,11 @@ export function FinanzasPage() {
     <div
       aria-label="Secciones de finanzas"
       className="flex shrink-0 gap-1 overflow-x-auto border-b border-border"
+      onKeyDown={alPulsarTeclaEnPestanas}
       ref={listaPestanas}
       role="tablist"
     >
-      {pestanas.map((pestana) => (
+      {pestanasFinanzas.map((pestana) => (
         <Link
           aria-controls={idPanelPestanas}
           aria-selected={pestana.id === tab}
@@ -212,6 +206,7 @@ export function FinanzasPage() {
           id={idPestana(pestana.id)}
           key={pestana.id}
           role="tab"
+          tabIndex={pestana.id === tab ? 0 : -1}
           to={`/finanzas/${pestana.id}`}
         >
           {pestana.etiqueta}
@@ -238,7 +233,7 @@ export function FinanzasPage() {
             <div className="flex flex-col gap-3 rounded-card border border-border bg-surface-active p-5 sm:flex-row sm:items-center sm:justify-between">
               <p className="m-0 text-sm text-danger" role="alert">{error}</p>
               <Button
-                className={`shrink-0 ${claseFoco}`}
+                className="shrink-0"
                 onClick={() => void cargar(periodo, false)}
                 variant="ghost"
               >

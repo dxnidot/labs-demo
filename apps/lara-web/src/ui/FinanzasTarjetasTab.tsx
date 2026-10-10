@@ -4,8 +4,8 @@ import type { Tarjeta } from "../domain/Tarjeta";
 import type { FinanzasPort } from "../application/ports/FinanzasPort";
 import { AlternarEstadoTarjeta } from "../application/use-cases/AlternarEstadoTarjeta";
 import { Card } from "./components/Card";
+import { Switch } from "./components/Switch";
 import { Tag } from "./components/Tag";
-import { claseFocoInterno } from "./components/foco";
 import { enmascarar, fechaConDiaSemana } from "./finanzasFormato";
 
 interface FinanzasTarjetasTabProps {
@@ -20,6 +20,7 @@ interface FinanzasTarjetasTabProps {
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Foco del switch hacia adentro para que la tabla con scroll no lo recorte.
+ * @modified Daniel Tovar 2026-10-10 Usa el componente Switch (44px táctiles y pista apagada con contraste).
  */
 export function FinanzasTarjetasTab({
   eventos,
@@ -97,24 +98,12 @@ export function FinanzasTarjetasTab({
                       {tarjeta.permiteLiquidarMsiAnticipado ? "Sí" : "No"}
                     </td>
                     <td className="px-3.5 py-3">
-                      <button
-                        aria-checked={tarjeta.activa}
-                        aria-label={`${tarjeta.alias} activa`}
-                        className={`relative h-6 w-10 rounded-pill border-0 p-0 transition-colors disabled:opacity-50 ${claseFocoInterno} ${
-                          tarjeta.activa ? "bg-accent" : "bg-control-off"
-                        }`}
-                        disabled={actualizando.has(tarjeta.id)}
-                        onClick={() => void cambiarEstado(tarjeta)}
-                        role="switch"
-                        type="button"
-                      >
-                        <span
-                          aria-hidden="true"
-                          className={`absolute top-0.75 size-4.5 rounded-pill ${
-                            tarjeta.activa ? "left-4.75 bg-accent-ink" : "left-0.75 bg-text"
-                          }`}
-                        />
-                      </button>
+                      <Switch
+                        activo={tarjeta.activa}
+                        deshabilitado={actualizando.has(tarjeta.id)}
+                        etiqueta={`${tarjeta.alias} activa`}
+                        onCambiar={() => void cambiarEstado(tarjeta)}
+                      />
                     </td>
                   </tr>
                 ))}
