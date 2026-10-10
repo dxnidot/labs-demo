@@ -84,6 +84,7 @@ const iconoNav = "size-4.5 shrink-0";
  * @modified Daniel Tovar 2026-10-10 Skip link, contenido principal enfocable y título del documento por vista.
  * @modified Daniel Tovar 2026-10-10 Adaptadores desde el composition root e indicador MOCK.
  * @modified Daniel Tovar 2026-10-10 Esqueletos de carga y reintento en Recientes.
+ * @modified Daniel Tovar 2026-10-10 Las rutas viejas de Trading MX y Trading USA redirigen a Inversiones.
  * @modified Daniel Tovar 2026-10-10 El foco al contraer/mostrar la barra ya no se pierde si un efecto viejo corre antes (carrera del montaje).
  */
 export function AppShell() {
@@ -561,6 +562,17 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
               <Route
                 path="/finanzas/pagos"
                 element={protegido(puedeVerPersonal, <Navigate replace to="/finanzas/tarjetas" />)}
+              />
+              <Route
+                path="/finanzas/trading-mx"
+                element={protegido(puedeVerPersonal, <Navigate replace to="/finanzas/inversiones" />)}
+              />
+              <Route
+                path="/finanzas/trading-usa"
+                element={protegido(
+                  puedeVerPersonal,
+                  <Navigate replace to="/finanzas/inversiones?mercado=usa" />,
+                )}
               />
               <Route path="/finanzas/:tab" element={protegido(puedeVerPersonal, <FinanzasPage />)} />
               <Route path="*" element={<Navigate replace to="/chat" />} />

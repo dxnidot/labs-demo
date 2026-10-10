@@ -63,4 +63,20 @@ describe("PageLayout", () => {
     expect(container.querySelector('[data-slot="page-footer"]')).toBeNull();
     expect(container.querySelector('[data-slot="page-tabs"]')).toBeNull();
   });
+
+  it("anchoColumna centra encabezado, pestañas y contenido en una columna de ~1180px; sin él no hay columna", () => {
+    const conColumna = render(
+      <PageLayout anchoColumna pestanas={<div role="tablist" />} titulo="Título">
+        <p>Contenido</p>
+      </PageLayout>,
+    );
+    for (const ranura of ["page-header", "page-tabs", "page-content"]) {
+      expect(conColumna.container.querySelector(`[data-slot="${ranura}"] .max-w-295.mx-auto`), ranura).not.toBeNull();
+    }
+    cleanup();
+
+    const sinColumna = montar();
+    expect(sinColumna.container.querySelector(".max-w-295")).toBeNull();
+  });
 });
+

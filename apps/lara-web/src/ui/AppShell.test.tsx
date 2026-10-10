@@ -405,9 +405,35 @@ describe("sidebar y rutas", () => {
     expect((await screen.findByRole("tab", { name: "Gastos" })).getAttribute("aria-selected")).toBe("true");
     expect(screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current")).toBe("page");
 
-    fireEvent.click(screen.getByRole("tab", { name: "Trading MX" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Inversiones" }));
 
-    expect(screen.getByRole("tab", { name: "Trading MX" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("tab", { name: "Inversiones" }).getAttribute("aria-selected")).toBe("true");
+  });
+
+  it("las rutas viejas Trading MX y Trading USA redirigen a Inversiones con su cuenta", async () => {
+    prepararFetch();
+
+    montar("/finanzas/trading-mx");
+
+    expect(
+      (await screen.findByRole("tab", { name: "Inversiones" })).getAttribute("aria-selected"),
+    ).toBe("true");
+    const grupo = await screen.findByRole("group", { name: "Cuenta" });
+    expect(within(grupo).getByRole("button", { name: "MX · MXN" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.queryByRole("tab", { name: /Trading/ })).toBeNull();
+    cleanup();
+
+    montar("/finanzas/trading-usa");
+
+    expect(
+      (await screen.findByRole("tab", { name: "Inversiones" })).getAttribute("aria-selected"),
+    ).toBe("true");
+    expect(
+      within(await screen.findByRole("group", { name: "Cuenta" }))
+        .getByRole("button", { name: "USA · USD" })
+        .getAttribute("aria-pressed"),
+    ).toBe("true");
+    expect(document.title).toBe("Finanzas · Inversiones · Lara");
   });
 
   it("sin ver_agentes, ver_identidad ni ver-finanzas no renderiza esas secciones en el DOM", async () => {

@@ -4,6 +4,5 @@ export const pestanasFinanzas = [
   { id: "gastos", etiqueta: "Gastos" },
   { id: "ingresos", etiqueta: "Ingresos" },
   { id: "tarjetas", etiqueta: "Tarjetas y pagos" },
-  { id: "trading-mx", etiqueta: "Trading MX" },
-  { id: "trading-usa", etiqueta: "Trading USA" },
+  { id: "inversiones", etiqueta: "Inversiones" },
 ] as const;

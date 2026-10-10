@@ -270,6 +270,7 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 - Panel derecho **Asistente de finanzas** (~384px), plegable y como drawer en pantallas estrechas. Renderiza Markdown con `react-markdown`, incluidas tablas.
 - Para varias transacciones, muestra un preview y una confirmación para el conjunto (**Confirmar las N**). El botón para adjuntar archivos va dentro del composer; finanzas procesa los archivos, nunca se envían al LLM.
 - No hay una caja separada de **Importar CSV**. Inversiones (MX y USA) muestra un estado vacío hasta FIN-04.
+- Implementado en `lara-web` (UI-09): el subtítulo muestra "Actualizado hace…" (se refresca cada 30 s); "Próximo pago" y "en N días" salen del calendario de los próximos 30 días y de la fecha de hoy (la UI solo resta fechas); "Ver calendario" en Resumen lleva a Tarjetas y pagos. Mientras el servicio no entregue los totales del mes, Resumen muestra un solo aviso en lugar de tres KPIs vacíos.
 - Diferencia pendiente: los filtros de la pestaña **Gastos** quedan fuera de esta pasada.
 
 ### 13 · Gastos fijos (a futuro)
@@ -288,6 +289,7 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 - **Mis tarjetas** como tiles: alias, ••••, día de corte, día de pago, "Pago en N días", MSI y un toggle para activarla o desactivarla. La inactiva va atenuada, con la etiqueta "Inactiva" y "fuera del calendario". Contador "N activas · N inactivas".
 - Calendario del mes en cuadrícula de 7 columnas: ● pago, ○ corte. El día es seleccionable y su detalle aparece debajo; se navega con teclado (`role="grid"`). Las tarjetas inactivas no se muestran.
 - La entrada lateral anterior `/finanzas/pagos` ahora es esta pestaña.
+- Implementado en `lara-web` (UI-09): la tarjeta inactiva se atenúa con tokens (`muted`, `faint`, borde discontinuo) y no con `opacity`, para mantener el contraste AA; el calendario añade flechas de mes y se carga por mes al servicio; teclas: flechas, Inicio/Fin (lunes/domingo), RePág/AvPág (mes). Con 7 columnas, a 320 px cada día mide ~30 px de ancho (cumple el mínimo de 24 px de WCAG 2.5.8, pero no los 44 px de la navegación).
 
 ## Reglas para implementar
 

@@ -74,8 +74,7 @@ const rutas = [
   { ruta: "/finanzas/gastos", titulo: "Finanzas" },
   { ruta: "/finanzas/ingresos", titulo: "Finanzas" },
   { ruta: "/finanzas/tarjetas", titulo: "Finanzas" },
-  { ruta: "/finanzas/trading-mx", titulo: "Finanzas" },
-  { ruta: "/finanzas/trading-usa", titulo: "Finanzas" },
+  { ruta: "/finanzas/inversiones", titulo: "Finanzas" },
 ];
 
 function contenedoresConScroll(raiz: HTMLElement) {

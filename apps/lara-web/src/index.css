@@ -92,6 +92,11 @@
   --radius-pill: 999px;
 }
 
+/* Cifras tabulares para fechas, montos y porcentajes (README > Tipografía). */
+@utility num {
+  font-variant-numeric: tabular-nums;
+}
+
 /* "Apariencia" > Tema: data-theme en <html> (ver index.html y useApariencia). */
 :root[data-theme="claro"] {
   color-scheme: light;

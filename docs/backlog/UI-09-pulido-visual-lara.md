@@ -30,7 +30,7 @@
   - [x] 5. Accesibilidad: foco, switch, áreas de 44 px, pestañas con flechas, skip link, título por vista, favicon y `prefers-reduced-motion`.
   - [x] 6. Mocks (`VITE_USE_MOCKS`, `.env.example`, composition root, pill MOCK) para `AuthPort`, `AgentePort`, `ModeloPort`, `EstadoLabPort`, `MenuPort` y `FinanzasPort`; catálogo de agentes y servicios pendientes movido a `domain/`.
   - [x] 7. Estados comunes: carga con esqueleto (`Esqueleto`, `AvisoCarga`), vacío sin jerga de backlog (`EstadoVacio` con mensaje claro) y error con reintento (`EstadoError`) en Estado, Base de datos, Menú por rol, Finanzas, Chat, asistente de Finanzas y Recientes.
-  - [ ] 8. Finanzas (12 y 14) según el mockup.
+  - [x] 8. Finanzas (12 y 14) según el mockup: pestaña Inversiones con selector MX | USA y redirección de las rutas viejas, íconos, periodo con ◀ ▶, "Actualizado hace…", banner de próximo pago, tiles de tarjetas y calendario en cuadrícula (`role="grid"`).
 - Archivos relevantes:
   - apps/lara-web/src/index.css
   - apps/lara-web/src/ui/
@@ -49,6 +49,7 @@
   - Confirmado: el tema se define con `light-dark()` y `color-scheme` (MDN: Chrome y Edge 123, Firefox 120, Safari 17.5); el oscuro conserva los valores de la guía y el claro sale de la misma paleta.
   - Confirmado: sin `VITE_USE_MOCKS` (o con `false`) Lara usa los adaptadores reales, igual que antes; en modo mock no hay peticiones a Keycloak ni a ningún backend (verificado en navegador).
   - Pendiente: ok de quien mantiene el lab a la paleta clara (checkpoint de 4b) antes de seguir con el resto de las vistas.
+  - Confirmado: en 320 px los días del calendario miden ~30 px de ancho (WCAG 2.5.8 pide 24 px); el resto de controles de Finanzas mide 44 px.
   - Confirmado: se corrigieron dos defectos previos: la columna "monto" de "Últimos movimientos" ya no se corta con el panel del asistente abierto (tabla de 3 columnas con el origen bajo el concepto) y el estado vacío del chat arranca arriba, con el saludo visible a 320 px.
   - Confirmado: el test intermitente de foco al contraer la barra lateral era una carrera del componente (un efecto con estado anterior consumía el destino de foco); se corrigió con `focoAplicable`.
   - Pendiente: Lato y NTR, que la guía visual citaba como fuentes alternativas, no están instaladas; requieren decidir y autorizar sus paquetes `@fontsource`.

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { EventoCalendario } from "../domain/EventoCalendario";
@@ -172,8 +172,13 @@ describe("FinanzasPage · carga y resumen", () => {
   it("presenta el próximo pago, barras por categoría, origen y estados vacíos sin calcular totales", async () => {
     renderizar();
 
-    const proximo = (await screen.findByText("Próximo pago")).closest("section") as HTMLElement;
+    const proximo = await screen.findByRole("region", { name: "Próximo pago" });
     expect(within(proximo).getByText("Tarjeta principal")).toBeTruthy();
+    expect(within(proximo).getByText("••••0042")).toBeTruthy();
+    expect(within(proximo).getByText(/5 oct · en \d+ días/)).toBeTruthy();
+    expect(within(proximo).getByRole("link", { name: "Ver calendario" }).getAttribute("href")).toBe(
+      "/finanzas/tarjetas",
+    );
 
     const categorias = screen.getByRole("list", {
       name: "Importes de gastos por categoría en MXN",
@@ -186,11 +191,12 @@ describe("FinanzasPage · carga y resumen", () => {
     expect(within(ultimos).getByText("manual")).toBeTruthy();
     expect(within(ultimos).getByText("notificación")).toBeTruthy();
 
-    expect(screen.getAllByText(/Aún no disponible: el servicio de finanzas/).length).toBeGreaterThanOrEqual(4);
+    const avisos = screen.getAllByText(/Aún no disponible: el servicio de finanzas/);
+    expect(avisos).toHaveLength(2);
+    expect(avisos[0].textContent).toContain("totales del mes");
+    expect(screen.queryByText("Ingresos del mes")).toBeNull();
     expect(screen.queryByText(/Pendiente:|Sin datos todavía/)).toBeNull();
-    expect(screen.getByRole("link", { name: "Ver tarjetas" }).getAttribute("href")).toBe(
-      "/finanzas/tarjetas",
-    );
+    expect(screen.getAllByRole("link", { name: "Ver calendario" })).toHaveLength(2);
     expect(screen.getByRole("link", { name: "Ver todos" }).getAttribute("href")).toBe(
       "/finanzas/gastos",
     );
@@ -284,13 +290,12 @@ describe("FinanzasPage · pestañas por ruta", () => {
     ["gastos", "Gastos"],
     ["ingresos", "Ingresos"],
     ["tarjetas", "Tarjetas y pagos"],
-    ["trading-mx", "Trading MX"],
-    ["trading-usa", "Trading USA"],
+    ["inversiones", "Inversiones"],
   ])("la ruta /finanzas/%s marca la pestaña %s", async (id, etiqueta) => {
     renderizar(`/finanzas/${id}`);
 
     const lista = screen.getByRole("tablist", { name: "Secciones de finanzas" });
-    expect(within(lista).getAllByRole("tab")).toHaveLength(6);
+    expect(within(lista).getAllByRole("tab")).toHaveLength(5);
     const activa = within(lista).getByRole("tab", { name: etiqueta });
     expect(activa.getAttribute("aria-selected")).toBe("true");
     expect(activa.getAttribute("href")).toBe(`/finanzas/${id}`);
@@ -310,8 +315,7 @@ describe("FinanzasPage · pestañas por ruta", () => {
       "Gastos:0",
       "Ingresos:-1",
       "Tarjetas y pagos:-1",
-      "Trading MX:-1",
-      "Trading USA:-1",
+      "Inversiones:-1",
     ]);
     await screen.findByRole("tabpanel");
   });
@@ -327,13 +331,13 @@ describe("FinanzasPage · pestañas por ruta", () => {
     expect(document.activeElement).toBe(ingresos);
 
     fireEvent.keyDown(ingresos, { key: "End" });
-    expect(within(lista).getByRole("tab", { name: "Trading USA" }).getAttribute("aria-selected")).toBe("true");
+    expect(within(lista).getByRole("tab", { name: "Inversiones" }).getAttribute("aria-selected")).toBe("true");
 
     fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowRight" });
     expect(within(lista).getByRole("tab", { name: "Resumen" }).getAttribute("aria-selected")).toBe("true");
 
     fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowLeft" });
-    expect(within(lista).getByRole("tab", { name: "Trading USA" }).getAttribute("aria-selected")).toBe("true");
+    expect(within(lista).getByRole("tab", { name: "Inversiones" }).getAttribute("aria-selected")).toBe("true");
 
     fireEvent.keyDown(document.activeElement as HTMLElement, { key: "Home" });
     expect(within(lista).getByRole("tab", { name: "Resumen" }).getAttribute("aria-selected")).toBe("true");
@@ -345,7 +349,7 @@ describe("FinanzasPage · pestañas por ruta", () => {
 
     expect(screen.getByRole("button", { name: "MXN" }).className).toContain("min-h-11");
     expect(screen.getByRole("button", { name: "USD" }).className).toContain("min-w-11");
-    expect((await screen.findByRole("link", { name: "Ver tarjetas" })).className).toContain("min-h-11");
+    expect((await screen.findAllByRole("link", { name: "Ver calendario" }))[1].className).toContain("min-h-11");
     expect(screen.getByRole("link", { name: "Ver todos" }).className).toContain("min-h-11");
   });
 
@@ -372,19 +376,100 @@ describe("FinanzasPage · pestañas por ruta", () => {
     expect(within(ingresos).getByText("notificación")).toBeTruthy();
   });
 
-  it("Tarjetas muestra la tabla con switch y el calendario", async () => {
+  it("Tarjetas muestra el próximo pago, los tiles con switch y el calendario en cuadrícula", async () => {
     renderizar("/finanzas/tarjetas");
 
     expect(await screen.findByRole("switch", { name: "Tarjeta principal activa" })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Próximos 30 días" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Próximo pago" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Mis tarjetas" })).toBeTruthy();
+    expect(screen.getByText("1 activa · 0 inactivas")).toBeTruthy();
+    expect(await screen.findByRole("grid", { name: "Octubre 2030" })).toBeTruthy();
   });
 
-  it.each(["trading-mx", "trading-usa"])("%s muestra el estado vacío de FIN-04", async (id) => {
-    renderizar(`/finanzas/${id}`);
+  it("Inversiones es una sola pestaña con selector MX | USA", async () => {
+    renderizar("/finanzas/inversiones");
 
-    expect((await screen.findByRole("heading", { name: /Aún no hay portafolio/ })).textContent).toContain(
-      id === "trading-mx" ? "Trading MX" : "Trading USA",
+    expect((await screen.findByRole("heading", { name: "Aún no hay portafolio de la cuenta MX" }))).toBeTruthy();
+    const grupo = screen.getByRole("group", { name: "Cuenta" });
+    expect(within(grupo).getByRole("button", { name: "MX · MXN" }).getAttribute("aria-pressed")).toBe("true");
+
+    fireEvent.click(within(grupo).getByRole("button", { name: "USA · USD" }));
+
+    expect(screen.getByRole("heading", { name: "Aún no hay portafolio de la cuenta USA" })).toBeTruthy();
+    expect(within(grupo).getByRole("button", { name: "USA · USD" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.queryByText(/FIN-04|Pendiente:/)).toBeNull();
+  });
+
+  it("las pestañas llevan ícono decorativo y la activa va en negrita", async () => {
+    renderizar("/finanzas/gastos");
+
+    const lista = screen.getByRole("tablist", { name: "Secciones de finanzas" });
+    for (const pestana of within(lista).getAllByRole("tab")) {
+      const icono = pestana.querySelector("svg");
+      expect(icono?.getAttribute("aria-hidden")).toBe("true");
+    }
+    expect(within(lista).getByRole("tab", { name: "Gastos" }).className).toContain("font-semibold");
+    expect(within(lista).getByRole("tab", { name: "Resumen" }).className).not.toContain("font-semibold");
+    await screen.findByRole("tabpanel");
+  });
+});
+
+describe("FinanzasPage · encabezado", () => {
+  it("muestra 'Actualizado hace…' al cargar y 'Actualizando…' mientras tanto", async () => {
+    let liberar!: () => void;
+    const listas = new Promise<void>((resolve) => {
+      liberar = resolve;
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        await listas;
+        return respuestaFinanzas(String(input), datosBase);
+      }),
     );
+
+    renderizar();
+
+    expect(screen.getByText("Actualizando…")).toBeTruthy();
+    liberar();
+    expect(await screen.findByText("Actualizado hace menos de 1 min")).toBeTruthy();
+  });
+
+  it("el periodo se mueve con Mes anterior y Mes siguiente y vuelve a consultar el resumen", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => respuestaFinanzas(String(input), datosBase));
+    vi.stubGlobal("fetch", fetchMock);
+    const [anio, mes] = periodoPrueba.split("-").map(Number);
+    const anterior = new Date(anio, mes - 2, 1);
+    const periodoAnterior = `${anterior.getFullYear()}-${String(anterior.getMonth() + 1).padStart(2, "0")}`;
+
+    renderizar();
+
+    const grupo = await screen.findByRole("group", { name: "Periodo" });
+    expect(screen.queryByLabelText("Periodo", { selector: "input" })).toBeNull();
+    fireEvent.click(within(grupo).getByRole("button", { name: "Mes anterior" }));
+
+    await waitFor(() =>
+      expect(fetchMock.mock.calls.map(([ruta]) => String(ruta))).toContain(
+        `/api/finanzas/movimientos/resumen-mensual?periodo=${periodoAnterior}`,
+      ),
+    );
+    fireEvent.click(within(grupo).getByRole("button", { name: "Mes siguiente" }));
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.filter(([ruta]) =>
+          String(ruta).endsWith(`resumen-mensual?periodo=${periodoPrueba}`),
+        ),
+      ).toHaveLength(2),
+    );
+  });
+
+  it("encabezado, pestañas y contenido comparten una columna de ~1180px", async () => {
+    const { container } = renderizar();
+    await screen.findByRole("tabpanel");
+
+    for (const ranura of ["page-header", "page-tabs", "page-content"]) {
+      expect(container.querySelector(`[data-slot="${ranura}"] .max-w-295`), ranura).not.toBeNull();
+    }
   });
 });
 
