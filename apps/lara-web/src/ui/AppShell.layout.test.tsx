@@ -83,6 +83,15 @@ function contenedoresConScroll(raiz: HTMLElement) {
 }
 
 describe("estructura PageLayout por ruta", () => {
+  it("el shell ocupa toda la ventana: su contenedor no lleva relleno de página", async () => {
+    const { container } = montar("/estado");
+
+    await screen.findByRole("heading", { name: "Estado del lab", level: 1 });
+    const contenedorShell = container.querySelector('[data-slot="page-content"]');
+    expect(contenedorShell?.querySelector("aside")).not.toBeNull();
+    expect(contenedorShell?.className).not.toMatch(/(^|\s)(p|px|py|pt|pb)-\d/);
+  });
+
   it.each(rutas)(
     "$ruta monta su vista dentro de PageLayout con encabezado fijo y un solo scroll",
     async (vista) => {

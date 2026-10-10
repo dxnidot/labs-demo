@@ -72,6 +72,7 @@ const iconoNav = "size-4.5 shrink-0";
  * @modified Daniel Tovar 2026-10-01 Oculta del DOM las secciones AGENTES, IDENTIDAD y PERSONAL según los roles del usuario.
  * @modified Daniel Tovar 2026-10-02 Protege las rutas de esas secciones: sin el rol muestra AccesoDenegado.
  * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
+ * @modified Daniel Tovar 2026-10-10 El shell usa PageLayout libre: sin el marco de 32/24/32 px alrededor de la barra lateral.
  */
 export function AppShell() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -255,6 +256,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
       cabecera={barraSuperior || undefined}
       className="h-dvh bg-bg font-sans text-text"
       desplazable={false}
+      libre
     >
       <div className="flex min-h-0 min-w-0 flex-1">
         {barraCompleta ? (
