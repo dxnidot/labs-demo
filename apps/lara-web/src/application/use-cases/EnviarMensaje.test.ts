@@ -4,7 +4,7 @@ import type { AuthPort } from "../ports/AuthPort";
 import { EnviarMensaje } from "./EnviarMensaje";
 
 describe("EnviarMensaje", () => {
-  it("usa los primeros 60 caracteres del primer mensaje recortado como título", async () => {
+  it("usa los primeros 60 caracteres del primer mensaje recortado como tÃ­tulo", async () => {
     const usuario = {
       id: "usuario-1",
       username: "ana",
@@ -37,7 +37,7 @@ describe("EnviarMensaje", () => {
     );
   });
 
-  it("propaga el origen finanzas al crear la sesión", async () => {
+  it("propaga el origen finanzas al crear la sesiÃ³n", async () => {
     const usuario = { id: "usuario-1", username: "ana", roles: [], kcMenuRoles: [] };
     const auth: AuthPort = {
       init: async () => usuario,
