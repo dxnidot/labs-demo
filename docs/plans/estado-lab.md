@@ -79,7 +79,7 @@ Sin cambios: puertos, nombres de BD, rutas HTTP y paquetes Java. Clients de Keyc
 - [ ] ⏳ UI-06 · Eliminar y renombrar chats en Recientes (Media; depende de UI-04)
 - [ ] 🔄 UI-07 · En curso: todas las vistas 01–14, login propio e íconos
 - [ ] 🔄 UI-08 · En curso: responsive y layout de página único
-- [ ] 🔄 UI-09 · En curso: pulido visual de Lara (fase A hecha; fase B y mocks en marcha, tema claro a la espera de ok; faltan motion y vistas con datos de relleno)
+- [ ] 🔄 UI-09 · En curso: pulido visual de Lara (fases A y B hechas, con tema claro y oscuro; mocks, estados comunes y Finanzas listos; faltan el resto de las vistas con datos de relleno y el motion)
 - [ ] ⏳ QA-01 · Capturas automáticas con Playwright para ui-reviewer (Baja; depende de UI-08)
 - [ ] 🔄 FE-01 · En curso: menú por rol implementado en Lara; kc-front ya no está en el monorepo, falta cerrar la historia en el backlog — Track de identidad: solo para pruebas
 

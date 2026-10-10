@@ -25,7 +25,7 @@
   - [x] 2. Marco de 32/24/32 px del shell corregido (`libre`), con prueba y medición.
   - [x] 3. Fuentes con Fontsource, `data-font` y diálogo Apariencia (`lara.fuente`).
   - [x] 4. Tokens semánticos, escala tipográfica y `Pill` con 4 tonos; sin alias muertos, escalas crudas ni medidas arbitrarias (`src/tokens.test.ts`).
-  - [~] 4b. Tema claro y oscuro: implementado y publicado como WIP; falta el ok a la paleta clara antes de seguir.
+  - [x] 4b. Tema claro y oscuro (`light-dark()`, `lara.tema`, sin parpadeo, contraste calculado en ambos temas); paleta clara aprobada.
   - [x] Aviso fijo de ADR-0007 junto al campo del chat (inicio, conversación y asistente de Finanzas).
   - [x] 5. Accesibilidad: foco, switch, áreas de 44 px, pestañas con flechas, skip link, título por vista, favicon y `prefers-reduced-motion`.
   - [x] 6. Mocks (`VITE_USE_MOCKS`, `.env.example`, composition root, pill MOCK) para `AuthPort`, `AgentePort`, `ModeloPort`, `EstadoLabPort`, `MenuPort` y `FinanzasPort`; catálogo de agentes y servicios pendientes movido a `domain/`.
@@ -48,9 +48,11 @@
   - Confirmado: `localStorage` admite solo `lara.fuente` y `lara.tema` (sistema, claro, oscuro; por defecto sistema), con `try/catch` y valor por defecto; reglas actualizadas en `copilot-instructions.md` y en el README de diseño.
   - Confirmado: el tema se define con `light-dark()` y `color-scheme` (MDN: Chrome y Edge 123, Firefox 120, Safari 17.5); el oscuro conserva los valores de la guía y el claro sale de la misma paleta.
   - Confirmado: sin `VITE_USE_MOCKS` (o con `false`) Lara usa los adaptadores reales, igual que antes; en modo mock no hay peticiones a Keycloak ni a ningún backend (verificado en navegador).
-  - Pendiente: ok de quien mantiene el lab a la paleta clara (checkpoint de 4b) antes de seguir con el resto de las vistas.
+  - Confirmado: la paleta clara fue aprobada por quien mantiene el lab (checkpoint de 4b).
   - Confirmado: en 320 px los días del calendario miden ~30 px de ancho (WCAG 2.5.8 pide 24 px); el resto de controles de Finanzas mide 44 px.
   - Confirmado: se corrigieron dos defectos previos: la columna "monto" de "Últimos movimientos" ya no se corta con el panel del asistente abierto (tabla de 3 columnas con el origen bajo el concepto) y el estado vacío del chat arranca arriba, con el saludo visible a 320 px.
   - Confirmado: el test intermitente de foco al contraer la barra lateral era una carrera del componente (un efecto con estado anterior consumía el destino de foco); se corrigió con `focoAplicable`.
   - Pendiente: Lato y NTR, que la guía visual citaba como fuentes alternativas, no están instaladas; requieren decidir y autorizar sus paquetes `@fontsource`.
-  - Pendiente: el `Estado` del backlog de UI-09 pasará a "Hecho" solo al cerrar las fases C y D.
+  - Pendiente: fase C (resto): pulir las vistas 05–11 y 13 contra su PNG con datos de relleno (Agentes, Base de datos ampliada, Memoria, Herramientas, Menú por rol, Usuarios, BPM y Gastos fijos) y el chat con A2A, pasos y adjuntar; faltan sus puertos y mocks.
+  - Pendiente: fase D (motion en CSS).
+  - Pendiente: el `Estado` de UI-09 pasará a "Hecho" solo al cerrar las fases C y D.
