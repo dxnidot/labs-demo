@@ -11,7 +11,7 @@ Entorno solo local en Windows, monorepo `D:\dev\labs`. Terminal: PowerShell.
 
 | Servicio | Carpeta | Puerto | Cómo se levanta |
 | --- | --- | --- | --- |
-| Keycloak 26 + PostgreSQL | `keycloak/` | 8080 | `docker compose up -d` |
+| Keycloak 26 + PostgreSQL | `infra/keycloak/` | 8080 | `docker compose up -d` |
 | kc-demo (Spring Boot 4, Java 21) | `kc-demo/` | 8081 | `.\mvnw.cmd spring-boot:run` |
 | kc-front (Angular) | `kc-front/` | 4200 | `npm start` |
 
@@ -27,9 +27,9 @@ Consola de administración: http://localhost:8080/admin
 ## Arrancar el lab
 
 ```powershell
-cd D:\dev\labs\keycloak
+cd D:\dev\labs\infra\keycloak
 docker compose up -d
-cd ..\kc-demo
+cd D:\dev\labs\kc-demo
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -45,7 +45,7 @@ Keycloak tarda cerca de un minuto en quedar listo después de `up -d`.
 ## Detener
 
 ```powershell
-cd D:\dev\labs\keycloak
+cd D:\dev\labs\infra\keycloak
 docker compose stop
 ```
 
@@ -82,6 +82,6 @@ Invoke-RestMethod -Uri 'http://localhost:8081/api/menu' -Headers @{ Authorizatio
 
 ## Problemas comunes
 
-- **El login no carga:** revisar `docker compose ps` en `keycloak/` y esperar a que Keycloak termine de arrancar.
+- **El login no carga:** revisar `docker compose ps` en `infra/keycloak/` y esperar a que Keycloak termine de arrancar.
 - **401 en kc-demo:** token vencido, o el client/realm no coincide con el emisor esperado por kc-demo.
 - **403 en kc-demo:** el usuario no tiene el rol que pide el endpoint (por ejemplo, `ana` no tiene `autorizar`).

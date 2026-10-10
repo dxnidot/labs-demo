@@ -7,7 +7,7 @@ Leyenda: ✅ Confirmado · 🔎 Inferido (falta validar) · ⏳ Pendiente
 ## Repo y documentación
 
 - [x] ✅ Monorepo `labs-demo` con historia de `kc-demo` conservada
-- [x] ✅ Contraseñas de Keycloak en `keycloak/.env` (ignorado) + `.env.example`
+- [x] ✅ Contraseñas de Keycloak en `infra/keycloak/.env` (ignorado) + `.env.example`
 - [x] ✅ `.gitignore` con reglas `.env`, `!.env.example` y `docs/private/`
 - [x] ✅ Estructura `docs/` (backlog, bugs, decisions, plans, archive, private)
 - [x] ✅ DOC-02 · Guía de UI de Lara: README y 13 capturas

@@ -1,4 +1,6 @@
-﻿services:
+﻿name: keycloak
+
+services:
   postgres:
     image: postgres:17
     environment:

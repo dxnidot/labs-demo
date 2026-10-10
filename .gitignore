@@ -42,3 +42,6 @@ Thumbs.db
 
 # Notas de traspaso entre sesiones de Claude Code
 .claude/handoff/
+
+# Datos privados locales
+data/private/

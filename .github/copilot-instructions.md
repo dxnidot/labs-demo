@@ -6,7 +6,7 @@ Laboratorio personal en Windows (`D:\dev\labs`, PowerShell). Repo **público**. 
 
 | Carpeta      | Qué es                                                                                                    | Puerto |
 | ------------ | --------------------------------------------------------------------------------------------------------- | ------ |
-| `keycloak/`  | Keycloak 26 + PostgreSQL (Docker Compose), realm `lab`                                                    | 8080   |
+| `infra/keycloak/` | Keycloak 26 + PostgreSQL (Docker Compose), realm `lab`                                                    | 8080   |
 | `kc-demo/`   | API Spring Boot 4, Java 21, valida JWT y arma el menú por rol                                             | 8081   |
 | `kc-front/`  | Front Angular (se va a absorber en Lara, ver ADR-0002)                                                    | 4200   |
 | `bpm-sync/`  | Sincronización BPM → Keycloak (pendiente)                                                                 | —      |
