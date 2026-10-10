@@ -44,10 +44,10 @@ Sin cambios: puertos, nombres de BD, variables de entorno, clients de Keycloak (
 - [x] ✅ Java 21 fijado en `pom.xml`
 - [x] ✅ API-01 · Pruebas unitarias de `MenuService` (JUnit 5 + Mockito, AAA)
 
-## kc-front (Angular, puerto 4200)
+## kc-front (Angular, ya no está en el monorepo)
 
-- [x] ✅ Angular hexagonal con Keycloak PKCE y Tailwind, en GitHub
-- [ ] ⏳ FE-02 · Angular 22.2.1 con `ng update` (TypeScript se queda en 6.0)
+- [x] ✅ Retirado del monorepo: el front actual es `apps/lara-web` (React + Vite + Tailwind 4, hexagonal)
+- [ ] ⏳ FE-02 · Angular 22.2.1 con `ng update` (TypeScript se queda en 6.0) — sin código en el repo; el backlog decide si se cancela
 
 ## bpm-sync
 
@@ -80,7 +80,7 @@ Sin cambios: puertos, nombres de BD, variables de entorno, clients de Keycloak (
 - [ ] 🔄 UI-07 · En curso: todas las vistas 01–14, login propio e íconos
 - [ ] 🔄 UI-08 · En curso: responsive y layout de página único
 - [ ] ⏳ QA-01 · Capturas automáticas con Playwright para ui-reviewer (Baja; depende de UI-08)
-- [ ] 🔄 FE-01 · En curso: menú por rol implementado en Lara; retiro de kc-front pendiente — Track de identidad: solo para pruebas
+- [ ] 🔄 FE-01 · En curso: menú por rol implementado en Lara; kc-front ya no está en el monorepo, falta cerrar la historia en el backlog — Track de identidad: solo para pruebas
 
 ## Finanzas personales
 
