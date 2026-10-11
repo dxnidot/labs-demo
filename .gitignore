@@ -40,6 +40,10 @@ Thumbs.db
 # Capturas de la app en ejecución (pueden contener datos reales)
 .capturas/
 
+# Estado local de playwright-cli (sesiones de navegador, snapshots)
+.playwright/
+.playwright-cli/
+
 # Notas de traspaso entre sesiones de Claude Code
 .claude/handoff/
 

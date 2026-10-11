@@ -72,14 +72,17 @@ function montar(ruta: string) {
 
 const vistas = [
   { ruta: "/estado", enlace: "Estado del lab", titulo: "Estado del lab" },
+  { ruta: "/gastos-fijos", enlace: "Gastos fijos", titulo: "Gastos fijos" },
+];
+
+// Vistas de LABORATORIO: ya no están en el sidebar del chat, solo se llega vía el menú de usuario.
+const vistasLaboratorio = [
   { ruta: "/agentes", enlace: "Agentes", titulo: "Agentes" },
   { ruta: "/base-de-datos", enlace: "Base de datos", titulo: "Base de datos" },
   { ruta: "/memoria", enlace: "Memoria vectorizada", titulo: "Memoria vectorizada" },
   { ruta: "/herramientas", enlace: "Herramientas MCP", titulo: "Herramientas MCP" },
   { ruta: "/menu-por-rol", enlace: "Menú por rol", titulo: "Menú por rol" },
   { ruta: "/usuarios", enlace: "Usuarios y roles", titulo: "Usuarios y roles" },
-  { ruta: "/sincronizacion-bpm", enlace: "Sincronización BPM", titulo: "Sincronización BPM" },
-  { ruta: "/gastos-fijos", enlace: "Gastos fijos", titulo: "Gastos fijos" },
 ];
 
 describe("login", () => {
@@ -123,6 +126,197 @@ describe("login", () => {
 
     expect(auth.logout).toHaveBeenCalledTimes(1);
   });
+
+  it("Configuración (menú de usuario) abre el diálogo y al cerrarlo devuelve el foco al botón de usuario", async () => {
+    prepararFetch();
+
+    montar("/chat");
+
+    const botonUsuario = await screen.findByRole("button", { name: /^ana/ });
+    fireEvent.click(botonUsuario);
+    fireEvent.click(screen.getByRole("menuitem", { name: "Configuración" }));
+    expect(screen.getByRole("dialog", { name: "Apariencia" })).toBeTruthy();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Apariencia" })).toBeNull());
+    expect(document.activeElement).toBe(botonUsuario);
+  });
+});
+
+describe("estados de carga y error con reintento", () => {
+  it("Estado del lab muestra esqueletos con aviso mientras comprueba los servicios", async () => {
+    prepararFetch();
+    vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>(() => {})));
+
+    montar("/estado");
+
+    expect(await screen.findByText("Comprobando servicios…")).toBeTruthy();
+    expect(document.querySelectorAll("main .animate-pulse").length).toBeGreaterThan(0);
+  });
+
+  it("Base de datos: si falla la carga ofrece Reintentar y luego muestra las sesiones", async () => {
+    let llamadas = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        if (String(input).endsWith("/sessions")) {
+          llamadas += 1;
+          // Las dos primeras llamadas son la del historial del shell y la de la página; fallan ambas.
+          return llamadas <= 2
+            ? new Response("", { status: 500 })
+            : new Response(
+                JSON.stringify([{ id: "3f9c0000000000000000a21e", lastUpdateTime: 1_790_000_000, state: { titulo: "Sesión recuperada" } }]),
+                { status: 200 },
+              );
+        }
+        return new Response("[]", { status: 200 });
+      }),
+    );
+
+    montar("/base-de-datos");
+
+    const panel = await screen.findByRole("tabpanel");
+    const alerta = await within(panel).findByRole("alert");
+    expect(alerta.textContent).toBeTruthy();
+    fireEvent.click(within(panel).getByRole("button", { name: "Reintentar" }));
+
+    expect(await within(panel).findByText("Sesión recuperada")).toBeTruthy();
+    expect(within(panel).queryByRole("alert")).toBeNull();
+  });
+
+  it("Menú por rol: si falla ofrece Reintentar y luego muestra las opciones", async () => {
+    let llamadas = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        if (String(input) === "/api/menu") {
+          llamadas += 1;
+          return llamadas === 1 ? new Response("", { status: 503 }) : new Response(JSON.stringify(menu), { status: 200 });
+        }
+        return new Response("[]", { status: 200 });
+      }),
+    );
+
+    montar("/menu-por-rol");
+
+    expect(await screen.findByRole("alert")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Reintentar" }));
+
+    const menuUsuario = await screen.findByRole("region", { name: "Menú de ana" });
+    expect(await within(menuUsuario).findByText("Reportes")).toBeTruthy();
+    expect(within(menuUsuario).queryByRole("alert")).toBeNull();
+  });
+
+  it("Recientes: si falla el historial ofrece Reintentar y lo recupera", async () => {
+    let llamadas = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        if (String(input).endsWith("/sessions")) {
+          llamadas += 1;
+          return llamadas === 1
+            ? new Response("", { status: 500 })
+            : new Response(JSON.stringify([{ id: "a1", lastUpdateTime: 1_790_000_000, state: { titulo: "Chat recuperado" } }]), { status: 200 });
+        }
+        return new Response("[]", { status: 200 });
+      }),
+    );
+
+    montar("/estado");
+
+    const nav = await screen.findByRole("navigation", { name: "Historial de chats" });
+    expect(await within(nav).findByRole("alert")).toBeTruthy();
+    fireEvent.click(within(nav).getByRole("button", { name: "Reintentar" }));
+
+    expect(await within(nav).findByText("Chat recuperado")).toBeTruthy();
+  });
+});
+
+describe("accesibilidad del shell", () => {
+  it("el skip link es lo primero que se alcanza con Tab y manda el foco al contenido principal", async () => {
+    prepararFetch();
+
+    montar("/estado");
+
+    const salto = await screen.findByRole("link", { name: "Saltar al contenido principal" });
+    expect(salto.getAttribute("href")).toBe("#contenido-principal");
+    fireEvent.click(salto);
+    const principal = screen.getByRole("main");
+    expect(principal.id).toBe("contenido-principal");
+    expect(document.activeElement).toBe(principal);
+  });
+
+  it.each([
+    ["/estado", "Estado del lab · Lara"],
+    ["/agentes", "Agentes · Lara"],
+    ["/finanzas/tarjetas", "Finanzas · Tarjetas y pagos · Lara"],
+    ["/chat", "Chat · Lara"],
+  ])("el título del documento de %s es %s", async (ruta, titulo) => {
+    prepararFetch();
+
+    montar(ruta);
+
+    await waitFor(() => expect(document.title).toBe(titulo));
+  });
+
+  it("el login tiene su propio título", async () => {
+    auth.init.mockResolvedValue(null);
+    prepararFetch();
+
+    montar("/chat");
+
+    await screen.findByRole("button", { name: "Continuar con Keycloak" });
+    expect(document.title).toBe("Iniciar sesión · Lara");
+  });
+
+  it("las pestañas de tablas de Base de datos usan tabindex itinerante, flechas y relación con su panel", async () => {
+    prepararFetch();
+
+    montar("/base-de-datos");
+
+    const lista = await screen.findByRole("tablist", { name: "Tablas" });
+    const [sessions, events] = within(lista).getAllByRole("tab");
+    expect(sessions.getAttribute("tabindex")).toBe("0");
+    expect(events.getAttribute("tabindex")).toBe("-1");
+
+    sessions.focus();
+    fireEvent.keyDown(sessions, { key: "ArrowRight" });
+
+    expect(events.getAttribute("aria-selected")).toBe("true");
+    expect(document.activeElement).toBe(events);
+    const panel = screen.getByRole("tabpanel");
+    expect(panel.getAttribute("aria-labelledby")).toBe(events.id);
+    expect(events.getAttribute("aria-controls")).toBe(panel.id);
+  });
+});
+
+describe("aviso de ADR-0007 junto al campo del chat", () => {
+  function descripcionDe(campo: HTMLElement): string {
+    const id = campo.getAttribute("aria-describedby");
+    return (id && document.getElementById(id)?.textContent) || "";
+  }
+
+  it("el chat nuevo lo muestra enlazado al campo de mensaje, sin botón de cerrar y sin localStorage", async () => {
+    prepararFetch();
+    localStorage.clear();
+
+    montar("/chat");
+
+    const campo = await screen.findByRole("textbox", { name: "Mensaje para Lara" });
+    expect(descripcionDe(campo)).toContain("se envía al proveedor del modelo");
+    expect(screen.queryByRole("button", { name: /cerrar aviso|descartar/i })).toBeNull();
+    expect(localStorage.length).toBe(0);
+  });
+
+  it("el asistente de Finanzas también lo muestra junto a su campo", async () => {
+    prepararFetch();
+
+    montar("/finanzas/resumen");
+
+    const campo = await screen.findByRole("textbox", { name: "Mensaje para el asistente de finanzas" });
+    expect(descripcionDe(campo)).toContain("No incluyas datos reales");
+  });
 });
 
 describe("sidebar y rutas", () => {
@@ -144,6 +338,34 @@ describe("sidebar y rutas", () => {
     expect(screen.getByRole("link", { name: vista.enlace }).getAttribute("aria-current")).toBe("page");
   });
 
+  it.each(vistasLaboratorio)(
+    "Laboratorio: la entrada $enlace abre su vista y marca aria-current",
+    async (vista) => {
+      prepararFetch();
+
+      montar(vista.ruta);
+
+      expect(await screen.findByRole("heading", { name: vista.titulo, level: 1 })).toBeTruthy();
+      expect(screen.getByRole("link", { name: vista.enlace }).getAttribute("aria-current")).toBe("page");
+      expect(screen.getByRole("button", { name: "Volver al chat" })).toBeTruthy();
+    },
+  );
+
+  it("el menú de usuario abre Configuración y lleva a Laboratorio", async () => {
+    prepararFetch();
+
+    montar("/chat");
+    fireEvent.click(await screen.findByRole("button", { name: /^ana/ }));
+
+    const menu = screen.getByRole("menu", { name: "Usuario" });
+    expect(within(menu).getByRole("menuitem", { name: "Configuración" })).toBeTruthy();
+
+    fireEvent.click(within(menu).getByRole("menuitem", { name: "Laboratorio" }));
+
+    expect(await screen.findByRole("heading", { name: "Agentes", level: 1 })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "LABORATORIO", level: 2 })).toBeTruthy();
+  });
+
   it("no ofrece MENÚ, Buscar chats, Configuración ni la entrada Chat suelta", async () => {
     prepararFetch([], menu);
 
@@ -152,33 +374,46 @@ describe("sidebar y rutas", () => {
 
     expect(screen.queryByText("MENÚ")).toBeNull();
     expect(screen.queryByText("Buscar chats")).toBeNull();
-    expect(screen.queryByLabelText("Configuración")).toBeNull();
+    expect(screen.queryByText("Configuración")).toBeNull();
     expect(screen.queryByRole("link", { name: "Chat" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Reportes" })).toBeNull();
-    for (const titulo of ["AGENTES", "IDENTIDAD", "PERSONAL · SOLO LOCAL", "RECIENTES"]) {
+    expect(screen.queryByText("LABORATORIO")).toBeNull();
+    for (const titulo of ["PERSONAL · SOLO LOCAL", "RECIENTES"]) {
       expect(screen.getByText(titulo)).toBeTruthy();
     }
     expect(screen.getByText("ver-menu · LOCAL")).toBeTruthy();
   });
 
-  it("contrae y vuelve a mostrar la barra lateral", async () => {
+  it("contrae a un riel de iconos y vuelve a mostrar la barra lateral completa", async () => {
     prepararFetch();
 
     montar("/chat");
     fireEvent.click(await screen.findByRole("button", { name: "Contraer barra lateral" }));
 
-    expect(screen.queryByRole("link", { name: "Agentes" })).toBeNull();
+    // Contraída: el riel sigue ofreciendo el enlace como ícono (con título), pero ya no muestra RECIENTES.
+    expect(screen.getByRole("link", { name: "Estado del lab" })).toBeTruthy();
+    expect(screen.queryByText("RECIENTES")).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Mostrar barra lateral" }));
 
-    expect(screen.getByRole("link", { name: "Agentes" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Estado del lab" })).toBeTruthy();
+    expect(screen.getByText("RECIENTES")).toBeTruthy();
   });
 
   it("Nuevo chat lleva a /chat desde otra vista", async () => {
     prepararFetch();
 
-    montar("/agentes");
+    montar("/gastos-fijos");
     fireEvent.click(await screen.findByRole("button", { name: "Nuevo chat" }));
+
+    expect(await screen.findByRole("heading", { name: /Hola, ana/ })).toBeTruthy();
+  });
+
+  it("Volver al chat lleva a /chat desde una vista de Laboratorio", async () => {
+    prepararFetch();
+
+    montar("/agentes");
+    fireEvent.click(await screen.findByRole("button", { name: "Volver al chat" }));
 
     expect(await screen.findByRole("heading", { name: /Hola, ana/ })).toBeTruthy();
   });
@@ -216,9 +451,35 @@ describe("sidebar y rutas", () => {
     expect((await screen.findByRole("tab", { name: "Gastos" })).getAttribute("aria-selected")).toBe("true");
     expect(screen.getByRole("link", { name: "Finanzas" }).getAttribute("aria-current")).toBe("page");
 
-    fireEvent.click(screen.getByRole("tab", { name: "Trading MX" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Inversiones" }));
 
-    expect(screen.getByRole("tab", { name: "Trading MX" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("tab", { name: "Inversiones" }).getAttribute("aria-selected")).toBe("true");
+  });
+
+  it("las rutas viejas Trading MX y Trading USA redirigen a Inversiones con su cuenta", async () => {
+    prepararFetch();
+
+    montar("/finanzas/trading-mx");
+
+    expect(
+      (await screen.findByRole("tab", { name: "Inversiones" })).getAttribute("aria-selected"),
+    ).toBe("true");
+    const grupo = await screen.findByRole("group", { name: "Cuenta" });
+    expect(within(grupo).getByRole("button", { name: "MX · MXN" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.queryByRole("tab", { name: /Trading/ })).toBeNull();
+    cleanup();
+
+    montar("/finanzas/trading-usa");
+
+    expect(
+      (await screen.findByRole("tab", { name: "Inversiones" })).getAttribute("aria-selected"),
+    ).toBe("true");
+    expect(
+      within(await screen.findByRole("group", { name: "Cuenta" }))
+        .getByRole("button", { name: "USA · USD" })
+        .getAttribute("aria-pressed"),
+    ).toBe("true");
+    expect(document.title).toBe("Finanzas · Inversiones · Lara");
   });
 
   it("sin ver_agentes, ver_identidad ni ver-finanzas no renderiza esas secciones en el DOM", async () => {
@@ -229,7 +490,7 @@ describe("sidebar y rutas", () => {
 
     expect(await screen.findByRole("heading", { name: /Hola, beto/ })).toBeTruthy();
     expect(screen.getByText("Estado del lab")).toBeTruthy();
-    for (const titulo of ["AGENTES", "IDENTIDAD", "PERSONAL · SOLO LOCAL"]) {
+    for (const titulo of ["PERSONAL · SOLO LOCAL", "LABORATORIO"]) {
       expect(screen.queryByText(titulo)).toBeNull();
     }
     for (const enlace of [
@@ -239,7 +500,6 @@ describe("sidebar y rutas", () => {
       "Herramientas MCP",
       "Menú por rol",
       "Usuarios y roles",
-      "Sincronización BPM",
       "Finanzas",
       "Gastos fijos",
     ]) {
@@ -277,14 +537,40 @@ describe("sidebar y rutas", () => {
 });
 
 describe("pantallas con datos", () => {
-  it("estados vacíos con el texto exacto de la regla", async () => {
+  it("los estados vacíos explican la carencia en lenguaje claro", async () => {
     prepararFetch();
 
     montar("/memoria");
 
+    const campo = await screen.findByPlaceholderText("¿Qué quieres encontrar?");
+    fireEvent.change(campo, { target: { value: "zzz-sin-resultados" } });
+    fireEvent.submit(campo.closest("form")!);
+
     expect(
-      await screen.findByText("Sin datos todavía · Fuente: memory service / RAG · Pendiente: EXT-01"),
+      await screen.findByText("No encontramos fragmentos relacionados. Prueba con otras palabras o colecciones."),
     ).toBeTruthy();
+  });
+
+  it.each([
+    "/estado",
+    "/agentes",
+    "/base-de-datos",
+    "/memoria",
+    "/herramientas",
+    "/menu-por-rol",
+    "/usuarios",
+    "/gastos-fijos",
+    "/finanzas/resumen",
+  ])("%s no muestra claves del backlog ni 'Pendiente:' al usuario", async (ruta) => {
+    prepararFetch();
+
+    montar(ruta);
+
+    await screen.findByRole("heading", { level: 1 });
+    await waitFor(() => expect(screen.queryByText(/^(Cargando|Comprobando)/)).toBeNull());
+    const texto = document.querySelector("main")?.textContent ?? "";
+    expect(texto).not.toMatch(/\b(?:AG|UI|EXT|FIN|BPM|KC|FE|QA|OBS)-\d{2}\b/);
+    expect(texto).not.toMatch(/Pendiente:|Sin datos todavía/);
   });
 
   it("Estado del lab muestra un servicio arriba y otro sin respuesta", async () => {
@@ -310,9 +596,7 @@ describe("pantallas con datos", () => {
     const tarjetaFinanzas = screen.getByText("finanzas", { selector: "span" }).closest("section");
     expect(within(tarjetaFinanzas as HTMLElement).getByText("Sin respuesta")).toBeTruthy();
     expect(screen.queryByText("kc-front")).toBeNull();
-    expect(
-      screen.getByText("Sin datos todavía · Fuente: health check de Java A2A · Pendiente: AG-02"),
-    ).toBeTruthy();
+    expect(screen.getAllByText("Aún no hay comprobación de salud para este servicio.")).toHaveLength(3);
   });
 
   it("Base de datos lista las sesiones del usuario y deja vacías las demás tablas", async () => {
@@ -335,8 +619,9 @@ describe("pantallas con datos", () => {
     fireEvent.click(screen.getByRole("tab", { name: "events" }));
 
     expect(
-      screen.getByText("Sin datos todavía · Fuente: ADK API server · tabla events · Pendiente: AG-05"),
+      await screen.findByText("SELECT id, session_id, author, timestamp, content FROM events ORDER BY timestamp DESC LIMIT 20;"),
     ).toBeTruthy();
+    expect(screen.getByText("evt_demo_001")).toBeTruthy();
   });
 
   it("Menú por rol muestra las opciones de /api/menu del usuario actual", async () => {
@@ -344,10 +629,11 @@ describe("pantallas con datos", () => {
 
     montar("/menu-por-rol");
 
-    expect(await screen.findByText("Reportes")).toBeTruthy();
-    expect(screen.getByText("consultar")).toBeTruthy();
-    expect(screen.getByText("exportar")).toBeTruthy();
-    expect(screen.getByText("roles: ver-menu")).toBeTruthy();
+    const menuUsuario = await screen.findByRole("region", { name: "Menú de ana" });
+    expect(await within(menuUsuario).findByText("Reportes")).toBeTruthy();
+    expect(within(menuUsuario).getByText("consultar")).toBeTruthy();
+    expect(within(menuUsuario).getByText("exportar")).toBeTruthy();
+    expect(within(menuUsuario).getByText("roles: ver-menu")).toBeTruthy();
     expect(screen.getByText("La acción también se valida en el backend.")).toBeTruthy();
     expect(fetchMock.mock.calls.filter(([url]) => url === "/api/menu")).toHaveLength(1);
   });

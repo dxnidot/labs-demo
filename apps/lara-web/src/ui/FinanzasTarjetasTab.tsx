@@ -3,33 +3,48 @@ import type { EventoCalendario } from "../domain/EventoCalendario";
 import type { Tarjeta } from "../domain/Tarjeta";
 import type { FinanzasPort } from "../application/ports/FinanzasPort";
 import { AlternarEstadoTarjeta } from "../application/use-cases/AlternarEstadoTarjeta";
-import { Card } from "./components/Card";
-import { Tag } from "./components/Tag";
-import { claseFocoInterno } from "./components/foco";
-import { enmascarar, fechaConDiaSemana } from "./finanzasFormato";
+import { CalendarioPagos, idCalendarioPagos } from "./CalendarioPagos";
+import { claseBotonSobreResaltado, ProximoPago } from "./components/ProximoPago";
+import { EstadoVacio } from "./components/EstadoVacio";
+import { Pill } from "./components/Pill";
+import { Switch } from "./components/Switch";
+import { diasEntre, enmascarar, textoEnDias } from "./finanzasFormato";
+import { comportamientoDeScroll } from "./movimientoReducido";
 
 interface FinanzasTarjetasTabProps {
   eventos: EventoCalendario[];
   finanzas: FinanzasPort;
+  /** Fecha de hoy AAAA-MM-DD. */
+  hoy: string;
   onTarjetaActualizada: (tarjeta: Tarjeta) => void;
   tarjetas: Tarjeta[];
 }
 
+function contar(cantidad: number, singular: string): string {
+  return `${cantidad} ${cantidad === 1 ? singular : `${singular}s`}`;
+}
+
 /**
- * Tabla de tarjetas con interruptor de activa y calendario de los próximos 30 días.
+ * Tarjetas y pagos: bloque de próximo pago, "Mis tarjetas" como tiles con interruptor de activa y el calendario
+ * del mes en cuadrícula. Las tarjetas inactivas quedan fuera del calendario.
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Foco del switch hacia adentro para que la tabla con scroll no lo recorte.
+ * @modified Daniel Tovar 2026-10-10 Usa el componente Switch (44px táctiles y pista apagada con contraste).
+ * @modified Daniel Tovar 2026-10-10 Rediseño según el mockup 14: próximo pago, tiles y calendario en cuadrícula.
  */
 export function FinanzasTarjetasTab({
   eventos,
   finanzas,
+  hoy,
   onTarjetaActualizada,
   tarjetas,
 }: FinanzasTarjetasTabProps) {
   const [actualizando, setActualizando] = useState<ReadonlySet<string>>(() => new Set());
   const [error, setError] = useState<string | null>(null);
-  const eventosPorFecha = agruparEventos(eventos);
+  const pagos = eventos.filter((evento) => evento.tipo === "PAGO");
+  const proximoPago = pagos[0];
+  const activas = tarjetas.filter((tarjeta) => tarjeta.activa).length;
 
   async function cambiarEstado(tarjeta: Tarjeta) {
     setError(null);
@@ -51,8 +66,29 @@ export function FinanzasTarjetasTab({
     }
   }
 
+  function irAlCalendario() {
+    const calendario = document.getElementById(idCalendarioPagos);
+    if (typeof calendario?.scrollIntoView === "function") {
+      calendario.scrollIntoView({ behavior: comportamientoDeScroll(), block: "start" });
+    }
+    // Con el calendario cargado el foco va al día seleccionado (las flechas ya responden); si no, a la tarjeta.
+    const dia = calendario?.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"]');
+    (dia ?? calendario)?.focus({ preventScroll: true });
+  }
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
+      <ProximoPago
+        accion={
+          <button className={claseBotonSobreResaltado} onClick={irAlCalendario} type="button">
+            Ver calendario
+          </button>
+        }
+        evento={proximoPago}
+        hoy={hoy}
+        tarjeta={tarjetas.find((tarjeta) => tarjeta.alias === proximoPago?.alias)}
+      />
+
       {error && (
         <p
           className="m-0 rounded-card border border-border bg-surface-active px-4 py-3 text-sm text-danger"
@@ -62,117 +98,91 @@ export function FinanzasTarjetasTab({
         </p>
       )}
 
-      {tarjetas.length === 0 ? (
-        <Card>
-          <p className="m-0 text-sm text-muted">
-            Aún no tienes tarjetas. Cárgalas desde el chat de Finanzas.
-          </p>
-        </Card>
-      ) : (
-        <Card className="overflow-hidden" relleno="ninguno">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[620px] border-collapse text-left text-[13px]">
-              <caption className="sr-only">Tarjetas registradas</caption>
-              <thead>
-                <tr className="border-b border-divider bg-surface text-muted">
-                  <th className="px-3.5 py-2.5 font-medium" scope="col">tarjeta</th>
-                  <th className="px-3.5 py-2.5 font-medium" scope="col">últimos 4</th>
-                  <th className="px-3.5 py-2.5 font-medium" scope="col">corte</th>
-                  <th className="px-3.5 py-2.5 font-medium" scope="col">pago</th>
-                  <th className="px-3.5 py-2.5 font-medium" scope="col">MSI anticipado</th>
-                  <th className="px-3.5 py-2.5 font-medium" scope="col">activa</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tarjetas.map((tarjeta) => (
-                  <tr
-                    className="border-b border-divider text-text-2 last:border-0"
-                    key={tarjeta.id}
-                  >
-                    <th className="px-3.5 py-3 font-normal" scope="row">{tarjeta.alias}</th>
-                    <td className="px-3.5 py-3 font-mono">{enmascarar(tarjeta.ultimos4)}</td>
-                    <td className="px-3.5 py-3 font-mono">día {tarjeta.diaCorte}</td>
-                    <td className="px-3.5 py-3 font-mono">día {tarjeta.diaPago}</td>
-                    <td className="px-3.5 py-3">
-                      {tarjeta.permiteLiquidarMsiAnticipado ? "Sí" : "No"}
-                    </td>
-                    <td className="px-3.5 py-3">
-                      <button
-                        aria-checked={tarjeta.activa}
-                        aria-label={`${tarjeta.alias} activa`}
-                        className={`relative h-6 w-10 rounded-pill border-0 p-0 transition-colors disabled:opacity-50 ${claseFocoInterno} ${
-                          tarjeta.activa ? "bg-accent" : "bg-neutral-700"
-                        }`}
-                        disabled={actualizando.has(tarjeta.id)}
-                        onClick={() => void cambiarEstado(tarjeta)}
-                        role="switch"
-                        type="button"
-                      >
-                        <span
-                          aria-hidden="true"
-                          className={`absolute top-[3px] size-[18px] rounded-pill ${
-                            tarjeta.activa ? "left-[19px] bg-accent-ink" : "left-[3px] bg-text"
-                          }`}
-                        />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
+      <section aria-labelledby="titulo-mis-tarjetas" className="flex flex-col gap-3">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="m-0 text-base font-semibold" id="titulo-mis-tarjetas">
+            Mis tarjetas
+          </h2>
+          <span className="text-compact text-faint">
+            {contar(activas, "activa")} · {contar(tarjetas.length - activas, "inactiva")}
+          </span>
+        </div>
 
-      <Card aria-labelledby="calendario-titulo">
-        <h2 className="m-0 text-base font-semibold" id="calendario-titulo">
-          Próximos 30 días
-        </h2>
-        {eventos.length === 0 ? (
-          <p className="m-0 text-sm text-muted">
-            No hay cortes ni pagos programados en los próximos 30 días.
-          </p>
+        {tarjetas.length === 0 ? (
+          <EstadoVacio mensaje="Aún no tienes tarjetas. Cárgalas desde el asistente de Finanzas." />
         ) : (
-          <ol className="m-0 flex list-none flex-col gap-3.5 p-0">
-            {eventosPorFecha.map(([fecha, delDia]) => (
-              <li className="flex flex-col gap-1.5" key={fecha}>
-                <h3 className="m-0 font-mono text-xs font-normal uppercase text-faint">
-                  {fechaConDiaSemana(fecha)}
-                </h3>
-                <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-                  {delDia.map((evento, indice) => (
-                    <li
-                      className="flex items-center gap-2.5 text-sm"
-                      key={`${evento.tipo}-${evento.alias}-${indice}`}
-                    >
-                      <Tag suave={evento.tipo === "CORTE"}>
-                        {evento.tipo === "PAGO" ? "pago" : "corte"}
-                      </Tag>
-                      {evento.alias}
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ol>
+          <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(13.75rem,1fr))] gap-3 p-0">
+            {tarjetas.map((tarjeta) => {
+              const pago = pagos.find((evento) => evento.alias === tarjeta.alias);
+              const esElProximo = pago !== undefined && pago === proximoPago;
+              return (
+                <li
+                  className={`flex min-w-0 flex-col gap-3 rounded-card border bg-surface p-4 ${
+                    tarjeta.activa ? "border-border" : "border-dashed border-border"
+                  }`}
+                  key={tarjeta.id}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className={`m-0 text-body font-semibold ${tarjeta.activa ? "" : "text-muted"}`}>
+                      {tarjeta.alias}
+                    </h3>
+                    <Switch
+                      activo={tarjeta.activa}
+                      deshabilitado={actualizando.has(tarjeta.id)}
+                      etiqueta={`${tarjeta.alias} activa`}
+                      onCambiar={() => void cambiarEstado(tarjeta)}
+                    />
+                  </div>
+                  <span className={`font-mono text-body tracking-wide ${tarjeta.activa ? "text-text-2" : "text-faint"}`}>
+                    {enmascarar(tarjeta.ultimos4)}
+                  </span>
+                  <dl className="m-0 grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex flex-col gap-0.5">
+                      <dt className="text-label uppercase text-faint">Corte</dt>
+                      <dd className={`num m-0 ${tarjeta.activa ? "" : "text-muted"}`}>día {tarjeta.diaCorte}</dd>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <dt className="text-label uppercase text-faint">Pago</dt>
+                      <dd className={`num m-0 ${tarjeta.activa ? "" : "text-muted"}`}>día {tarjeta.diaPago}</dd>
+                    </div>
+                  </dl>
+                  <div className="flex items-center justify-between gap-2 border-t border-border pt-2.5">
+                    {tarjeta.activa ? (
+                      pago ? (
+                        <span
+                          className={`num inline-flex items-center rounded-pill px-2 py-0.5 text-xs ${
+                            esElProximo
+                              ? "bg-highlight font-semibold text-highlight-ink"
+                              : "bg-surface-active text-text-2"
+                          }`}
+                        >
+                          Pago {textoEnDias(diasEntre(hoy, pago.fecha))}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-faint">Sin pago en 30 días</span>
+                      )
+                    ) : (
+                      <Pill contorno>Inactiva</Pill>
+                    )}
+                    <span className="text-xs text-faint">
+                      {tarjeta.activa
+                        ? `MSI: ${tarjeta.permiteLiquidarMsiAnticipado ? "sí" : "no"}`
+                        : "fuera del calendario"}
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         )}
-        <p className="m-0 text-xs text-faint">
-          Las tarjetas inactivas no aparecen. Fines de semana y feriados: regla pendiente.
-        </p>
-      </Card>
+      </section>
+
+      <CalendarioPagos
+        fechaInicial={proximoPago?.fecha}
+        finanzas={finanzas}
+        hoy={hoy}
+        tarjetas={tarjetas}
+      />
     </div>
   );
-}
-
-function agruparEventos(eventos: EventoCalendario[]): Array<[string, EventoCalendario[]]> {
-  const grupos = new Map<string, EventoCalendario[]>();
-  for (const evento of eventos) {
-    const grupo = grupos.get(evento.fecha);
-    if (grupo) {
-      grupo.push(evento);
-    } else {
-      grupos.set(evento.fecha, [evento]);
-    }
-  }
-  return Array.from(grupos.entries());
 }

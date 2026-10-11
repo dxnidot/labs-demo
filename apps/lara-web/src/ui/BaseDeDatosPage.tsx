@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react";
 import { ListarSesiones } from "../application/use-cases/ListarSesiones";
 import type { SesionChat } from "../domain/SesionChat";
+import type { ConsultaTablaAdk } from "../domain/TablaAdk";
 import type { Usuario } from "../domain/Usuario";
-import { AdkAgenteAdapter } from "../infrastructure/adapters/AdkAgenteAdapter";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import type { BaseDatosPort } from "../application/ports/BaseDatosPort";
+import { adaptadores } from "../infrastructure/composition";
+import { AvisoCarga, EsqueletoTabla } from "./components/Esqueleto";
+import { EstadoError } from "./components/EstadoError";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { claseFocoInterno } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
+import { Pill } from "./components/Pill";
+import { alPulsarTeclaEnPestanas } from "./pestanasTeclado";
 import { useScrollPestanaActiva } from "./useScrollPestanaActiva";
 
-const listarSesiones = new ListarSesiones(new AdkAgenteAdapter(keycloakAuthAdapter));
+const listarSesiones = new ListarSesiones(adaptadores.agente);
 const tablas = ["sessions", "events", "app_states", "user_states"] as const;
 type Tabla = (typeof tablas)[number];
 const columnas = ["id", "título", "origen", "última actualización"];
 const celda = "border-b border-border px-3.5 py-3 text-text-2";
+const encabezado = "border-b border-border bg-surface px-3.5 py-2.5 text-left font-medium text-muted";
 
 function abreviar(id: string): string {
   return id.length > 9 ? `${id.slice(0, 4)}…${id.slice(-4)}` : id;
@@ -29,11 +35,19 @@ function formatearFecha(fecha: Date): string {
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Pestañas de tablas con flechas, tabindex itinerante y relación tab-panel.
+ * @modified Daniel Tovar 2026-10-10 Adaptador desde el composition root (VITE_USE_MOCKS).
+ * @modified Daniel Tovar 2026-10-10 Esqueleto de carga, vacíos sin jerga y error con reintento.
+ * @modified Daniel Tovar 2026-10-10 Añade consultas SQL ficticias para las tablas adicionales de ADK.
  */
-export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
+export function BaseDeDatosPage({ usuario, baseDatos }: { usuario: Usuario; baseDatos: BaseDatosPort }) {
   const [tabla, setTabla] = useState<Tabla>("sessions");
   const [sesiones, setSesiones] = useState<SesionChat[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [intento, setIntento] = useState(0);
+  const [consulta, setConsulta] = useState<ConsultaTablaAdk | null>(null);
+  const [errorConsulta, setErrorConsulta] = useState<string | null>(null);
+  const [intentoConsulta, setIntentoConsulta] = useState(0);
   const listaTablas = useScrollPestanaActiva(tabla);
 
   useEffect(() => {
@@ -53,36 +67,71 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
     return () => {
       activo = false;
     };
-  }, [usuario.id]);
+  }, [usuario.id, intento]);
+
+  useEffect(() => {
+    if (tabla === "sessions") return;
+    let activo = true;
+    setConsulta(null);
+    setErrorConsulta(null);
+    baseDatos.consultarTabla(tabla)
+      .then((resultado) => { if (activo) setConsulta(resultado); })
+      .catch((reason: unknown) => {
+        if (activo) setErrorConsulta(reason instanceof Error ? reason.message : "No se pudo consultar esta tabla.");
+      });
+    return () => { activo = false; };
+  }, [baseDatos, tabla, intentoConsulta]);
+
+  function reintentar() {
+    setError(null);
+    setSesiones(null);
+    setIntento((actual) => actual + 1);
+  }
+
+  function reintentarConsulta() {
+    setErrorConsulta(null);
+    setConsulta(null);
+    setIntentoConsulta((actual) => actual + 1);
+  }
 
   return (
     <PageLayout
       pestanas={
         <>
           <div className="flex flex-wrap gap-2">
-            <span className="rounded-pill border border-border px-3 py-1.5 font-mono text-xs text-text-2">
+            <Pill contorno mono>
               ADK API server · sessions
-            </span>
-            <span className="rounded-pill bg-surface-active px-3 py-1.5 font-mono text-xs text-warn">
+            </Pill>
+            <Pill mono tone="warn">
               Solo lectura
-            </span>
+            </Pill>
           </div>
 
           <div
             aria-label="Tablas"
             className="flex shrink-0 gap-1 overflow-x-auto"
+            onKeyDown={alPulsarTeclaEnPestanas}
             ref={listaTablas}
             role="tablist"
           >
             {tablas.map((nombre) => (
               <button
+                aria-controls="panel-tablas"
                 aria-selected={tabla === nombre}
-                className={`min-h-11 shrink-0 whitespace-nowrap rounded-[8px] px-3.5 font-mono text-[13px] min-[980px]:min-h-9 ${claseFocoInterno} ${
+                className={`min-h-11 shrink-0 whitespace-nowrap rounded-button px-3.5 font-mono text-compact shell:min-h-9 ${claseFocoInterno} ${
                   tabla === nombre ? "bg-surface-active text-text" : "text-muted"
                 }`}
+                id={`pestana-tabla-${nombre}`}
                 key={nombre}
-                onClick={() => setTabla(nombre)}
+                onClick={() => {
+                  setTabla(nombre);
+                  if (nombre !== "sessions") {
+                    setConsulta(null);
+                    setErrorConsulta(null);
+                  }
+                }}
                 role="tab"
+                tabIndex={tabla === nombre ? 0 : -1}
                 type="button"
               >
                 {nombre}
@@ -94,27 +143,45 @@ export function BaseDeDatosPage({ usuario }: { usuario: Usuario }) {
       subtitulo="Sesiones, eventos y estado que guarda el orquestador."
       titulo="Base de datos"
     >
-      <div role="tabpanel">
-        {tabla !== "sessions" && (
-          <EstadoVacio fuente={`ADK API server · tabla ${tabla}`} pendiente="AG-05" />
+      <div aria-labelledby={`pestana-tabla-${tabla}`} id="panel-tablas" role="tabpanel">
+        {tabla !== "sessions" && errorConsulta && <EstadoError mensaje={errorConsulta} onReintentar={reintentarConsulta} />}
+        {tabla !== "sessions" && !errorConsulta && consulta === null && (
+          <><AvisoCarga texto={`Cargando ${tabla}…`} /><EsqueletoTabla /></>
         )}
-        {tabla === "sessions" && error && (
-          <p className="m-0 text-sm text-danger" role="alert">{error}</p>
+        {tabla !== "sessions" && consulta?.filas.length === 0 && (
+          <><pre aria-label="Consulta SQL" className="mb-4 overflow-x-auto rounded-card border border-border bg-surface p-4 font-mono text-compact text-text-2">{consulta.sql}</pre><EstadoVacio mensaje="Esta tabla todavía no tiene registros guardados." /></>
         )}
+        {tabla !== "sessions" && consulta && consulta.filas.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <pre aria-label="Consulta SQL" className="overflow-x-auto rounded-card border border-border bg-surface p-4 font-mono text-compact text-text-2">{consulta.sql}</pre>
+            <div className="overflow-x-auto rounded-card border border-border">
+              <table className="w-full min-w-120 border-collapse font-mono text-compact">
+                <thead><tr>{consulta.columnas.map((columna) => <th className={encabezado} key={columna} scope="col">{columna}</th>)}</tr></thead>
+                <tbody>{consulta.filas.map((fila, indice) => (
+                  <tr key={`${consulta.tabla}-${indice}`}>{consulta.columnas.map((columna, columnaIndice) => <td className={celda} key={columna}>{fila[columnaIndice] ?? ""}</td>)}</tr>
+                ))}</tbody>
+              </table>
+            </div>
+          </div>
+        )}
+        {tabla === "sessions" && error && <EstadoError mensaje={error} onReintentar={reintentar} />}
         {tabla === "sessions" && !error && sesiones === null && (
-          <p className="m-0 text-sm text-muted" role="status">Cargando sesiones…</p>
+          <>
+            <AvisoCarga texto="Cargando sesiones…" />
+            <EsqueletoTabla />
+          </>
         )}
         {tabla === "sessions" && sesiones?.length === 0 && (
-          <EstadoVacio fuente="ADK API server · sesiones del usuario" pendiente="AG-05" />
+          <EstadoVacio mensaje="Todavía no hay sesiones guardadas." />
         )}
         {tabla === "sessions" && sesiones && sesiones.length > 0 && (
           <div className="overflow-x-auto rounded-card border border-border">
-            <table className="w-full min-w-120 border-collapse font-mono text-[13px]">
+            <table className="w-full min-w-120 border-collapse font-mono text-compact">
               <thead>
                 <tr>
                   {columnas.map((columna) => (
                     <th
-                      className="border-b border-border bg-surface px-3.5 py-2.5 text-left font-medium text-muted"
+                      className={encabezado}
                       key={columna}
                       scope="col"
                     >

@@ -1,4 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
 @import "tailwindcss";
 
 @theme {
@@ -11,64 +15,128 @@
   --color-neutral-600: #575757;
   --color-neutral-700: #434343;
   --color-neutral-800: #292929;
-  --color-neutral-900: #1a1a1a;
-  --color-neutral-950: #14171b;
-  --color-hoki-50: #f6f7f9;
-  --color-hoki-100: #eceff2;
-  --color-hoki-200: #d4dce3;
-  --color-hoki-300: #afbeca;
-  --color-hoki-400: #839bad;
-  --color-hoki-500: #678398;
-  --color-hoki-600: #4f667a;
-  --color-hoki-700: #415363;
-  --color-hoki-800: #384754;
-  --color-hoki-900: #323d48;
-  --color-hoki-950: #212830;
-  --color-bg: var(--color-neutral-950);
-  --color-sidebar: var(--color-neutral-900);
-  --color-surface: var(--color-neutral-900);
-  --color-surface-hover: var(--color-neutral-800);
-  --color-surface-active: var(--color-neutral-800);
-  --color-border: var(--color-neutral-800);
-  --color-divider: var(--color-neutral-800);
-  --color-text: var(--color-neutral-50);
-  --color-text-2: var(--color-neutral-200);
-  --color-muted: var(--color-hoki-300);
-  --color-faint: var(--color-hoki-400);
-  --color-accent: var(--color-hoki-300);
-  --color-accent-hover: var(--color-hoki-200);
-  --color-accent-ink: var(--color-hoki-950);
-  --color-highlight: var(--color-hoki-200);
-  --color-highlight-ink: var(--color-hoki-950);
-  --color-chart-1: var(--color-hoki-200);
-  --color-chart-2: var(--color-hoki-300);
-  --color-chart-3: var(--color-hoki-400);
-  --color-chart-4: var(--color-hoki-500);
-  --color-ok: var(--color-hoki-400);
-  --color-warn: var(--color-neutral-400);
-  --color-danger: var(--color-neutral-300);
+  --color-neutral-900: #131416;
+  --color-neutral-950: #0a0c0e;
+  /* Paleta pedida: claro en azules (fondo, blanco, azul brillante); oscuro en gris pizarra + cian/rosa/lavanda. */
+  --color-azul-claro: #e9f1fa;
+  --color-azul-claro-hover: #d3e6f5;
+  --color-azul-claro-borde: #c7dcec;
+  --color-azul-claro-borde-fuerte: #9fbfd9;
+  /* Tal cual lo pediste: solo sirve como FONDO (con tinta oscura) o decorativo (chart-5, que siempre
+     lleva etiqueta en texto) — como texto puro da 2.64:1 sobre blanco (se necesita 4.5:1). */
+  --color-azul-brillante: #00abe4;
+  /* Mismo matiz, oscurecido: el que carga el texto/accent/botones donde sí hace falta leerlo. */
+  --color-azul-oscuro: #006786;
+  --color-azul-hover: #007a9e;
+  --color-azul-chart-2: #0086b0;
+  --color-azul-chart-4: #004f66;
+  --color-azul-chart-5: #003347;
+  --color-texto-claro: #2b3a44;
 
-  /* Compatibility aliases keep existing component classes on the monochrome palette. */
-  --color-mint: var(--color-ok);
-  --color-butter: var(--color-warn);
-  --color-pink: var(--color-danger);
-  --color-lavender: var(--color-accent);
-  --color-peach: var(--color-accent);
-  --color-pill-accent: var(--color-neutral-800);
-  --color-pill-mint: var(--color-neutral-800);
-  --color-pill-lavender: var(--color-neutral-800);
-  --color-pill-pink: var(--color-neutral-800);
-  --color-pill-butter: var(--color-neutral-800);
-  --color-pill-peach: var(--color-neutral-800);
-  --font-sans: "IBM Plex Sans", sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  /* Oscuro provisional (monocromo), mientras se decide algo definitivo: negro carbón + grises. */
+  --color-mono-bg: #121212;
+  --color-mono-hover: #1e1e1e;
+  --color-mono-borde: #444444;
+  --color-mono-borde-fuerte: #5a5a5a;
+  --color-mono-texto: #e0e0e0;
+  --color-mono-texto-2: #b0b0b0;
+  --color-mono-acento: #888888;
+  --color-mono-acento-hover: #a0a0a0;
+  --color-mono-ink: #121212;
+  --color-mono-muted-sobre-acento: #1a1a1a;
+  --color-mono-chart-1: #d0d0d0;
+  --color-mono-chart-2: #b0b0b0;
+  --color-mono-chart-4: #707070;
+  --color-mono-chart-5: #505050;
+  /* Borde de controles: un solo valor en ambos temas, ajustado para leerse sobre blanco/azul claro
+     y sobre el gris carbón oscuro (ver src/contraste.test.ts). */
+  --color-borde-control-claro: #6b6b6b;
+  --color-borde-control-oscuro: var(--color-mono-acento);
+  /*
+   * Tokens semánticos: light-dark(claro, oscuro). Requiere color-scheme (ver :root).
+   */
+  --color-bg: light-dark(var(--color-azul-claro), var(--color-mono-bg));
+  --color-sidebar: light-dark(var(--color-neutral-50), var(--color-mono-bg));
+  --color-surface: light-dark(var(--color-neutral-50), var(--color-mono-bg));
+  --color-surface-hover: light-dark(var(--color-azul-claro-hover), var(--color-mono-hover));
+  --color-surface-active: light-dark(var(--color-azul-claro-hover), var(--color-mono-hover));
+  --color-border: light-dark(var(--color-azul-claro-borde), var(--color-mono-borde));
+  --color-divider: light-dark(var(--color-azul-claro-borde), var(--color-mono-borde));
+  --color-border-strong: light-dark(var(--color-azul-claro-borde-fuerte), var(--color-mono-borde-fuerte));
+  /* Borde de controles (inputs, composer, radios) y pista del switch apagado: >= 3:1 sobre la superficie. */
+  --color-border-control: light-dark(var(--color-borde-control-claro), var(--color-borde-control-oscuro));
+  --color-control-off: light-dark(var(--color-borde-control-claro), var(--color-borde-control-oscuro));
+  --color-text: light-dark(var(--color-neutral-950), var(--color-mono-texto));
+  --color-text-2: light-dark(var(--color-texto-claro), var(--color-mono-texto-2));
+  --color-muted: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-faint: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-accent: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-accent-hover: light-dark(var(--color-azul-hover), var(--color-mono-acento-hover));
+  --color-accent-ink: light-dark(var(--color-neutral-50), var(--color-mono-ink));
+  --color-highlight: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-highlight-ink: light-dark(var(--color-neutral-50), var(--color-mono-ink));
+  --color-highlight-muted: light-dark(var(--color-azul-claro-hover), var(--color-mono-muted-sobre-acento));
+  --color-chart-1: light-dark(var(--color-azul-chart-5), var(--color-mono-chart-1));
+  --color-chart-2: light-dark(var(--color-azul-chart-4), var(--color-mono-chart-2));
+  --color-chart-3: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-chart-4: light-dark(var(--color-azul-chart-2), var(--color-mono-chart-4));
+  --color-chart-5: light-dark(var(--color-azul-brillante), var(--color-mono-chart-5));
+  --color-ok: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-warn: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+  --color-danger: light-dark(var(--color-neutral-900), var(--color-neutral-300));
+
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Escala tipográfica de la guía (README > Tipografía) y de las maquetas. */
+  --text-label: 0.6875rem;
+  --text-label--letter-spacing: 0.08em;
+  --text-compact: 0.8125rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.6;
+  --text-heading: 1.0625rem;
+  --text-brand: 1.1875rem;
+  --text-stat: 1.375rem;
+  --text-title: 1.625rem;
+  --text-hero: 2.125rem;
+  --text-display: 2.75rem;
+  --leading-body: 1.6;
+  --leading-display: 1.1;
+  --tracking-label: 0.08em;
+
+  /* Cortes del layout (980px y 1180px). Van en rem como los de Tailwind: con unidades mezcladas el CSS
+     generado ordena mal las variantes. shell = barra lateral fija (debe coincidir con useVistaEstrecha). */
+  --breakpoint-shell: 61.25rem;
+  --breakpoint-wide: 73.75rem;
+
   --radius-button: 9px;
   --radius-card: 13px;
   --radius-composer: 16px;
   --radius-pill: 999px;
 }
 
+/* Cifras tabulares para fechas, montos y porcentajes (README > Tipografía). */
+@utility num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* "Apariencia" > Tema: data-theme en <html> (ver index.html y useApariencia). */
+:root[data-theme="claro"] {
+  color-scheme: light;
+}
+
+:root[data-theme="oscuro"] {
+  color-scheme: dark;
+}
+
+/* "Apariencia" > Fuente: data-font en <html> (ver index.html y useApariencia). */
+:root[data-font="ibm-plex-mono"] {
+  --font-sans: var(--font-mono);
+}
+
 :root {
+  /* Sin data-theme sigue la preferencia del sistema (prefers-color-scheme); Apariencia la fuerza. */
+  color-scheme: light dark;
   color: var(--color-text);
   background: var(--color-bg);
   font-synthesis: none;
@@ -101,4 +169,32 @@ textarea {
 
 *::-webkit-scrollbar {
   display: none;
+}
+
+/*
+ * Foco visible y consistente en todo control: anillo de 2px con --color-accent (>= 3:1 en ambos temas).
+ * Los componentes que lo necesitan hacia adentro (contenedores con overflow) lo sobrescriben con utilidades.
+ */
+@layer base {
+  :where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * Movimiento reducido: sin animaciones ni desplazamiento suave, y las transiciones se limitan a cambios de
+ * color (que no se perciben como movimiento), para conservar el feedback de hover y de estado.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+    transition-property: color, background-color, border-color, outline-color, opacity !important;
+  }
 }

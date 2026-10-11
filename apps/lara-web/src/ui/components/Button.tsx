@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { claseFoco } from "./foco";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "ghost";
@@ -9,6 +10,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * Botón accesible con variantes de acción principal y secundaria.
  * @author Daniel
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-10-10 Foco visible propio (antes dependía de quien lo usaba).
  */
 export function Button({
   variant = "ghost",
@@ -23,7 +25,7 @@ export function Button({
 
   return (
     <button
-      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-button px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${variantClass} ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-button px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${claseFoco} ${variantClass} ${className}`}
       {...props}
     >
       {children}

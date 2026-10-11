@@ -10,12 +10,11 @@ import {
 import type { OrigenSesion, SesionChat } from "../domain/SesionChat";
 import type { Mensaje } from "../domain/Mensaje";
 import type { ActualizacionStreaming } from "../application/ports/AgentePort";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
-import { AdkAgenteAdapter } from "../infrastructure/adapters/AdkAgenteAdapter";
+import { adaptadores } from "../infrastructure/composition";
 import { EnviarMensaje } from "../application/use-cases/EnviarMensaje";
 
-const agente = new AdkAgenteAdapter(keycloakAuthAdapter);
-const casoEnviarMensaje = new EnviarMensaje(keycloakAuthAdapter, agente);
+const agente = adaptadores.agente;
+const casoEnviarMensaje = new EnviarMensaje(adaptadores.auth, agente);
 
 interface ChatSessionsValue {
   activeSessionId: string | null;
@@ -51,6 +50,7 @@ const ChatSessionsContext = createContext<ChatSessionsValue | null>(null);
  * @modified Daniel 2026-09-30 Comparte el puerto y caso de uso de chat embebido.
  * @modified Daniel Tovar 2026-09-30 Separa la sesión del panel de finanzas y la oculta de Recientes.
  * @modified Daniel Tovar 2026-10-01 enviarMensaje exige el modeloId elegido en el chat.
+ * @modified Daniel Tovar 2026-10-10 Adaptadores desde el composition root (VITE_USE_MOCKS).
  */
 export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderProps) {
   const [todasLasSesiones, setTodasLasSesiones] = useState<SesionChat[]>([]);

@@ -1,34 +1,33 @@
 import { useCallback, useEffect, useState } from "react";
 import { ComprobarServicios } from "../application/use-cases/ComprobarServicios";
-import type { Disponibilidad, EstadoServicio } from "../domain/ServicioLab";
-import { HttpEstadoLabAdapter } from "../infrastructure/adapters/HttpEstadoLabAdapter";
+import {
+  serviciosLab,
+  serviciosPendientes,
+  type Disponibilidad,
+  type EstadoServicio,
+} from "../domain/ServicioLab";
+import { adaptadores } from "../infrastructure/composition";
 import { Card } from "./components/Card";
+import { AvisoCarga, Esqueleto } from "./components/Esqueleto";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { claseFoco } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
+import { PuntoEstado, type EstadoPunto } from "./components/PuntoEstado";
 
-const comprobarServicios = new ComprobarServicios(new HttpEstadoLabAdapter());
+const comprobarServicios = new ComprobarServicios(adaptadores.estadoLab);
 
-const serviciosPendientes = [
-  { nombre: "Java A2A", detalle: ":8002 · Java A2A", pendiente: "AG-02" },
-  { nombre: "TypeScript A2A", detalle: ":8003 · TypeScript A2A", pendiente: "AG-03" },
-  { nombre: "Open WebUI", detalle: ":3000 · RAG", pendiente: "EXT-01" },
-] as const;
-
-const leyenda: Record<Disponibilidad, { texto: string; punto: string }> = {
-  arriba: { texto: "Arriba", punto: "bg-ok" },
-  "sin-respuesta": { texto: "Sin respuesta", punto: "bg-danger" },
+const leyenda: Record<Disponibilidad, { texto: string; estado: EstadoPunto }> = {
+  arriba: { texto: "Arriba", estado: "ok" },
+  "sin-respuesta": { texto: "Sin respuesta", estado: "danger" },
 };
-
-function Punto({ clase }: { clase: string }) {
-  return <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${clase}`} />;
-}
 
 /**
  * Pantalla "Estado del lab": comprobaciones reales de salud y pendientes marcados como vacíos.
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Adaptador desde el composition root y servicios pendientes en domain/ServicioLab.
+ * @modified Daniel Tovar 2026-10-10 Esqueleto de carga y vacíos sin jerga.
  */
 export function EstadoLabPage() {
   const [estados, setEstados] = useState<EstadoServicio[] | null>(null);
@@ -46,7 +45,7 @@ export function EstadoLabPage() {
     <PageLayout
       acciones={
         <button
-          className={`inline-flex min-h-11 items-center rounded-pill border border-border px-3 text-[13px] text-text-2 hover:bg-surface-hover min-[980px]:min-h-8 ${claseFoco}`}
+          className={`inline-flex min-h-11 items-center rounded-pill border border-border px-3 text-compact text-text-2 hover:bg-surface-hover shell:min-h-8 ${claseFoco}`}
           onClick={() => void comprobar()}
           type="button"
         >
@@ -56,44 +55,51 @@ export function EstadoLabPage() {
       subtitulo="Qué está arriba en tu PC y qué sigue en el checklist."
       titulo="Estado del lab"
     >
-      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 shell:grid-cols-4">
         {estados === null && (
-          <p className="m-0 text-sm text-muted min-[980px]:col-span-4" role="status">
-            Comprobando servicios…
-          </p>
+          <>
+            <AvisoCarga texto="Comprobando servicios…" />
+            {serviciosLab.map((servicio) => (
+              <Card aria-hidden="true" key={servicio.clave}>
+                <Esqueleto className="h-5 w-2/5" />
+                <Esqueleto className="h-3 w-4/5" />
+                <Esqueleto className="h-4 w-1/4" />
+              </Card>
+            ))}
+          </>
         )}
         {estados?.map(({ servicio, disponibilidad }) => (
           <Card key={servicio.clave}>
             <div className="flex items-center gap-2.5">
-              <Punto clase={leyenda[disponibilidad].punto} />
+              <PuntoEstado estado={leyenda[disponibilidad].estado} />
               <span className="font-medium">{servicio.nombre}</span>
             </div>
             <span className="font-mono text-xs text-muted">{servicio.detalle}</span>
-            <span className="text-[13px] text-text-2">{leyenda[disponibilidad].texto}</span>
+            <span className="text-compact text-text-2">{leyenda[disponibilidad].texto}</span>
           </Card>
         ))}
         {serviciosPendientes.map((servicio) => (
           <Card key={servicio.nombre}>
             <span className="font-medium">{servicio.nombre}</span>
             <span className="font-mono text-xs text-muted">{servicio.detalle}</span>
-            <EstadoVacio fuente={`health check de ${servicio.nombre}`} pendiente={servicio.pendiente} />
+            <EstadoVacio mensaje="Aún no hay comprobación de salud para este servicio." />
           </Card>
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-4 text-[13px] text-muted">
-        <span className="inline-flex items-center gap-2"><Punto clase="bg-ok" />Arriba</span>
-        <span className="inline-flex items-center gap-2"><Punto clase="bg-danger" />Sin respuesta</span>
+      <div className="flex flex-wrap gap-4 text-compact text-muted">
+        <span className="inline-flex items-center gap-2"><PuntoEstado estado="ok" />Arriba</span>
+        <span className="inline-flex items-center gap-2"><PuntoEstado estado="danger" />Sin respuesta</span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 min-[980px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 shell:grid-cols-2">
         <Card>
           <h2 className="m-0 text-base font-semibold">Avance por parte</h2>
-          <EstadoVacio fuente="docs/plans/estado-lab.md" pendiente="UI-07" />
+          <EstadoVacio mensaje="El avance del plan aún no se muestra aquí; está en docs/plans/estado-lab.md." />
         </Card>
         <Card>
           <h2 className="m-0 text-base font-semibold">Sigue en el checklist</h2>
-          <EstadoVacio fuente="docs/plans/estado-lab.md" pendiente="UI-07" />
+          <EstadoVacio mensaje="Los siguientes pendientes aún no se muestran aquí; están en docs/plans/estado-lab.md." />
         </Card>
       </div>
     </PageLayout>

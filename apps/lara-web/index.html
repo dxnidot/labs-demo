@@ -3,8 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#111316" />
-    <title>Lara · Chat</title>
+    <!-- Iguales a --color-bg de index.css en cada tema (lo verifica src/tokens.test.ts). -->
+    <meta name="theme-color" content="#e9f1fa" media="(prefers-color-scheme: light)" data-tema="claro" data-media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)" data-tema="oscuro" data-media="(prefers-color-scheme: dark)" />
+    <title>Lara</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      // Aplica tema y fuente antes del primer render, sin parpadeo (mismas claves y valores que
+      // PreferenciasLocalStorageAdapter y aplicarApariencia.ts).
+      (function () {
+        var raiz = document.documentElement;
+        try {
+          var fuente = localStorage.getItem("lara.fuente");
+          if (fuente === "ibm-plex-sans" || fuente === "ibm-plex-mono") {
+            raiz.dataset.font = fuente;
+          }
+          var tema = localStorage.getItem("lara.tema");
+          if (tema === "claro" || tema === "oscuro") {
+            raiz.dataset.theme = tema;
+            var metas = document.querySelectorAll('meta[name="theme-color"][data-tema]');
+            for (var i = 0; i < metas.length; i++) {
+              if (metas[i].dataset.tema !== tema) {
+                metas[i].setAttribute("media", "not all");
+              }
+            }
+          }
+        } catch (error) {
+          // Sin almacenamiento: se queda la preferencia por defecto (fuente Plex Sans, tema del sistema).
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+  <title>Lara</title>
+  <!-- Mismo trazo que LaraLogo; color = --color-accent de cada tema (lo verifica src/contraste.test.ts). -->
+  <style>
+    :root { color: #006786; }
+    @media (prefers-color-scheme: dark) { :root { color: #888888; } }
+  </style>
+  <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="2" />
+  <path d="M10 8v12h9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

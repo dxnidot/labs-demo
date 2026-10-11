@@ -1,6 +1,6 @@
 # UI-09 · Pulido visual de Lara con skills de diseño y datos de relleno
 
-- Estado: Pendiente
+- Estado: En curso
 - Prioridad: Media
 - Parte del lab: C.5
 - Depende de: UI-08
@@ -15,10 +15,22 @@
 - Criterio de aceptación:
   - La fase A entrega un informe con diferencias por pantalla (contra su PNG) y no deja archivos modificados (`git status` limpio).
   - Tras la fase B, `grep -rnE "#[0-9a-fA-F]{3,8}\b" apps/lara-web/src --include=*.tsx` no encuentra colores sueltos en componentes.
-  - Tras la fase C, `VITE_USE_MOCKS=true` en `.env.example`, cada mock marcado con `// MOCK`, indicador visual discreto en modo mock, y ningún componente con datos inline ni uso de `localStorage` fuera de la clave `"lara.fuente"`.
+  - Tras la fase C, `VITE_USE_MOCKS=true` en `.env.example`, cada mock marcado con `// MOCK`, indicador visual discreto en modo mock, y ningún componente con datos inline ni uso de `localStorage` fuera de las claves `"lara.fuente"` y `"lara.tema"`.
   - Tras la fase D, no hay librería de animación nueva y existe una regla `prefers-reduced-motion`.
   - El chat muestra un aviso visible, antes de enviar el primer mensaje de la sesión y accesible desde el compositor, que dice que lo escrito se envía al proveedor del modelo; tiene prueba de componente y usa solo tokens de `index.css`.
   - `npm run build` y `npm test` terminan sin errores desde `apps/lara-web/`.
+- Tareas (fases B y C1; rama `feat/lara-ui-polish`):
+  - [x] Fase A: informe de auditoría entregado (2026-10-10), sin archivos modificados.
+  - [x] 1. `EnviarMensaje.test.ts` a UTF-8.
+  - [x] 2. Marco de 32/24/32 px del shell corregido (`libre`), con prueba y medición.
+  - [x] 3. Fuentes con Fontsource, `data-font` y diálogo Apariencia (`lara.fuente`).
+  - [x] 4. Tokens semánticos, escala tipográfica y `Pill` con 4 tonos; sin alias muertos, escalas crudas ni medidas arbitrarias (`src/tokens.test.ts`).
+  - [x] 4b. Tema claro y oscuro (`light-dark()`, `lara.tema`, sin parpadeo, contraste calculado en ambos temas); paleta clara aprobada.
+  - [x] Aviso fijo de ADR-0007 junto al campo del chat (inicio, conversación y asistente de Finanzas).
+  - [x] 5. Accesibilidad: foco, switch, áreas de 44 px, pestañas con flechas, skip link, título por vista, favicon y `prefers-reduced-motion`.
+  - [x] 6. Mocks (`VITE_USE_MOCKS`, `.env.example`, composition root, pill MOCK) para `AuthPort`, `AgentePort`, `ModeloPort`, `EstadoLabPort`, `MenuPort` y `FinanzasPort`; catálogo de agentes y servicios pendientes movido a `domain/`.
+  - [x] 7. Estados comunes: carga con esqueleto (`Esqueleto`, `AvisoCarga`), vacío sin jerga de backlog (`EstadoVacio` con mensaje claro) y error con reintento (`EstadoError`) en Estado, Base de datos, Menú por rol, Finanzas, Chat, asistente de Finanzas y Recientes.
+  - [x] 8. Finanzas (12 y 14) según el mockup: pestaña Inversiones con selector MX | USA y redirección de las rutas viejas, íconos, periodo con ◀ ▶, "Actualizado hace…", banner de próximo pago, tiles de tarjetas y calendario en cuadrícula (`role="grid"`).
 - Archivos relevantes:
   - apps/lara-web/src/index.css
   - apps/lara-web/src/ui/
@@ -29,7 +41,19 @@
   - Confirmado: el repo es público; los datos de relleno son ficticios, sin datos reales ni "parecidos".
   - Confirmado: las etiquetas de la UI "kc-demo" → "kc-menu" y "finanzas" → "kc-finanzas" (`ServicioLab.ts`, `HttpEstadoLabAdapter.ts`, `MenuPorRolPage.tsx` y su test) se cambian en un commit aparte, fuera de las fases.
   - Inferido: Impeccable y las skills de Emil Kowalski sirven para la auditoría y el motion; la skill principal de Taste no debe convivir con Impeccable.
-  - Pendiente: instalar las skills de diseño a nivel de proyecto (`.claude/skills/`).
-  - Confirmado: el aviso se pide porque el chat y los resultados de las herramientas se envían al proveedor del modelo (ADR-0007, propuesta).
-  - Pendiente: redactar el texto exacto del aviso y decidir si se puede descartar o es permanente.
-  - Pendiente: aprobar el plan antes de pasar la historia a "En curso".
+  - Confirmado: las skills de diseño están instaladas a nivel de proyecto (`.claude/skills/`, registradas en `skills-lock.json`).
+  - Confirmado: el aviso se pide porque el chat y los resultados de las herramientas se envían al proveedor del modelo (ADR-0007).
+  - Confirmado: el aviso es una línea fija junto al campo del chat, sin botón de cerrar y sin `localStorage`; texto: "Lo que escribas aquí se envía al proveedor del modelo para generar la respuesta. No incluyas datos reales que no quieras compartir con él." (`AvisoProveedorModelo`).
+  - Confirmado: plan aprobado el 2026-10-10 para las fases B y C1; la fuente por defecto es IBM Plex Sans (la de los PNG y de `index.css`).
+  - Confirmado: `localStorage` admite solo `lara.fuente` y `lara.tema` (sistema, claro, oscuro; por defecto sistema), con `try/catch` y valor por defecto; reglas actualizadas en `copilot-instructions.md` y en el README de diseño.
+  - Confirmado: el tema se define con `light-dark()` y `color-scheme` (MDN: Chrome y Edge 123, Firefox 120, Safari 17.5); el oscuro conserva los valores de la guía y el claro sale de la misma paleta.
+  - Confirmado: sin `VITE_USE_MOCKS` (o con `false`) Lara usa los adaptadores reales, igual que antes; en modo mock no hay peticiones a Keycloak ni a ningún backend (verificado en navegador).
+  - Confirmado: la paleta clara fue aprobada por quien mantiene el lab (checkpoint de 4b).
+  - Confirmado: en 320 px los días del calendario miden ~30 px de ancho (WCAG 2.5.8 pide 24 px); el resto de controles de Finanzas mide 44 px.
+  - Confirmado: se corrigieron dos defectos previos: la columna "monto" de "Últimos movimientos" ya no se corta con el panel del asistente abierto (tabla de 3 columnas con el origen bajo el concepto) y el estado vacío del chat arranca arriba, con el saludo visible a 320 px.
+  - Confirmado: el test intermitente de foco al contraer la barra lateral era una carrera del componente (un efecto con estado anterior consumía el destino de foco); se corrigió con `focoAplicable`.
+  - Pendiente: Lato y NTR, que la guía visual citaba como fuentes alternativas, no están instaladas; requieren decidir y autorizar sus paquetes `@fontsource`.
+  - Confirmado: fase C (resto) hecha — vistas 05–11 y 13 pulidas contra su PNG con datos de relleno (Agentes, Base de datos ampliada, Memoria, Herramientas, Menú por rol, Usuarios y roles, Sincronización BPM y Gastos fijos), cada una con su puerto y mock, y el chat con A2A, pasos y adjuntar.
+  - Confirmado: la vista "Sincronización BPM" se quitó de Lara (no se implementará); se borraron su página, puerto, mock, dominio y rama del sidebar. El servicio `bpm-sync` en sí (BPM-01) sigue como una decisión de backend aparte, sin tocar.
+  - Pendiente: fase D (motion en CSS).
+  - Pendiente: el `Estado` de UI-09 pasará a "Hecho" solo al cerrar las fases C y D.

@@ -17,6 +17,8 @@ interface PageLayoutProps {
   flotante?: ReactNode;
   /** Contenido sin relleno ni columna interna: quien lo usa decide su propio espaciado. */
   libre?: boolean;
+  /** Centra encabezado, pestañas y contenido en una columna de ~1180px (Finanzas). */
+  anchoColumna?: boolean;
   /** Si es false el contenido no genera scroll (p. ej. el shell, cuyas vistas hijas ya lo tienen). */
   desplazable?: boolean;
   className?: string;
@@ -32,6 +34,7 @@ interface PageLayoutProps {
  * overflow, pestañas) nunca se encojan por flex-shrink dentro del contenedor con scroll.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-10-10 anchoColumna: encabezado, pestañas y contenido en una columna centrada de ~1180px (Finanzas).
  */
 export function PageLayout({
   titulo,
@@ -43,6 +46,7 @@ export function PageLayout({
   flotante,
   libre = false,
   desplazable = true,
+  anchoColumna = false,
   className = "",
   contenidoClassName = "",
   contenidoProps,
@@ -50,6 +54,7 @@ export function PageLayout({
   children,
 }: PageLayoutProps) {
   const relleno = libre ? "" : "px-4 pb-4 pt-6 sm:px-8 sm:pb-8";
+  const columna = anchoColumna ? "mx-auto w-full max-w-295" : "";
   const scroll = desplazable ? "overflow-y-auto" : "flex flex-col overflow-hidden";
   return (
     <div className={`flex min-h-0 min-w-0 flex-1 flex-col ${className}`}>
@@ -60,20 +65,22 @@ export function PageLayout({
       ) : (
         titulo && (
           <header
-            className="flex shrink-0 flex-wrap items-end justify-between gap-4 px-4 pt-4 sm:px-8 sm:pt-8"
+            className="shrink-0 px-4 pt-4 sm:px-8 sm:pt-8"
             data-slot="page-header"
           >
-            <div className="flex min-w-0 flex-col gap-2">
-              <h1 className="m-0 text-[1.625rem] font-semibold">{titulo}</h1>
-              {subtitulo && <p className="m-0 text-sm text-muted">{subtitulo}</p>}
+            <div className={`flex flex-wrap items-end justify-between gap-4 ${columna}`}>
+              <div className="flex min-w-0 flex-col gap-2">
+                <h1 className="m-0 text-title font-semibold">{titulo}</h1>
+                {subtitulo && <p className="m-0 text-sm text-muted">{subtitulo}</p>}
+              </div>
+              {acciones}
             </div>
-            {acciones}
           </header>
         )
       )}
       {pestanas && (
-        <div className="flex shrink-0 flex-col gap-4 px-4 pt-5 sm:px-8" data-slot="page-tabs">
-          {pestanas}
+        <div className="shrink-0 px-4 pt-5 sm:px-8" data-slot="page-tabs">
+          <div className={`flex flex-col gap-4 ${columna}`}>{pestanas}</div>
         </div>
       )}
       <div className="relative flex min-h-0 flex-1 flex-col">
@@ -83,7 +90,11 @@ export function PageLayout({
           ref={contenidoRef}
           {...contenidoProps}
         >
-          {libre || !desplazable ? children : <div className="flex flex-col gap-6">{children}</div>}
+          {libre || !desplazable ? (
+            children
+          ) : (
+            <div className={`flex flex-col gap-6 ${columna}`}>{children}</div>
+          )}
         </div>
         {flotante}
       </div>

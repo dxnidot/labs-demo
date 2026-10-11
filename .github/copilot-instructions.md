@@ -39,7 +39,7 @@ Laboratorio personal en Windows (`D:\dev\labs`, PowerShell). Repo **público**. 
 ## UI de Lara y datos de relleno
 
 - Tokens solo desde `apps/lara-web/src/index.css`; nunca colores sueltos en componentes.
-- `localStorage` está prohibido, con una única excepción: la clave `"lara.fuente"` (fuente elegida en Apariencia; preferencia visual no sensible), siempre con `try/catch` y valor por defecto IBM Plex Mono. Nada más va a `localStorage`, tampoco los mocks.
+- `localStorage` está prohibido, con dos excepciones: la clave `"lara.fuente"` (fuente elegida en Apariencia; valor por defecto IBM Plex Sans) y la clave `"lara.tema"` (tema elegido en Apariencia: `sistema`, `claro` u `oscuro`; valor por defecto `sistema`). Ambas son preferencias visuales no sensibles y se leen y escriben siempre con `try/catch` y valor por defecto. Nada más va a `localStorage`, tampoco los mocks.
 - Donde falte backend, usa adaptadores mock que cumplan los mismos puertos que los reales, en una carpeta separada y seleccionados con `VITE_USE_MOCKS`. Los componentes nunca llevan datos inline.
 - `VITE_USE_MOCKS=true` por defecto en `.env.example`; la config real va en `.env.local` (ignorado por Git). Marca cada mock con `// MOCK` y muestra un indicador visual discreto cuando el modo mock esté activo.
 - Los datos de relleno son ficticios: ningún dato real, secreto, token ni contraseña, ni siquiera "parecidos" a los reales (repo público).

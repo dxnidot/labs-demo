@@ -1,11 +1,12 @@
-import { herramientasConfig, type PermisoHerramienta } from "../agentesConfig";
+import { herramientasConfig, type PermisoHerramienta } from "../domain/catalogoLab";
 import { EstadoVacio } from "./components/EstadoVacio";
 import { PageLayout } from "./components/PageLayout";
+import { Pill, type PillTone } from "./components/Pill";
 
-const colorPermiso: Record<PermisoHerramienta, string> = {
-  permitida: "text-ok",
-  "solo lectura": "text-muted",
-  "escritura con confirmación": "text-warn",
+const tonoPermiso: Record<PermisoHerramienta, PillTone> = {
+  permitida: "ok",
+  "solo lectura": "accent",
+  "escritura con confirmación": "warn",
 };
 
 /**
@@ -13,6 +14,8 @@ const colorPermiso: Record<PermisoHerramienta, string> = {
  * @author Daniel Tovar
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (encabezado fijo, único scroll) y corte responsive a 980px.
+ * @modified Daniel Tovar 2026-10-10 Catálogo importado de domain/catalogoLab.
+ * @modified Daniel Tovar 2026-10-10 Vacío sin jerga.
  */
 export function HerramientasPage() {
   return (
@@ -21,7 +24,7 @@ export function HerramientasPage() {
       titulo="Herramientas MCP"
     >
       <div className="overflow-x-auto rounded-card border border-border">
-        <table className="w-full min-w-120 border-collapse text-[13px]">
+        <table className="w-full min-w-120 border-collapse text-compact">
           <thead>
             <tr>
               {["herramienta", "origen", "permiso"].map((columna) => (
@@ -43,18 +46,14 @@ export function HerramientasPage() {
                 </td>
                 <td className="border-b border-border px-3.5 py-3 text-text-2">{herramienta.origen}</td>
                 <td className="border-b border-border px-3.5 py-3">
-                  <span
-                    className={`rounded-pill bg-surface-active px-2.5 py-0.5 text-xs ${colorPermiso[herramienta.permiso]}`}
-                  >
-                    {herramienta.permiso}
-                  </span>
+                  <Pill tone={tonoPermiso[herramienta.permiso]}>{herramienta.permiso}</Pill>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <EstadoVacio fuente="MCP filesystem" pendiente="AG-06" />
+      <EstadoVacio mensaje="Las herramientas MCP de archivos aún no están conectadas; arriba se listan las que ya existen." />
     </PageLayout>
   );
 }

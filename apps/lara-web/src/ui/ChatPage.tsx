@@ -1,23 +1,36 @@
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
-import { ArrowUp } from "lucide-react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+  type RefObject,
+} from "react";
+import { ArrowUp, Check, Paperclip, X } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ListarModelos } from "../application/use-cases/ListarModelos";
 import type { Mensaje } from "../domain/Mensaje";
 import type { Modelo } from "../domain/Modelo";
 import type { Usuario } from "../domain/Usuario";
-import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
-import { HttpModeloAdapter } from "../infrastructure/adapters/HttpModeloAdapter";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import { adaptadores } from "../infrastructure/composition";
+import { agregarOActualizarPaso, agregarOActualizarTexto } from "./chatEventos";
 import { Button } from "./components/Button";
+import { IconButton } from "./components/IconButton";
+import { Tag } from "./components/Tag";
 import { claseFoco, claseFocoContenedor } from "./components/foco";
+import { AvisoProveedorModelo } from "./components/AvisoProveedorModelo";
+import { Esqueleto, AvisoCarga } from "./components/Esqueleto";
+import { EstadoError } from "./components/EstadoError";
 import { LaraLogo } from "./components/LaraLogo";
 import { PageLayout } from "./components/PageLayout";
+import { PuntoEstado } from "./components/PuntoEstado";
 import { SelectorModelo } from "./components/SelectorModelo";
-import { modeloOrquestador } from "../agentesConfig";
+import { modeloOrquestador } from "../domain/catalogoLab";
+import { comportamientoDeScroll } from "./movimientoReducido";
 import { useChatSessions } from "./useChatSessions";
 
-const listarModelos = new ListarModelos(new HttpModeloAdapter(new ApiHttpClient(keycloakAuthAdapter)));
+const listarModelos = new ListarModelos(adaptadores.modelo);
 const modelosDeRespaldo: Modelo[] = [
   { id: modeloOrquestador, nombre: modeloOrquestador.split("/")[1], tier: "basic" },
 ];
@@ -69,10 +82,95 @@ const sugerencias = [
 
 function ChipAgente() {
   return (
-    <span className="inline-flex min-h-8 items-center gap-2 rounded-pill border border-border px-3 text-[13px] text-text-2">
-      <span aria-hidden="true" className="size-2 rounded-full bg-ok" />
+    <span className="inline-flex min-h-8 items-center gap-2 rounded-pill border border-border px-3 text-compact text-text-2">
+      <PuntoEstado estado="ok" />
       Agente: orquestador
     </span>
+  );
+}
+
+function ChipMemoria() {
+  return (
+    <span className="inline-flex min-h-8 items-center gap-2 rounded-pill border border-border px-3 text-compact text-text-2">
+      <PuntoEstado estado="ok" />
+      Memoria: activa
+    </span>
+  );
+}
+
+/** Separador A2A centrado en mono, con los pasos del flujo determinista cuando los hay (mockup 04). */
+function MensajeEvento({ mensaje }: { mensaje: Mensaje }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <div aria-hidden="true" className="flex items-center gap-3 text-xs text-faint">
+        <span className="h-px flex-1 bg-divider" />
+        <span className="font-mono">{mensaje.texto}</span>
+        <span className="h-px flex-1 bg-divider" />
+      </div>
+      {mensaje.pasos && mensaje.pasos.length > 0 && (
+        <ul className="m-0 flex list-none flex-col gap-2 rounded-card border border-border bg-surface p-3.5 text-sm">
+          {mensaje.pasos.map((paso) => (
+            <li className="flex items-center justify-between gap-3" key={paso.clave}>
+              <span className="flex items-center gap-2">
+                <Check
+                  aria-hidden="true"
+                  className={`size-4 shrink-0 ${paso.completado ? "text-ok" : "text-faint opacity-0"}`}
+                />
+                {paso.nombre}
+              </span>
+              <span className="font-mono text-xs text-faint">{paso.clave}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+interface AdjuntarArchivoProps {
+  archivo: File | null;
+  entradaRef: RefObject<HTMLInputElement | null>;
+  onElegir: (archivo: File | null) => void;
+}
+
+/**
+ * Control "adjuntar" del composer: solo previsualiza el nombre del archivo elegido (sin backend de
+ * carga en el chat general todavía), para que el usuario vea que se seleccionó antes de poder quitarlo.
+ */
+function AdjuntarArchivo({ archivo, entradaRef, onElegir }: AdjuntarArchivoProps) {
+  return (
+    <>
+      <input
+        aria-label="Elegir archivo para adjuntar"
+        className="hidden"
+        onChange={(event) => onElegir(event.target.files?.[0] ?? null)}
+        ref={entradaRef}
+        type="file"
+      />
+      <IconButton
+        aria-label="Adjuntar archivo"
+        onClick={() => entradaRef.current?.click()}
+        tamano="compacto"
+        type="button"
+      >
+        <Paperclip aria-hidden="true" className="size-4.5" />
+      </IconButton>
+      {archivo && (
+        <Tag>
+          <span className="flex items-center gap-1.5">
+            {archivo.name}
+            <button
+              aria-label={`Quitar ${archivo.name}`}
+              className="inline-flex size-4 items-center justify-center"
+              onClick={() => onElegir(null)}
+              type="button"
+            >
+              <X aria-hidden="true" className="size-3.5" />
+            </button>
+          </span>
+        </Tag>
+      )}
+    </>
   );
 }
 
@@ -80,11 +178,11 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
   return (
     <button
       aria-label="Enviar"
-      className={`inline-flex size-11 shrink-0 items-center justify-center rounded-[10px] bg-accent text-accent-ink transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 min-[980px]:size-10 ${claseFoco}`}
+      className={`inline-flex size-11 shrink-0 items-center justify-center rounded-button bg-accent text-accent-ink transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 shell:size-10 ${claseFoco}`}
       disabled={deshabilitado}
       type="submit"
     >
-      <ArrowUp aria-hidden="true" className="size-[18px]" />
+      <ArrowUp aria-hidden="true" className="size-4.5" />
     </button>
   );
 }
@@ -100,6 +198,12 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (cabecera y composer fijos, conversación como único scroll), foco visible y avatar solo con la L.
  * @modified Daniel Tovar 2026-10-01 Agrega el selector de modelo de LLM en la cabecera.
  * @modified Daniel Tovar 2026-10-02 Logs de consola del catálogo cargado y del modelo elegido por envío.
+ * @modified Daniel Tovar 2026-10-10 Aviso fijo de ADR-0007 junto al campo de mensaje.
+ * @modified Daniel Tovar 2026-10-10 "Ir al final" respeta prefers-reduced-motion.
+ * @modified Daniel Tovar 2026-10-10 Esqueleto al abrir una conversación y errores con reintento (abrir y enviar).
+ * @modified Daniel Tovar 2026-10-10 El estado inicial arranca arriba (antes bajaba el scroll al final y ocultaba el saludo a 320px).
+ * @modified Daniel Tovar 2026-10-10 Catálogo de domain/catalogoLab y catálogo de modelos desde el composition root.
+ * @modified Daniel Tovar 2026-10-10 Eventos A2A y pasos del flujo determinista como mensajes "evento" (mockup 04).
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {
@@ -116,12 +220,17 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
   const [cargando, setCargando] = useState(false);
   const [cargandoSesion, setCargandoSesion] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [origenError, setOrigenError] = useState<"sesion" | "envio" | null>(null);
+  const [intentoSesion, setIntentoSesion] = useState(0);
+  const ultimoEnvio = useRef("");
   const [mostrarIrAlFinal, setMostrarIrAlFinal] = useState(false);
   const [modelos, setModelos] = useState<Modelo[]>(modelosDeRespaldo);
   const [modeloId, setModeloId] = useState(modelosDeRespaldo[0].id);
   const composicionActiva = useRef(false);
   const listaMensajesRef = useRef<HTMLDivElement>(null);
   const seguirAlFinal = useRef(true);
+  const entradaArchivo = useRef<HTMLInputElement>(null);
+  const [archivoAdjunto, setArchivoAdjunto] = useState<File | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -152,6 +261,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
 
     let active = true;
     setError(null);
+    setOrigenError(null);
     setCargandoSesion(true);
     setMensajes([]);
     obtenerSesion(activeSessionId)
@@ -163,6 +273,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
       .catch((reason: unknown) => {
         if (active) {
           setError(reason instanceof Error ? reason.message : "No se pudo abrir la conversación.");
+          setOrigenError("sesion");
         }
       })
       .finally(() => {
@@ -173,32 +284,42 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     return () => {
       active = false;
     };
-  }, [activeSessionId, obtenerSesion]);
+  }, [activeSessionId, obtenerSesion, intentoSesion]);
 
   useEffect(() => {
     const list = listaMensajesRef.current;
-    if (list && seguirAlFinal.current) {
+    if (!list) {
+      return;
+    }
+    if (mensajes.length === 0) {
+      // Estado inicial (saludo, campo y sugerencias): arranca arriba, no al final del contenido.
+      list.scrollTop = 0;
+      return;
+    }
+    if (seguirAlFinal.current) {
       list.scrollTop = list.scrollHeight;
       setMostrarIrAlFinal(false);
     }
   }, [mensajes, estado, cargandoSesion]);
 
-  async function enviar(event: FormEvent<HTMLFormElement>) {
+  function enviar(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const mensaje = texto.trim();
     if (!mensaje || cargando || cargandoSesion || composicionActiva.current) {
       return;
     }
+    void enviarTexto(mensaje);
+  }
 
+  async function enviarTexto(mensaje: string) {
+    ultimoEnvio.current = mensaje;
     setError(null);
+    setOrigenError(null);
     setCargando(true);
     setTexto("");
+    setArchivoAdjunto(null);
     seguirAlFinal.current = true;
-    setMensajes((actuales) => [
-      ...actuales,
-      { rol: "usuario", texto: mensaje, fecha: new Date() },
-      { rol: "agente", texto: "", fecha: new Date() },
-    ]);
+    setMensajes((actuales) => [...actuales, { rol: "usuario", texto: mensaje, fecha: new Date() }]);
 
     let receivedText = false;
     console.info(`[modelo] enviando mensaje con model=${modeloId}`);
@@ -211,22 +332,27 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
             setEstado(`Consultando ${update.nombre}…`);
             return;
           }
+          if (update.tipo === "a2a") {
+            setEstado("");
+            setMensajes((actuales) => [
+              ...actuales,
+              {
+                rol: "evento",
+                texto: `${update.origen} → ${update.destino} · A2A · ${update.modo}`,
+                fecha: new Date(),
+                pasos: [],
+              },
+            ]);
+            return;
+          }
+          if (update.tipo === "paso") {
+            setMensajes((actuales) => agregarOActualizarPaso(actuales, update));
+            return;
+          }
 
           receivedText = true;
           setEstado("");
-          setMensajes((actuales) =>
-            actuales.map((item, index) =>
-              index === actuales.length - 1 && item.rol === "agente"
-                ? {
-                    ...item,
-                    texto:
-                      update.operacion === "agregar"
-                        ? item.texto + update.texto
-                        : update.texto,
-                  }
-                : item,
-            ),
-          );
+          setMensajes((actuales) => agregarOActualizarTexto(actuales, update));
         },
         modeloId,
       );
@@ -236,23 +362,33 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
       }
       await refreshSessions();
     } catch (reason: unknown) {
-      setMensajes((actuales) =>
-        actuales.filter(
-          (item, index) =>
-            index !== actuales.length - 1 || item.rol !== "agente" || item.texto.length > 0,
-        ),
-      );
+      setMensajes((actuales) => {
+        const ultimo = actuales.at(-1);
+        return ultimo?.rol === "agente" && ultimo.texto.length === 0 ? actuales.slice(0, -1) : actuales;
+      });
       setError(reason instanceof Error ? reason.message : "No se pudo completar el mensaje.");
+      setOrigenError("envio");
     } finally {
       setEstado("");
       setCargando(false);
     }
   }
 
+  /** Reabre la conversación o reenvía el último mensaje (solo si el fallo no dejó una respuesta a medias). */
+  const reintentar =
+    origenError === "sesion"
+      ? () => setIntentoSesion((actual) => actual + 1)
+      : origenError === "envio" && mensajes.at(-1)?.rol === "usuario"
+        ? () => {
+            setMensajes((actuales) => actuales.slice(0, -1));
+            void enviarTexto(ultimoEnvio.current);
+          }
+        : undefined;
+
   function desplazarAlFinal() {
     const list = listaMensajesRef.current;
     if (list) {
-      list.scrollTo({ top: list.scrollHeight, behavior: "smooth" });
+      list.scrollTo({ top: list.scrollHeight, behavior: comportamientoDeScroll() });
       seguirAlFinal.current = true;
       setMostrarIrAlFinal(false);
     }
@@ -276,7 +412,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
         mensajes.length > 0 || cargandoSesion ? (
           <header className="flex h-15 items-center justify-between gap-4 border-b border-divider px-4 sm:px-6">
             <div className="flex min-w-0 items-center gap-3">
-              <h1 className="m-0 truncate text-[15px] font-medium">
+              <h1 className="m-0 truncate text-body font-medium">
                 {sesionActiva?.titulo ?? "Nuevo chat"}
               </h1>
               <span className="whitespace-nowrap rounded-pill border border-border bg-surface px-2.5 py-0.5 font-mono text-xs text-muted">
@@ -321,7 +457,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
       pie={
         mensajes.length > 0 || cargandoSesion ? (
           <footer className="px-4 pb-4 sm:px-6 sm:pb-5">
-            <div className="mx-auto flex w-full max-w-[760px] flex-col gap-2.5">
+            <div className="mx-auto flex w-full max-w-190 flex-col gap-2.5">
               <form
                 className={`flex flex-col gap-3 rounded-composer border border-border bg-surface py-3.5 pl-4 pr-3.5 ${claseFocoContenedor}`}
                 onSubmit={enviar}
@@ -330,8 +466,9 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                   Mensaje para Lara
                 </label>
                 <textarea
-                  className="w-full resize-none bg-transparent text-[15px] text-text outline-none placeholder:text-faint"
+                  className="w-full resize-none bg-transparent text-body text-text outline-none placeholder:text-faint"
                   disabled={cargando || cargandoSesion}
+                  aria-describedby="aviso-proveedor-chat"
                   id="mensaje-chat"
                   onChange={(event) => setTexto(event.target.value)}
                   onCompositionEnd={() => {
@@ -346,10 +483,19 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                   value={texto}
                 />
                 <div className="flex items-center justify-between gap-2">
-                  <ChipAgente />
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <AdjuntarArchivo
+                      archivo={archivoAdjunto}
+                      entradaRef={entradaArchivo}
+                      onElegir={setArchivoAdjunto}
+                    />
+                    <ChipAgente />
+                    <ChipMemoria />
+                  </div>
                   <BotonEnviar deshabilitado={cargando || cargandoSesion || !texto.trim()} />
                 </div>
               </form>
+              <AvisoProveedorModelo id="aviso-proveedor-chat" />
               <p className="m-0 text-center text-xs text-faint">
                 Lara puede equivocarse. Verifica los datos importantes.
               </p>
@@ -360,10 +506,10 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     >
       <div className="mx-auto flex min-h-full w-full max-w-190 flex-col gap-6">
         {mensajes.length === 0 && !cargandoSesion && (
-          <div className="m-auto flex w-full max-w-[760px] flex-col gap-7 py-6">
+          <div className="m-auto flex w-full max-w-190 flex-col gap-7 py-6">
             <div className="flex items-center gap-3.5">
               <LaraLogo tamano={36} />
-              <h1 className="m-0 text-2xl font-medium tracking-[-0.02em] sm:text-[2.125rem]">
+              <h1 className="m-0 text-2xl font-medium tracking-tight sm:text-hero">
                 Hola, {usuario.username}. ¿En qué te ayudo?
               </h1>
             </div>
@@ -375,8 +521,9 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                 Mensaje para Lara
               </label>
               <textarea
-                className="w-full resize-none bg-transparent text-[15px] text-text outline-none placeholder:text-faint"
+                className="w-full resize-none bg-transparent text-body text-text outline-none placeholder:text-faint"
                 disabled={cargando}
+                aria-describedby="aviso-proveedor-inicio"
                 id="mensaje"
                 onChange={(event) => setTexto(event.target.value)}
                 onCompositionEnd={() => {
@@ -391,14 +538,23 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                 value={texto}
               />
               <div className="flex items-center justify-between gap-2">
-                <ChipAgente />
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <AdjuntarArchivo
+                    archivo={archivoAdjunto}
+                    entradaRef={entradaArchivo}
+                    onElegir={setArchivoAdjunto}
+                  />
+                  <ChipAgente />
+                  <ChipMemoria />
+                </div>
                 <BotonEnviar deshabilitado={cargando || !texto.trim()} />
               </div>
             </form>
-            <div className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1100px]:grid-cols-4">
+            <AvisoProveedorModelo className="-mt-3" id="aviso-proveedor-inicio" />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 wide:grid-cols-4">
               {sugerencias.map((sugerencia) => (
                 <button
-                  className={`flex flex-col gap-1.5 rounded-[12px] border border-border bg-surface p-4 text-left text-sm transition-colors hover:border-neutral-700 hover:bg-surface-hover ${claseFoco}`}
+                  className={`flex flex-col gap-1.5 rounded-card border border-border bg-surface p-4 text-left text-sm transition-colors hover:border-border-strong hover:bg-surface-hover ${claseFoco}`}
                   key={sugerencia}
                   onClick={() => setTexto(sugerencia)}
                   type="button"
@@ -411,19 +567,37 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
           </div>
         )}
 
-        {cargandoSesion && <p className="m-auto text-sm text-muted">Cargando conversación…</p>}
+        {cargandoSesion && (
+          <>
+            <AvisoCarga texto="Cargando conversación…" />
+            <div aria-hidden="true" className="flex flex-col gap-6">
+              <Esqueleto className="h-11 w-3/5 self-end" />
+              <div className="flex gap-3.5">
+                <Esqueleto className="size-7.5 shrink-0" />
+                <div className="flex w-full flex-col gap-3">
+                  <Esqueleto className="h-4 w-full" />
+                  <Esqueleto className="h-4 w-4/5" />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
-        {mensajes.map((mensaje, index) => (
+        {mensajes.map((mensaje, index) => {
+          if (mensaje.rol === "evento") {
+            return <MensajeEvento key={`${mensaje.fecha.getTime()}-${index}`} mensaje={mensaje} />;
+          }
+          return (
           <article
             className={
               mensaje.rol === "usuario"
-                ? "max-w-[80%] self-end rounded-[14px] bg-surface-active px-4 py-3 text-[15px] leading-[1.55]"
-                : "flex w-full gap-3.5 text-[15px] leading-[1.6]"
+                ? "max-w-4/5 self-end rounded-card bg-surface-active px-4 py-3 text-body"
+                : "flex w-full gap-3.5 text-body leading-body"
             }
             key={`${mensaje.fecha.getTime()}-${index}`}
           >
             {mensaje.rol === "agente" && (
-              <span className="inline-flex size-7.5 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface">
+              <span className="inline-flex size-7.5 shrink-0 items-center justify-center rounded-button border border-border bg-surface">
                 <LaraLogo soloL tamano={18} />
               </span>
             )}
@@ -443,14 +617,11 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
               )}
             </div>
           </article>
-        ))}
+          );
+        })}
 
         {estado && <p className="mx-auto font-mono text-xs text-muted">{estado}</p>}
-        {error && (
-          <p className="rounded-card border border-border bg-surface-active px-4 py-3 text-sm text-danger" role="alert">
-            {error}
-          </p>
-        )}
+        {error && <EstadoError mensaje={error} onReintentar={reintentar} />}
       </div>
     </PageLayout>
   );

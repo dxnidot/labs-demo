@@ -2,28 +2,36 @@ import { Link } from "react-router";
 import type { ResumenFinanciero } from "../application/use-cases/ObtenerResumenFinanciero";
 import type { Moneda } from "../domain/MovimientoFinanciero";
 import { Card } from "./components/Card";
+import { EstadoVacio } from "./components/EstadoVacio";
+import { claseBotonSobreResaltado, ProximoPago } from "./components/ProximoPago";
 import { claseFoco } from "./components/foco";
 import { Tag } from "./components/Tag";
 import { etiquetaOrigen, fechaCorta, formatoMoneda } from "./finanzasFormato";
 
 interface FinanzasResumenTabProps {
   datos: ResumenFinanciero;
+  /** Fecha de hoy AAAA-MM-DD. */
+  hoy: string;
   moneda: Moneda;
   periodo: string;
 }
 
-const coloresBarra = ["bg-chart-1", "bg-chart-2", "bg-chart-3", "bg-chart-4", "bg-hoki-600"];
+const coloresBarra = ["bg-chart-1", "bg-chart-2", "bg-chart-3", "bg-chart-4", "bg-chart-5"];
 const maximoMovimientos = 5;
-const textoSinDatos = "Sin datos todavía · Fuente: finanzas · Pendiente: totales mensuales";
-const enlaceClase = `text-[13px] text-accent underline hover:text-accent-hover ${claseFoco}`;
+const textoSinTotales =
+  "Aún no disponible: el servicio de finanzas todavía no entrega los totales del mes (ingresos, gastos y lo que te queda).";
+const enlaceClase = `inline-flex min-h-11 items-center text-compact text-accent underline hover:text-accent-hover shell:min-h-0 ${claseFoco}`;
 
 /**
  * Resumen de finanzas: próximo pago, gastos por categoría, próximos pagos y últimos movimientos.
  * Los totales que requieren calcular importes quedan en estado vacío hasta que el servicio los expone.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-10-10 Textos sin jerga de backlog.
+ * @modified Daniel Tovar 2026-10-10 Últimos movimientos en 3 columnas (el origen va bajo el concepto): el monto ya no queda cortado.
+ * @modified Daniel Tovar 2026-10-10 Bloque de próximo pago destacado y un solo aviso en lugar de 3 KPIs vacíos (mockup 12).
  */
-export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTabProps) {
+export function FinanzasResumenTab({ datos, hoy, moneda, periodo }: FinanzasResumenTabProps) {
   const proximoPago = datos.eventos.find((evento) => evento.tipo === "PAGO");
   const categorias = datos.resumen
     .filter((fila) => fila.tipo === "GASTO" && fila.moneda === moneda)
@@ -36,37 +44,26 @@ export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTa
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1180px]:grid-cols-4">
-        {["Ingresos del mes", "Gastos del mes", "Te queda"].map((titulo) => (
-          <Card key={titulo}>
-            <span className="text-[13px] text-muted">{titulo}</span>
-            <span className="font-mono text-[26px] font-medium text-faint">—</span>
-            <span className="text-xs text-faint">{textoSinDatos}</span>
-          </Card>
-        ))}
-        <section className="flex min-w-0 flex-col gap-3 rounded-card border border-highlight bg-highlight p-5 text-highlight-ink">
-          <span className="text-[13px] text-hoki-700">Próximo pago</span>
-          {proximoPago ? (
-            <>
-              <span className="text-[22px] font-semibold">{fechaCorta(proximoPago.fecha)}</span>
-              <span className="text-xs text-hoki-700">{proximoPago.alias}</span>
-            </>
-          ) : (
-            <>
-              <span className="text-[22px] font-semibold">—</span>
-              <span className="text-xs text-hoki-700">Sin pagos en los próximos 30 días</span>
-            </>
-          )}
-        </section>
-      </div>
+      <ProximoPago
+        accion={
+          <Link className={claseBotonSobreResaltado} to="/finanzas/tarjetas">
+            Ver calendario
+          </Link>
+        }
+        evento={proximoPago}
+        hoy={hoy}
+        tarjeta={datos.tarjetas.find((tarjeta) => tarjeta.alias === proximoPago?.alias)}
+      />
 
-      <div className="grid grid-cols-1 gap-4 min-[1180px]:grid-cols-2">
+      <EstadoVacio mensaje={textoSinTotales} />
+
+      <div className="grid grid-cols-1 gap-4 wide:grid-cols-2">
         <Card aria-labelledby="serie-titulo">
           <h2 className="m-0 text-base font-semibold" id="serie-titulo">
             Ingresos vs gastos · 6 meses
           </h2>
           <p className="m-0 text-sm text-faint">
-            Sin datos todavía · Fuente: finanzas · Pendiente: serie mensual
+            Aún no disponible: el servicio de finanzas todavía no entrega la serie de los últimos meses.
           </p>
         </Card>
 
@@ -85,13 +82,13 @@ export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTa
             >
               {categorias.map((fila, indice) => (
                 <li
-                  className="grid grid-cols-[110px_minmax(0,1fr)_72px] items-center gap-3 text-[13px]"
+                  className="grid grid-cols-[110px_minmax(0,1fr)_72px] items-center gap-3 text-compact"
                   key={fila.categoria}
                 >
                   <span className="truncate">{fila.categoria}</span>
-                  <div aria-hidden="true" className="h-2.5 rounded-[5px] bg-surface-active">
+                  <div aria-hidden="true" className="h-2.5 rounded-md bg-surface-active">
                     <div
-                      className={`h-full rounded-[5px] ${coloresBarra[indice % coloresBarra.length]}`}
+                      className={`h-full rounded-md ${coloresBarra[indice % coloresBarra.length]}`}
                       style={{ width: `${mayor > 0 ? (fila.total / mayor) * 100 : 0}%` }}
                     />
                   </div>
@@ -105,14 +102,14 @@ export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTa
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 min-[1180px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 wide:grid-cols-2">
         <Card aria-labelledby="proximos-pagos-titulo">
           <div className="flex items-center justify-between">
             <h2 className="m-0 text-base font-semibold" id="proximos-pagos-titulo">
               Próximos pagos
             </h2>
             <Link className={enlaceClase} to="/finanzas/tarjetas">
-              Ver tarjetas
+              Ver calendario
             </Link>
           </div>
           {datos.eventos.length === 0 ? (
@@ -153,39 +150,39 @@ export function FinanzasResumenTab({ datos, moneda, periodo }: FinanzasResumenTa
               No hay movimientos en {moneda} para este periodo.
             </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left text-[13px]">
-                <caption className="sr-only">Últimos movimientos en {moneda}</caption>
-                <thead className="bg-surface">
-                  <tr className="border-b border-divider text-muted">
-                    <th className="px-3.5 py-2.5 font-medium" scope="col">fecha</th>
-                    <th className="px-3.5 py-2.5 font-medium" scope="col">concepto</th>
-                    <th className="px-3.5 py-2.5 font-medium" scope="col">origen</th>
-                    <th className="px-3.5 py-2.5 text-right font-medium" scope="col">monto</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ultimos.map((movimiento) => (
-                    <tr
-                      className="border-b border-divider text-text-2 last:border-0"
-                      key={movimiento.id}
-                    >
-                      <td className="whitespace-nowrap px-3.5 py-3 font-mono">
-                        {fechaCorta(movimiento.fecha)}
-                      </td>
-                      <td className="px-3.5 py-3">{movimiento.comercio}</td>
-                      <td className="px-3.5 py-3">
+            <table className="w-full border-collapse text-left text-compact">
+              <caption className="sr-only">Últimos movimientos en {moneda}</caption>
+              <thead className="bg-surface">
+                <tr className="border-b border-divider text-muted">
+                  <th className="px-2 py-2.5 font-medium" scope="col">fecha</th>
+                  <th className="px-2 py-2.5 font-medium" scope="col">concepto</th>
+                  <th className="px-2 py-2.5 text-right font-medium" scope="col">monto</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ultimos.map((movimiento) => (
+                  <tr
+                    className="border-b border-divider text-text-2 last:border-0"
+                    key={movimiento.id}
+                  >
+                    <td className="whitespace-nowrap px-2 py-3 align-top font-mono">
+                      {fechaCorta(movimiento.fecha)}
+                    </td>
+                    <td className="px-2 py-3">
+                      <span className="block">{movimiento.comercio}</span>
+                      <span className="mt-1 inline-flex">
+                        <span className="sr-only">Origen: </span>
                         <Tag>{etiquetaOrigen(movimiento.origen)}</Tag>
-                      </td>
-                      <td className="whitespace-nowrap px-3.5 py-3 text-right font-mono">
-                        {movimiento.tipo === "GASTO" ? "−" : "+"}
-                        {formatoMoneda[movimiento.moneda].format(movimiento.monto)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-2 py-3 text-right align-top font-mono">
+                      {movimiento.tipo === "GASTO" ? "−" : "+"}
+                      {formatoMoneda[movimiento.moneda].format(movimiento.monto)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </Card>
       </div>

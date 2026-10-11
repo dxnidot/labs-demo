@@ -21,3 +21,10 @@ export const serviciosLab: readonly ServicioLab[] = [
   { clave: "kc-demo", nombre: "kc-demo", detalle: ":8081 · Spring Boot" },
   { clave: "finanzas", nombre: "finanzas", detalle: ":8083 · servicio finanzas" },
 ];
+
+/** Servicios del plan sin health check todavía: la vista los muestra como pendientes. */
+export const serviciosPendientes = [
+  { nombre: "Java A2A", detalle: ":8002 · Java A2A" },
+  { nombre: "TypeScript A2A", detalle: ":8003 · TypeScript A2A" },
+  { nombre: "Open WebUI", detalle: ":3000 · RAG" },
+] as const;

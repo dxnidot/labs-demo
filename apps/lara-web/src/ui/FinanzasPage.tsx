@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MessageCircle, RefreshCw } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpLeft,
+  CreditCard,
+  LayoutGrid,
+  MessageCircle,
+  TrendingUp,
+} from "lucide-react";
 import { Link, Navigate, useParams } from "react-router";
 import {
   ObtenerResumenFinanciero,
@@ -7,25 +14,36 @@ import {
 } from "../application/use-cases/ObtenerResumenFinanciero";
 import type { Moneda } from "../domain/MovimientoFinanciero";
 import type { Tarjeta } from "../domain/Tarjeta";
-import { ApiHttpClient } from "../infrastructure/adapters/ApiHttpClient";
-import { HttpFinanzasAdapter } from "../infrastructure/adapters/HttpFinanzasAdapter";
-import { keycloakAuthAdapter } from "../infrastructure/adapters/KeycloakAuthAdapter";
+import { adaptadores } from "../infrastructure/composition";
 import { Button } from "./components/Button";
-import { claseFoco, claseFocoInterno } from "./components/foco";
+import { Card } from "./components/Card";
+import { AvisoCarga, Esqueleto, EsqueletoTabla } from "./components/Esqueleto";
+import { EstadoError } from "./components/EstadoError";
+import { claseFocoInterno } from "./components/foco";
 import { PageLayout } from "./components/PageLayout";
+import { SelectorPeriodo } from "./components/SelectorPeriodo";
 import { FinanzasChatPanel } from "./FinanzasChatPanel";
-import { fechaLocalActual, periodoActual } from "./finanzasFormato";
+import { fechaLocalActual, periodoActual, textoActualizado } from "./finanzasFormato";
+import { pestanasFinanzas } from "./finanzasPestanas";
 import { FinanzasMovimientosTab } from "./FinanzasMovimientosTab";
 import { FinanzasResumenTab } from "./FinanzasResumenTab";
 import { FinanzasTarjetasTab } from "./FinanzasTarjetasTab";
-import { FinanzasTradingTab } from "./FinanzasTradingTab";
+import { FinanzasInversionesTab } from "./FinanzasInversionesTab";
+import { alPulsarTeclaEnPestanas } from "./pestanasTeclado";
+import { useMinutosDesde } from "./useMinutosDesde";
 import { useScrollPestanaActiva } from "./useScrollPestanaActiva";
 import { useVistaEstrecha } from "./useVistaEstrecha";
 
-const finanzasPort = new HttpFinanzasAdapter(new ApiHttpClient(keycloakAuthAdapter));
+const finanzasPort = adaptadores.finanzas;
 const obtenerResumenFinanciero = new ObtenerResumenFinanciero(finanzasPort);
 const monedas: readonly Moneda[] = ["MXN", "USD"];
-const periodoValido = /^\d{4}-\d{2}$/;
+const iconosPestana: Record<(typeof pestanasFinanzas)[number]["id"], typeof LayoutGrid> = {
+  resumen: LayoutGrid,
+  gastos: ArrowDownRight,
+  ingresos: ArrowUpLeft,
+  tarjetas: CreditCard,
+  inversiones: TrendingUp,
+};
 const idBotonAsistente = "abrir-asistente-finanzas";
 const idPanelPestanas = "panel-finanzas";
 
@@ -33,19 +51,10 @@ function idPestana(id: string): string {
   return `pestana-finanzas-${id}`;
 }
 
-const pestanas = [
-  { id: "resumen", etiqueta: "Resumen" },
-  { id: "gastos", etiqueta: "Gastos" },
-  { id: "ingresos", etiqueta: "Ingresos" },
-  { id: "tarjetas", etiqueta: "Tarjetas y pagos" },
-  { id: "trading-mx", etiqueta: "Trading MX" },
-  { id: "trading-usa", etiqueta: "Trading USA" },
-] as const;
-
-type PestanaId = (typeof pestanas)[number]["id"];
+type PestanaId = (typeof pestanasFinanzas)[number]["id"];
 
 function esPestana(valor: string | undefined): valor is PestanaId {
-  return pestanas.some((pestana) => pestana.id === valor);
+  return pestanasFinanzas.some((pestana) => pestana.id === valor);
 }
 
 /**
@@ -57,6 +66,10 @@ function esPestana(valor: string | undefined): valor is PestanaId {
  * @modified Daniel Tovar 2026-09-30 ARIA completo de pestañas, foco visible y retorno de foco del asistente.
  * @modified Daniel Tovar 2026-09-30 La pestaña activa lleva solo la línea inferior (.ftab de la maqueta).
  * @modified Daniel Tovar 2026-09-30 Sobre PageLayout (pestañas fijas, único scroll), botón Asistente siempre visible en angosto y pestañas con scroll.
+ * @modified Daniel Tovar 2026-10-10 Pestañas con flechas y tabindex itinerante, MXN/USD de 44px en angosto y lista de pestañas compartida.
+ * @modified Daniel Tovar 2026-10-10 Adaptador de finanzas desde el composition root (VITE_USE_MOCKS).
+ * @modified Daniel Tovar 2026-10-10 Esqueleto de carga y error con el componente común.
+ * @modified Daniel Tovar 2026-10-10 Mockups 12 y 14: pestaña Inversiones, íconos, periodo con flechas, "Actualizado hace…" y columna de ~1180px.
  */
 export function FinanzasPage() {
   const { tab } = useParams();
@@ -65,6 +78,8 @@ export function FinanzasPage() {
   const [periodo, setPeriodo] = useState(periodoActual);
   const [moneda, setMoneda] = useState<Moneda>("MXN");
   const [datos, setDatos] = useState<ResumenFinanciero | null>(null);
+  const [actualizadoEn, setActualizadoEn] = useState<Date | null>(null);
+  const minutos = useMinutosDesde(actualizadoEn);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [asistenteAbierto, setAsistenteAbierto] = useState(!estrecha);
@@ -111,6 +126,7 @@ export function FinanzasPage() {
       );
       if (actual === peticion.current) {
         setDatos(resultado);
+        setActualizadoEn(new Date());
       }
     } catch (reason: unknown) {
       if (actual === peticion.current) {
@@ -149,19 +165,7 @@ export function FinanzasPage() {
 
   const acciones = (
     <div className="flex flex-wrap items-center gap-2">
-      <label className="sr-only" htmlFor="periodo-finanzas">Periodo</label>
-      <input
-        className="min-h-11 rounded-pill border border-border bg-transparent px-3 text-[13px] text-text-2 scheme-dark min-[980px]:min-h-8"
-        id="periodo-finanzas"
-        onChange={(event) => {
-          const nuevoPeriodo = event.currentTarget.value;
-          if (periodoValido.test(nuevoPeriodo)) {
-            setPeriodo(nuevoPeriodo);
-          }
-        }}
-        type="month"
-        value={periodo}
-      />
+      <SelectorPeriodo onCambiar={setPeriodo} periodo={periodo} />
       <div
         aria-label="Moneda"
         className="inline-flex rounded-pill border border-border p-0.75"
@@ -170,7 +174,7 @@ export function FinanzasPage() {
         {monedas.map((opcion) => (
           <button
             aria-pressed={moneda === opcion}
-            className={`min-h-9 rounded-pill px-3 font-mono text-xs min-[980px]:min-h-7.5 ${claseFocoInterno} ${
+            className={`min-h-11 min-w-11 rounded-pill px-3 font-mono text-xs shell:min-h-7.5 shell:min-w-0 ${claseFocoInterno} ${
               moneda === opcion ? "bg-accent text-accent-ink" : "text-muted"
             }`}
             key={opcion}
@@ -183,7 +187,6 @@ export function FinanzasPage() {
       </div>
       {(estrecha || !asistenteAbierto) && (
         <Button
-          className={claseFoco}
           id={idBotonAsistente}
           onClick={abrirAsistente}
           variant="primary"
@@ -199,24 +202,31 @@ export function FinanzasPage() {
     <div
       aria-label="Secciones de finanzas"
       className="flex shrink-0 gap-1 overflow-x-auto border-b border-border"
+      onKeyDown={alPulsarTeclaEnPestanas}
       ref={listaPestanas}
       role="tablist"
     >
-      {pestanas.map((pestana) => (
-        <Link
-          aria-controls={idPanelPestanas}
-          aria-selected={pestana.id === tab}
-          className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-none border-b-2 bg-transparent px-3.5 text-sm hover:text-text min-[980px]:min-h-10 ${claseFocoInterno} ${
-            pestana.id === tab ? "border-accent text-text" : "border-transparent text-muted"
-          }`}
-          id={idPestana(pestana.id)}
-          key={pestana.id}
-          role="tab"
-          to={`/finanzas/${pestana.id}`}
-        >
-          {pestana.etiqueta}
-        </Link>
-      ))}
+      {pestanasFinanzas.map((pestana) => {
+        const Icono = iconosPestana[pestana.id];
+        const activa = pestana.id === tab;
+        return (
+          <Link
+            aria-controls={idPanelPestanas}
+            aria-selected={activa}
+            className={`inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 bg-transparent px-3.5 text-sm hover:text-text shell:min-h-10 ${claseFocoInterno} ${
+              activa ? "border-accent font-semibold text-text" : "border-transparent font-medium text-muted"
+            }`}
+            id={idPestana(pestana.id)}
+            key={pestana.id}
+            role="tab"
+            tabIndex={activa ? 0 : -1}
+            to={`/finanzas/${pestana.id}`}
+          >
+            <Icono aria-hidden="true" className="size-4 shrink-0" />
+            {pestana.etiqueta}
+          </Link>
+        );
+      })}
     </div>
   );
 
@@ -224,31 +234,33 @@ export function FinanzasPage() {
     <div className="flex min-h-0 min-w-0 flex-1">
       <PageLayout
         acciones={acciones}
+        anchoColumna
         pestanas={pestanasNav}
-        subtitulo="Calculado por el servicio finanzas · solo en tu PC."
+        subtitulo={textoActualizado(minutos)}
         titulo="Finanzas"
       >
         <div aria-labelledby={idPestana(tab)} id={idPanelPestanas} role="tabpanel">
           {cargando && (
-            <p className="m-0 rounded-card border border-border bg-surface p-5 text-sm text-muted" role="status">
-              Cargando movimientos, resumen y tarjetas…
-            </p>
+            <>
+              <AvisoCarga texto="Cargando movimientos, resumen y tarjetas…" />
+              <div aria-hidden="true" className="flex flex-col gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 wide:grid-cols-4">
+                  {Array.from({ length: 4 }, (_, indice) => (
+                    <Card key={indice}>
+                      <Esqueleto className="h-4 w-1/2" />
+                      <Esqueleto className="h-7 w-3/4" />
+                    </Card>
+                  ))}
+                </div>
+                <EsqueletoTabla />
+              </div>
+            </>
           )}
           {!cargando && error && (
-            <div className="flex flex-col gap-3 rounded-card border border-border bg-surface-active p-5 min-[600px]:flex-row min-[600px]:items-center min-[600px]:justify-between">
-              <p className="m-0 text-sm text-danger" role="alert">{error}</p>
-              <Button
-                className={`shrink-0 ${claseFoco}`}
-                onClick={() => void cargar(periodo, false)}
-                variant="ghost"
-              >
-                <RefreshCw aria-hidden="true" className="size-4" />
-                Reintentar
-              </Button>
-            </div>
+            <EstadoError mensaje={error} onReintentar={() => void cargar(periodo, false)} />
           )}
           {datos && tab === "resumen" && (
-            <FinanzasResumenTab datos={datos} moneda={moneda} periodo={periodo} />
+            <FinanzasResumenTab datos={datos} hoy={fechaLocalActual()} moneda={moneda} periodo={periodo} />
           )}
           {datos && tab === "gastos" && (
             <FinanzasMovimientosTab
@@ -272,12 +284,12 @@ export function FinanzasPage() {
             <FinanzasTarjetasTab
               eventos={datos.eventos}
               finanzas={finanzasPort}
+              hoy={fechaLocalActual()}
               onTarjetaActualizada={alActualizarTarjeta}
               tarjetas={datos.tarjetas}
             />
           )}
-          {datos && tab === "trading-mx" && <FinanzasTradingTab mercado="mx" />}
-          {datos && tab === "trading-usa" && <FinanzasTradingTab mercado="usa" />}
+          {datos && tab === "inversiones" && <FinanzasInversionesTab />}
         </div>
       </PageLayout>
 
