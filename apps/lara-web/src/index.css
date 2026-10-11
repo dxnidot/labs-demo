@@ -29,17 +29,17 @@
   --color-hoki-900: #323d48;
   --color-hoki-950: #212830;
   /* Acento oscuro alterno (cielo, azul pastel): solo se usa en el lado oscuro de los tokens semánticos de abajo. */
-  --color-cielo-50: #f3f8fc;
-  --color-cielo-100: #e6f1fa;
-  --color-cielo-200: #c9e2f5;
-  --color-cielo-300: #a3cdef;
-  --color-cielo-400: #7eb6e6;
-  --color-cielo-500: #5f9fd6;
-  --color-cielo-600: #4a84b8;
-  --color-cielo-700: #2f5879;
-  --color-cielo-800: #35597a;
-  --color-cielo-900: #2f4a63;
-  --color-cielo-950: #1c2d3d;
+  --color-cielo-50: #f4f7f9;
+  --color-cielo-100: #e8eef2;
+  --color-cielo-200: #d6e3ec;
+  --color-cielo-300: #b7cad9;
+  --color-cielo-400: #91abc0;
+  --color-cielo-500: #70899f;
+  --color-cielo-600: #577089;
+  --color-cielo-700: #3e5365;
+  --color-cielo-800: #39495a;
+  --color-cielo-900: #2f3c4a;
+  --color-cielo-950: #1c252e;
   /*
    * Tokens semánticos: light-dark(claro, oscuro). El oscuro es el de la guía y los PNG; el claro sale
    * de la misma paleta (neutral + hoki) con los papeles invertidos. Requiere color-scheme (ver :root).

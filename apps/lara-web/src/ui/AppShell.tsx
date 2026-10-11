@@ -472,21 +472,6 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
                   Estado del lab
                 </SidebarItem>
 
-                {itemsPersonal.length > 0 && (
-                  <SeccionNav titulo="PERSONAL · SOLO LOCAL">
-                    {itemsPersonal.map((item) => (
-                      <SidebarItem
-                        active={item.activo ?? enRuta(item.ruta)}
-                        icono={item.icono}
-                        key={item.ruta}
-                        to={item.ruta}
-                      >
-                        {item.etiqueta}
-                      </SidebarItem>
-                    ))}
-                  </SeccionNav>
-                )}
-
                 {itemsLaboratorio.length > 0 && (
                   <GrupoColapsable idContenido="grupo-laboratorio" titulo="LABORATORIO">
                     {itemsLaboratorio.map((item) => (
@@ -500,6 +485,21 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
                       </SidebarItem>
                     ))}
                   </GrupoColapsable>
+                )}
+
+                {itemsPersonal.length > 0 && (
+                  <SeccionNav titulo="PERSONAL · SOLO LOCAL">
+                    {itemsPersonal.map((item) => (
+                      <SidebarItem
+                        active={item.activo ?? enRuta(item.ruta)}
+                        icono={item.icono}
+                        key={item.ruta}
+                        to={item.ruta}
+                      >
+                        {item.etiqueta}
+                      </SidebarItem>
+                    ))}
+                  </SeccionNav>
                 )}
               </nav>
 
@@ -595,6 +595,9 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
             <div aria-hidden="true" className="my-1 h-px w-6 shrink-0 bg-divider" />
             <nav aria-label="Principal" className="flex flex-col items-center gap-1">
               <RielItem activo={enRuta("/estado")} etiqueta="Estado del lab" icono={<LayoutDashboard aria-hidden="true" className={iconoNav} />} to="/estado" />
+              {itemsLaboratorio.map((item) => (
+                <RielItem activo={enRuta(item.ruta)} etiqueta={item.etiqueta} icono={item.icono} key={item.ruta} to={item.ruta} />
+              ))}
               {itemsPersonal.map((item) => (
                 <RielItem
                   activo={item.activo ?? enRuta(item.ruta)}
@@ -603,9 +606,6 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
                   key={item.ruta}
                   to={item.ruta}
                 />
-              ))}
-              {itemsLaboratorio.map((item) => (
-                <RielItem activo={enRuta(item.ruta)} etiqueta={item.etiqueta} icono={item.icono} key={item.ruta} to={item.ruta} />
               ))}
             </nav>
           </div>

@@ -42,11 +42,11 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 | `hoki-800`         | `#384754` | Hoki oscuro                              |
 | `hoki-900`         | `#323D48` | Hoki oscuro                              |
 | `hoki-950`         | `#212830` | Tinta sobre accent/highlight             |
-| `cielo-200`        | `#C9E2F5` | Accent hover, highlight (solo oscuro)    |
-| `cielo-300`        | `#A3CDEF` | Muted, accent (solo oscuro)              |
-| `cielo-400`        | `#7EB6E6` | Faint, estado ok (solo oscuro)           |
-| `cielo-500`–`700`  | `#5F9FD6`–`#2F5879` | Gráficas y highlight-muted (solo oscuro) |
-| `cielo-950`        | `#1C2D3D` | Tinta sobre accent/highlight (solo oscuro) |
+| `cielo-200`        | `#D6E3EC` | Accent hover, highlight (solo oscuro)    |
+| `cielo-300`        | `#B7CAD9` | Muted, accent (solo oscuro)              |
+| `cielo-400`        | `#91ABC0` | Faint, estado ok (solo oscuro)           |
+| `cielo-500`–`700`  | `#70899F`–`#3E5365` | Gráficas y highlight-muted (solo oscuro) |
+| `cielo-950`        | `#1C252E` | Tinta sobre accent/highlight (solo oscuro) |
 | `bg`               | `#14171B` | Fondo                                   |
 | `sidebar`, `surface` | `#1A1A1A` | Barra lateral, tarjetas y composer       |
 | `surface-hover`, `surface-active`, `border`, `divider` | `#292929` | Estados y separadores |
@@ -98,20 +98,20 @@ En `index.css` cada token semántico se define una sola vez con `light-dark(clar
 | `control-off` | #767676 | #767676 |
 | `text` | #14171B | #FAFAFA |
 | `text-2` | #292929 | #E6E6E6 |
-| `muted` | #384754 | #A3CDEF |
-| `faint` | #415363 | #7EB6E6 |
-| `accent` | #415363 | #A3CDEF |
-| `accent-hover` | #384754 | #C9E2F5 |
-| `accent-ink` | #FAFAFA | #1C2D3D |
-| `highlight` | #384754 | #C9E2F5 |
-| `highlight-ink` | #F6F7F9 | #1C2D3D |
-| `highlight-muted` | #D4DCE3 | #2F5879 |
-| `chart-1` | #323D48 | #C9E2F5 |
-| `chart-2` | #384754 | #A3CDEF |
-| `chart-3` | #415363 | #7EB6E6 |
-| `chart-4` | #4F667A | #5F9FD6 |
-| `chart-5` | #678398 | #4A84B8 |
-| `ok` | #415363 | #7EB6E6 |
+| `muted` | #384754 | #B7CAD9 |
+| `faint` | #415363 | #91ABC0 |
+| `accent` | #415363 | #B7CAD9 |
+| `accent-hover` | #384754 | #D6E3EC |
+| `accent-ink` | #FAFAFA | #1C252E |
+| `highlight` | #384754 | #D6E3EC |
+| `highlight-ink` | #F6F7F9 | #1C252E |
+| `highlight-muted` | #D4DCE3 | #3E5365 |
+| `chart-1` | #323D48 | #D6E3EC |
+| `chart-2` | #384754 | #B7CAD9 |
+| `chart-3` | #415363 | #91ABC0 |
+| `chart-4` | #4F667A | #70899F |
+| `chart-5` | #678398 | #577089 |
+| `ok` | #415363 | #91ABC0 |
 | `warn` | #575757 | #A5A5A5 |
 | `danger` | #1A1A1A | #D6D6D6 |
 
