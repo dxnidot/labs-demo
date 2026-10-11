@@ -199,8 +199,9 @@ describe("estados de carga y error con reintento", () => {
     expect(await screen.findByRole("alert")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Reintentar" }));
 
-    expect(await screen.findByText("Reportes")).toBeTruthy();
-    expect(screen.queryByRole("alert")).toBeNull();
+    const menuUsuario = await screen.findByRole("region", { name: "Menú de ana" });
+    expect(await within(menuUsuario).findByText("Reportes")).toBeTruthy();
+    expect(within(menuUsuario).queryByRole("alert")).toBeNull();
   });
 
   it("Recientes: si falla el historial ofrece Reintentar y lo recupera", async () => {
@@ -497,8 +498,12 @@ describe("pantallas con datos", () => {
 
     montar("/memoria");
 
+    const campo = await screen.findByPlaceholderText("¿Qué quieres encontrar?");
+    fireEvent.change(campo, { target: { value: "zzz-sin-resultados" } });
+    fireEvent.submit(campo.closest("form")!);
+
     expect(
-      await screen.findByText("La memoria vectorizada aún no está conectada: todavía no hay nada que buscar."),
+      await screen.findByText("No encontramos fragmentos relacionados. Prueba con otras palabras o colecciones."),
     ).toBeTruthy();
   });
 
@@ -570,7 +575,10 @@ describe("pantallas con datos", () => {
 
     fireEvent.click(screen.getByRole("tab", { name: "events" }));
 
-    expect(screen.getByText("Esta tabla aún no se puede consultar desde Lara.")).toBeTruthy();
+    expect(
+      await screen.findByText("SELECT id, session_id, author, timestamp, content FROM events ORDER BY timestamp DESC LIMIT 20;"),
+    ).toBeTruthy();
+    expect(screen.getByText("evt_demo_001")).toBeTruthy();
   });
 
   it("Menú por rol muestra las opciones de /api/menu del usuario actual", async () => {
@@ -578,10 +586,11 @@ describe("pantallas con datos", () => {
 
     montar("/menu-por-rol");
 
-    expect(await screen.findByText("Reportes")).toBeTruthy();
-    expect(screen.getByText("consultar")).toBeTruthy();
-    expect(screen.getByText("exportar")).toBeTruthy();
-    expect(screen.getByText("roles: ver-menu")).toBeTruthy();
+    const menuUsuario = await screen.findByRole("region", { name: "Menú de ana" });
+    expect(await within(menuUsuario).findByText("Reportes")).toBeTruthy();
+    expect(within(menuUsuario).getByText("consultar")).toBeTruthy();
+    expect(within(menuUsuario).getByText("exportar")).toBeTruthy();
+    expect(within(menuUsuario).getByText("roles: ver-menu")).toBeTruthy();
     expect(screen.getByText("La acción también se valida en el backend.")).toBeTruthy();
     expect(fetchMock.mock.calls.filter(([url]) => url === "/api/menu")).toHaveLength(1);
   });

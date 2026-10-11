@@ -541,20 +541,41 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
               <Route path="/agentes" element={protegido(puedeVerAgentes, <AgentesPage />)} />
               <Route
                 path="/base-de-datos"
-                element={protegido(puedeVerAgentes, <BaseDeDatosPage usuario={usuario} />)}
+                element={protegido(
+                  puedeVerAgentes,
+                  <BaseDeDatosPage baseDatos={adaptadores.baseDatos} usuario={usuario} />,
+                )}
               />
-              <Route path="/memoria" element={protegido(puedeVerAgentes, <MemoriaPage />)} />
+              <Route
+                path="/memoria"
+                element={protegido(puedeVerAgentes, <MemoriaPage memoria={adaptadores.memoria} />)}
+              />
               <Route path="/herramientas" element={protegido(puedeVerAgentes, <HerramientasPage />)} />
               <Route
                 path="/menu-por-rol"
-                element={protegido(puedeVerIdentidad, <MenuPorRolPage usuario={usuario} />)}
+                element={protegido(
+                  puedeVerIdentidad,
+                  <MenuPorRolPage menuPorRol={adaptadores.menuPorRol} usuario={usuario} />,
+                )}
               />
-              <Route path="/usuarios" element={protegido(puedeVerIdentidad, <UsuariosRolesPage />)} />
+              <Route
+                path="/usuarios"
+                element={protegido(
+                  puedeVerIdentidad,
+                  <UsuariosRolesPage usuariosRealm={adaptadores.usuariosRealm} />,
+                )}
+              />
               <Route
                 path="/sincronizacion-bpm"
-                element={protegido(puedeVerIdentidad, <SincronizacionBpmPage />)}
+                element={protegido(puedeVerIdentidad, <SincronizacionBpmPage bpm={adaptadores.bpm} />)}
               />
-              <Route path="/gastos-fijos" element={protegido(puedeVerPersonal, <GastosFijosPage />)} />
+              <Route
+                path="/gastos-fijos"
+                element={protegido(
+                  puedeVerPersonal,
+                  <GastosFijosPage gastosFijos={adaptadores.gastosFijos} />,
+                )}
+              />
               <Route
                 path="/finanzas"
                 element={protegido(puedeVerPersonal, <Navigate replace to="/finanzas/resumen" />)}
