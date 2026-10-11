@@ -2,8 +2,8 @@
   <title>Lara</title>
   <!-- Mismo trazo que LaraLogo; color = --color-accent de cada tema (lo verifica src/contraste.test.ts). -->
   <style>
-    :root { color: #415363; }
-    @media (prefers-color-scheme: dark) { :root { color: #b7cad9; } }
+    :root { color: #006786; }
+    @media (prefers-color-scheme: dark) { :root { color: #b39cd0; } }
   </style>
   <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="2" />
   <path d="M10 8v12h9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />

@@ -17,60 +17,69 @@
   --color-neutral-800: #292929;
   --color-neutral-900: #131416;
   --color-neutral-950: #0a0c0e;
-  --color-hoki-50: #f6f7f9;
-  --color-hoki-100: #eceff2;
-  --color-hoki-200: #d4dce3;
-  --color-hoki-300: #afbeca;
-  --color-hoki-400: #839bad;
-  --color-hoki-500: #678398;
-  --color-hoki-600: #4f667a;
-  --color-hoki-700: #415363;
-  --color-hoki-800: #384754;
-  --color-hoki-900: #323d48;
-  --color-hoki-950: #212830;
-  /* Acento oscuro alterno (cielo, azul pastel): solo se usa en el lado oscuro de los tokens semánticos de abajo. */
-  --color-cielo-50: #f4f7f9;
-  --color-cielo-100: #e8eef2;
-  --color-cielo-200: #d6e3ec;
-  --color-cielo-300: #b7cad9;
-  --color-cielo-400: #91abc0;
-  --color-cielo-500: #70899f;
-  --color-cielo-600: #577089;
-  --color-cielo-700: #3e5365;
-  --color-cielo-800: #39495a;
-  --color-cielo-900: #2f3c4a;
-  --color-cielo-950: #1c252e;
+  /* Paleta pedida: claro en azules (fondo, blanco, azul brillante); oscuro en gris pizarra + cian/rosa/lavanda. */
+  --color-azul-claro: #e9f1fa;
+  --color-azul-claro-hover: #d3e6f5;
+  --color-azul-claro-borde: #c7dcec;
+  --color-azul-claro-borde-fuerte: #9fbfd9;
+  /* Tal cual lo pediste: solo sirve como FONDO (con tinta oscura) o decorativo (chart-5, que siempre
+     lleva etiqueta en texto) — como texto puro da 2.64:1 sobre blanco (se necesita 4.5:1). */
+  --color-azul-brillante: #00abe4;
+  /* Mismo matiz, oscurecido: el que carga el texto/accent/botones donde sí hace falta leerlo. */
+  --color-azul-oscuro: #006786;
+  --color-azul-hover: #007a9e;
+  --color-azul-chart-2: #0086b0;
+  --color-azul-chart-4: #004f66;
+  --color-azul-chart-5: #003347;
+  --color-texto-claro: #2b3a44;
+
+  --color-gris-pizarra: #2c2c2c;
+  --color-gris-pizarra-hover: #3a3a3a;
+  --color-gris-pizarra-borde: #454545;
+  --color-gris-pizarra-borde-fuerte: #5a5a5a;
+  --color-texto-oscuro: #e4e4e4;
+  --color-texto-oscuro-2: #b8b8b8;
+  --color-cian: #a8dadc;
+  --color-cian-oscuro: #6fa8ab;
+  --color-rosa: #ffc1cc;
+  --color-rosa-oscuro: #4a3a5c;
+  --color-lavanda: #b39cd0;
+  --color-lavanda-oscuro: #8268a0;
+  --color-ink-sobre-pastel: #1c1c1c;
+  /* Borde de controles: un solo valor en ambos temas, ajustado para leerse sobre blanco/azul claro
+     y sobre el gris pizarra oscuro (ver src/contraste.test.ts). */
+  --color-borde-control-claro: #6b6b6b;
+  --color-borde-control-oscuro: #8f8f8f;
   /*
-   * Tokens semánticos: light-dark(claro, oscuro). El oscuro es el de la guía y los PNG; el claro sale
-   * de la misma paleta (neutral + hoki) con los papeles invertidos. Requiere color-scheme (ver :root).
+   * Tokens semánticos: light-dark(claro, oscuro). Requiere color-scheme (ver :root).
    */
-  --color-bg: light-dark(var(--color-hoki-100), var(--color-neutral-950));
-  --color-sidebar: light-dark(var(--color-neutral-50), var(--color-neutral-900));
-  --color-surface: light-dark(var(--color-neutral-50), var(--color-neutral-900));
-  --color-surface-hover: light-dark(var(--color-hoki-200), var(--color-neutral-800));
-  --color-surface-active: light-dark(var(--color-hoki-200), var(--color-neutral-800));
-  --color-border: light-dark(var(--color-neutral-300), var(--color-neutral-800));
-  --color-divider: light-dark(var(--color-neutral-300), var(--color-neutral-800));
-  --color-border-strong: light-dark(var(--color-neutral-400), var(--color-neutral-700));
+  --color-bg: light-dark(var(--color-azul-claro), var(--color-gris-pizarra));
+  --color-sidebar: light-dark(var(--color-neutral-50), var(--color-gris-pizarra));
+  --color-surface: light-dark(var(--color-neutral-50), var(--color-gris-pizarra));
+  --color-surface-hover: light-dark(var(--color-azul-claro-hover), var(--color-gris-pizarra-hover));
+  --color-surface-active: light-dark(var(--color-azul-claro-hover), var(--color-gris-pizarra-hover));
+  --color-border: light-dark(var(--color-azul-claro-borde), var(--color-gris-pizarra-borde));
+  --color-divider: light-dark(var(--color-azul-claro-borde), var(--color-gris-pizarra-borde));
+  --color-border-strong: light-dark(var(--color-azul-claro-borde-fuerte), var(--color-gris-pizarra-borde-fuerte));
   /* Borde de controles (inputs, composer, radios) y pista del switch apagado: >= 3:1 sobre la superficie. */
-  --color-border-control: var(--color-neutral-500);
-  --color-control-off: var(--color-neutral-500);
-  --color-text: light-dark(var(--color-neutral-950), var(--color-neutral-50));
-  --color-text-2: light-dark(var(--color-neutral-800), var(--color-neutral-200));
-  --color-muted: light-dark(var(--color-hoki-800), var(--color-cielo-300));
-  --color-faint: light-dark(var(--color-hoki-700), var(--color-cielo-400));
-  --color-accent: light-dark(var(--color-hoki-700), var(--color-cielo-300));
-  --color-accent-hover: light-dark(var(--color-hoki-800), var(--color-cielo-200));
-  --color-accent-ink: light-dark(var(--color-neutral-50), var(--color-cielo-950));
-  --color-highlight: light-dark(var(--color-hoki-800), var(--color-cielo-200));
-  --color-highlight-ink: light-dark(var(--color-hoki-50), var(--color-cielo-950));
-  --color-highlight-muted: light-dark(var(--color-hoki-200), var(--color-cielo-700));
-  --color-chart-1: light-dark(var(--color-hoki-900), var(--color-cielo-200));
-  --color-chart-2: light-dark(var(--color-hoki-800), var(--color-cielo-300));
-  --color-chart-3: light-dark(var(--color-hoki-700), var(--color-cielo-400));
-  --color-chart-4: light-dark(var(--color-hoki-600), var(--color-cielo-500));
-  --color-chart-5: light-dark(var(--color-hoki-500), var(--color-cielo-600));
-  --color-ok: light-dark(var(--color-hoki-700), var(--color-cielo-400));
+  --color-border-control: light-dark(var(--color-borde-control-claro), var(--color-borde-control-oscuro));
+  --color-control-off: light-dark(var(--color-borde-control-claro), var(--color-borde-control-oscuro));
+  --color-text: light-dark(var(--color-neutral-950), var(--color-texto-oscuro));
+  --color-text-2: light-dark(var(--color-texto-claro), var(--color-texto-oscuro-2));
+  --color-muted: light-dark(var(--color-azul-oscuro), var(--color-cian));
+  --color-faint: light-dark(var(--color-azul-oscuro), var(--color-lavanda));
+  --color-accent: light-dark(var(--color-azul-oscuro), var(--color-lavanda));
+  --color-accent-hover: light-dark(var(--color-azul-hover), var(--color-rosa));
+  --color-accent-ink: light-dark(var(--color-neutral-50), var(--color-ink-sobre-pastel));
+  --color-highlight: light-dark(var(--color-azul-oscuro), var(--color-rosa));
+  --color-highlight-ink: light-dark(var(--color-neutral-50), var(--color-ink-sobre-pastel));
+  --color-highlight-muted: light-dark(var(--color-azul-claro-hover), var(--color-rosa-oscuro));
+  --color-chart-1: light-dark(var(--color-azul-chart-5), var(--color-rosa));
+  --color-chart-2: light-dark(var(--color-azul-chart-4), var(--color-cian));
+  --color-chart-3: light-dark(var(--color-azul-oscuro), var(--color-lavanda));
+  --color-chart-4: light-dark(var(--color-azul-chart-2), var(--color-cian-oscuro));
+  --color-chart-5: light-dark(var(--color-azul-brillante), var(--color-lavanda-oscuro));
+  --color-ok: light-dark(var(--color-azul-oscuro), var(--color-cian));
   --color-warn: light-dark(var(--color-neutral-600), var(--color-neutral-400));
   --color-danger: light-dark(var(--color-neutral-900), var(--color-neutral-300));
 

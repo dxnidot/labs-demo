@@ -20,102 +20,97 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 
 | Escala/token       | Hex       | Uso                                      |
 | ------------------ | --------- | ---------------------------------------- |
-| `neutral-50`       | `#FAFAFA` | Texto principal                          |
+| `neutral-50`       | `#FAFAFA` | Texto/superficies sobre accent (claro)   |
 | `neutral-100`      | `#F5F5F5` | Neutro claro                             |
-| `neutral-200`      | `#E6E6E6` | Texto secundario                         |
+| `neutral-200`      | `#E6E6E6` | Neutro claro                             |
 | `neutral-300`      | `#D6D6D6` | Estado danger                            |
 | `neutral-400`      | `#A5A5A5` | Estado warn                              |
-| `neutral-500`      | `#767676` | Neutro medio                             |
-| `neutral-600`      | `#575757` | Neutro medio oscuro                      |
-| `neutral-700`      | `#434343` | Neutro oscuro                            |
-| `neutral-800`      | `#292929` | Hover, activo, bordes, divisores y pills |
-| `neutral-900`      | `#1A1A1A` | Sidebar y superficies                   |
-| `neutral-950`      | `#14171B` | Fondo de la app                          |
-| `hoki-50`          | `#F6F7F9` | Hoki claro                               |
-| `hoki-100`         | `#ECEFF2` | Hoki claro                               |
-| `hoki-200`         | `#D4DCE3` | Accent hover, highlight, gráfico 1       |
-| `hoki-300`         | `#AFBECA` | Muted, accent, gráfico 2                 |
-| `hoki-400`         | `#839BAD` | Faint, estado ok, gráfico 3              |
-| `hoki-500`         | `#678398` | Gráfico 4                                |
-| `hoki-600`         | `#4F667A` | Hoki oscuro                              |
-| `hoki-700`         | `#415363` | Hoki oscuro                              |
-| `hoki-800`         | `#384754` | Hoki oscuro                              |
-| `hoki-900`         | `#323D48` | Hoki oscuro                              |
-| `hoki-950`         | `#212830` | Tinta sobre accent/highlight             |
-| `cielo-200`        | `#D6E3EC` | Accent hover, highlight (solo oscuro)    |
-| `cielo-300`        | `#B7CAD9` | Muted, accent (solo oscuro)              |
-| `cielo-400`        | `#91ABC0` | Faint, estado ok (solo oscuro)           |
-| `cielo-500`–`700`  | `#70899F`–`#3E5365` | Gráficas y highlight-muted (solo oscuro) |
-| `cielo-950`        | `#1C252E` | Tinta sobre accent/highlight (solo oscuro) |
-| `bg`               | `#14171B` | Fondo                                   |
-| `sidebar`, `surface` | `#1A1A1A` | Barra lateral, tarjetas y composer       |
-| `surface-hover`, `surface-active`, `border`, `divider` | `#292929` | Estados y separadores |
-| `text`              | `#FAFAFA` | Texto principal                           |
-| `text-2`            | `#E6E6E6` | Texto secundario                          |
-| `muted`             | `#AFBECA` | Descripciones                             |
-| `faint`              | `#839BAD` | Notas y etiquetas                         |
-| `accent`             | `#AFBECA` | Acciones principales, links e iconos      |
-| `accent-hover`, `highlight` | `#D4DCE3` | Hover; fondo de tarjeta destacada |
-| `accent-ink`, `highlight-ink` | `#212830` | Texto sobre accent/highlight |
+| `neutral-500`–`700`| `#767676`–`#434343` | Neutros medios (sin uso semántico directo) |
+| `neutral-900`      | `#131416` | Estado danger (claro)                    |
+| `neutral-950`      | `#0A0C0E` | Texto principal (claro)                  |
+
+Desde la vuelta de colores, **claro y oscuro ya no son la misma paleta invertida**: son dos familias de color distintas, cada una con su propio primitivo en `index.css`.
+
+**Claro** — azules (fondo e interacción) + blanco (superficies):
+
+| Token               | Hex       | Uso                                          |
+| ------------------- | --------- | --------------------------------------------- |
+| `azul-claro`         | `#E9F1FA` | Fondo de la app                               |
+| `azul-claro-hover`   | `#D3E6F5` | Hover/activo, muted sobre highlight           |
+| `azul-claro-borde`   | `#C7DCEC` | Bordes y divisores                            |
+| `azul-claro-borde-fuerte` | `#9FBFD9` | Bordes marcados                       |
+| `azul-brillante`     | `#00ABE4` | Solo fondo (con tinta oscura) o `chart-5` (decorativo, siempre con etiqueta); como texto da 2.64:1, no alcanza 4.5:1 |
+| `azul-oscuro`        | `#006786` | Texto: accent, muted, faint, ok, highlight     |
+| `azul-hover`         | `#007A9E` | Fondo de accent-hover (con tinta blanca)       |
+| `azul-chart-2/4/5`   | `#0086B0` / `#004F66` / `#003347` | Serie de gráficas |
+
+**Oscuro** — gris pizarra (fondo) + cian/rosa/lavanda (acentos):
+
+| Token               | Hex       | Uso                                       |
+| ------------------- | --------- | ------------------------------------------ |
+| `gris-pizarra`       | `#2C2C2C` | Fondo, barra lateral y superficies         |
+| `gris-pizarra-hover` | `#3A3A3A` | Hover/activo                               |
+| `gris-pizarra-borde` | `#454545` | Bordes y divisores                         |
+| `gris-pizarra-borde-fuerte` | `#5A5A5A` | Bordes marcados                     |
+| `cian`               | `#A8DADC` | Texto: muted, estado ok, gráfico           |
+| `rosa`               | `#FFC1CC` | Fondo de accent-hover y highlight (con tinta oscura) |
+| `rosa-oscuro`        | `#4A3A5C` | Texto muted sobre highlight (rosa)         |
+| `lavanda`            | `#B39CD0` | Accent, faint, botón/CTA principal         |
+| `lavanda-oscuro`     | `#8268A0` | Gráfico                                    |
+| `cian-oscuro`        | `#6FA8AB` | Gráfico                                    |
+| `ink-sobre-pastel`   | `#1C1C1C` | Texto sobre accent/highlight/cian/rosa/lavanda |
 
 #### Series de gráficas
 
-| Token      | Hex       |
-| ---------- | --------- |
-| `chart-1`  | `#D4DCE3` |
-| `chart-2`  | `#AFBECA` |
-| `chart-3`  | `#839BAD` |
-| `chart-4`  | `#678398` |
-| `chart-5`  | `#4F667A` |
+| Token      | Claro     | Oscuro    |
+| ---------- | --------- | --------- |
+| `chart-1`  | `#003347` | `#FFC1CC` |
+| `chart-2`  | `#004F66` | `#A8DADC` |
+| `chart-3`  | `#006786` | `#B39CD0` |
+| `chart-4`  | `#0086B0` | `#6FA8AB` |
+| `chart-5`  | `#00ABE4` | `#8268A0` |
 
 #### Estados
 
-| Token      | Hex       | Uso                                      |
-| ---------- | --------- | ---------------------------------------- |
-| `ok`       | `#839BAD` | Correcto, arriba, permitido              |
-| `warn`     | `#A5A5A5` | Pendiente, parcial, solo lectura         |
-| `danger`   | `#D6D6D6` | Error, bloqueado, rechazado              |
+| Token      | Hex (claro / oscuro)   | Uso                                      |
+| ---------- | ------------------------ | ----------------------------------------- |
+| `ok`       | `#006786` / `#A8DADC`    | Correcto, arriba, permitido              |
+| `warn`     | `#575757` / `#A5A5A5`    | Pendiente, parcial, solo lectura         |
+| `danger`   | `#131416` / `#D6D6D6`    | Error, bloqueado, rechazado              |
 
-**Regla:** el estado nunca se comunica solo con color. Siempre va con texto ("Arriba", "Pendiente", "bloqueada") y, en los puntos de estado, con forma: círculo lleno (ok), rombo (warn) y anillo hueco (danger).
+**Regla:** el estado nunca se comunica solo con color. Siempre va con texto ("Arriba", "Pendiente", "bloqueada") y, en los puntos de estado, con forma: círculo lleno (ok), rombo (warn) y anillo hueco (danger). `ok`/`warn`/`danger` se quedaron en gris/azul-oscuro a propósito (no rojo/verde): es una decisión de accesibilidad a daltonismo, no se tocó con el cambio de paleta.
 
-#### Tema claro
-
-Los PNG solo definen el oscuro. El claro se deriva de la misma paleta (neutral + hoki) con los papeles invertidos: el botón primario y el bloque "Próximo pago" pasan a ser oscuros. **Pendiente del ok de quien mantiene el lab.**
+#### Tema claro / oscuro
 
 En `index.css` cada token semántico se define una sola vez con `light-dark(claro, oscuro)`. `:root` declara `color-scheme: light dark` (sigue `prefers-color-scheme`) y `data-theme="claro" | "oscuro"` en `<html>` lo fuerza; la preferencia (`sistema` | `claro` | `oscuro`) se guarda en `lara.tema` y se aplica antes del primer render. `light-dark()` funciona desde Chrome y Edge 123, Firefox 120 y Safari 17.5.
 
 | Token | Claro | Oscuro |
 | ----- | ----- | ------ |
-| `bg` | #ECEFF2 | #0A0C0E |
-| `sidebar` | #FAFAFA | #131416 |
-| `surface` | #FAFAFA | #131416 |
-| `surface-hover` | #D4DCE3 | #292929 |
-| `surface-active` | #D4DCE3 | #292929 |
-| `border` | #D6D6D6 | #292929 |
-| `divider` | #D6D6D6 | #292929 |
-| `border-strong` | #A5A5A5 | #434343 |
-| `border-control` | #767676 | #767676 |
-| `control-off` | #767676 | #767676 |
-| `text` | #14171B | #FAFAFA |
-| `text-2` | #292929 | #E6E6E6 |
-| `muted` | #384754 | #B7CAD9 |
-| `faint` | #415363 | #91ABC0 |
-| `accent` | #415363 | #B7CAD9 |
-| `accent-hover` | #384754 | #D6E3EC |
-| `accent-ink` | #FAFAFA | #1C252E |
-| `highlight` | #384754 | #D6E3EC |
-| `highlight-ink` | #F6F7F9 | #1C252E |
-| `highlight-muted` | #D4DCE3 | #3E5365 |
-| `chart-1` | #323D48 | #D6E3EC |
-| `chart-2` | #384754 | #B7CAD9 |
-| `chart-3` | #415363 | #91ABC0 |
-| `chart-4` | #4F667A | #70899F |
-| `chart-5` | #678398 | #577089 |
-| `ok` | #415363 | #91ABC0 |
+| `bg` | #E9F1FA | #2C2C2C |
+| `sidebar` | #FAFAFA | #2C2C2C |
+| `surface` | #FAFAFA | #2C2C2C |
+| `surface-hover` | #D3E6F5 | #3A3A3A |
+| `surface-active` | #D3E6F5 | #3A3A3A |
+| `border` | #C7DCEC | #454545 |
+| `divider` | #C7DCEC | #454545 |
+| `border-strong` | #9FBFD9 | #5A5A5A |
+| `border-control` | #6B6B6B | #8F8F8F |
+| `control-off` | #6B6B6B | #8F8F8F |
+| `text` | #0A0C0E | #E4E4E4 |
+| `text-2` | #2B3A44 | #B8B8B8 |
+| `muted` | #006786 | #A8DADC |
+| `faint` | #006786 | #B39CD0 |
+| `accent` | #006786 | #B39CD0 |
+| `accent-hover` | #007A9E | #FFC1CC |
+| `accent-ink` | #FAFAFA | #1C1C1C |
+| `highlight` | #006786 | #FFC1CC |
+| `highlight-ink` | #FAFAFA | #1C1C1C |
+| `highlight-muted` | #D3E6F5 | #4A3A5C |
+| `ok` | #006786 | #A8DADC |
 | `warn` | #575757 | #A5A5A5 |
-| `danger` | #1A1A1A | #D6D6D6 |
+| `danger` | #131416 | #D6D6D6 |
 
-**Acento oscuro `cielo`:** el modo oscuro usa una escala azul pastel aparte (`--color-cielo-*` en `index.css`, 50–950) en vez de `hoki` para `accent`, `muted`, `faint`, `highlight*`, `chart-*` y `ok`; el claro no cambió y sigue en `hoki`. El fondo oscuro (`bg`/`sidebar`/`surface`) también se oscureció (`neutral-950`/`neutral-900` más negros, estilo "OLED"). Todo verificado en `src/contraste.test.ts` (texto >= 4.5:1, controles >= 3:1).
+**Nota de contraste:** `border-control`/`control-off` pasaron de un solo valor en ambos temas a `light-dark()` — el fondo gris pizarra oscuro necesitaba un gris más claro que el claro para llegar a 3:1 contra ambos. `azul-brillante` (`#00ABE4`, el color pedido tal cual) solo se usa de fondo (con tinta oscura) o en `chart-5` (decorativo, siempre con etiqueta); como texto da 2.64:1, no alcanza 4.5:1 — en cualquier rol de texto se usa `azul-oscuro` (mismo matiz, oscurecido).
 
 Contraste calculado desde estos tokens y verificado en `src/contraste.test.ts`: texto >= 4.5:1 y controles y estados >= 3:1 en ambos temas. La única excepción es `chart-5`, que siempre va con etiqueta y valor en texto. `ok` y `danger` se distinguen además por forma y por texto.
 
