@@ -33,53 +33,55 @@
   --color-azul-chart-5: #003347;
   --color-texto-claro: #2b3a44;
 
-  --color-gris-pizarra: #2c2c2c;
-  --color-gris-pizarra-hover: #3a3a3a;
-  --color-gris-pizarra-borde: #454545;
-  --color-gris-pizarra-borde-fuerte: #5a5a5a;
-  --color-texto-oscuro: #e4e4e4;
-  --color-texto-oscuro-2: #b8b8b8;
-  --color-cian: #a8dadc;
-  --color-cian-oscuro: #6fa8ab;
-  --color-rosa: #ffc1cc;
-  --color-rosa-oscuro: #4a3a5c;
-  --color-lavanda: #b39cd0;
-  --color-lavanda-oscuro: #8268a0;
-  --color-ink-sobre-pastel: #1c1c1c;
+  /* Oscuro provisional (monocromo), mientras se decide algo definitivo: negro carbón + grises. */
+  --color-mono-bg: #121212;
+  --color-mono-hover: #1e1e1e;
+  --color-mono-borde: #444444;
+  --color-mono-borde-fuerte: #5a5a5a;
+  --color-mono-texto: #e0e0e0;
+  --color-mono-texto-2: #b0b0b0;
+  --color-mono-acento: #888888;
+  --color-mono-acento-hover: #a0a0a0;
+  --color-mono-ink: #121212;
+  --color-mono-muted-sobre-acento: #1a1a1a;
+  --color-mono-chart-1: #d0d0d0;
+  --color-mono-chart-2: #b0b0b0;
+  --color-mono-chart-4: #707070;
+  --color-mono-chart-5: #505050;
   /* Borde de controles: un solo valor en ambos temas, ajustado para leerse sobre blanco/azul claro
-     y sobre el gris pizarra oscuro (ver src/contraste.test.ts). */
+     y sobre el gris carbón oscuro (ver src/contraste.test.ts). */
   --color-borde-control-claro: #6b6b6b;
-  --color-borde-control-oscuro: #8f8f8f;
+  --color-borde-control-oscuro: var(--color-mono-acento);
   /*
    * Tokens semánticos: light-dark(claro, oscuro). Requiere color-scheme (ver :root).
    */
-  --color-bg: light-dark(var(--color-azul-claro), var(--color-gris-pizarra));
-  --color-sidebar: light-dark(var(--color-neutral-50), var(--color-gris-pizarra));
-  --color-surface: light-dark(var(--color-neutral-50), var(--color-gris-pizarra));
-  --color-surface-hover: light-dark(var(--color-azul-claro-hover), var(--color-gris-pizarra-hover));
-  --color-surface-active: light-dark(var(--color-azul-claro-hover), var(--color-gris-pizarra-hover));
-  --color-border: light-dark(var(--color-azul-claro-borde), var(--color-gris-pizarra-borde));
-  --color-divider: light-dark(var(--color-azul-claro-borde), var(--color-gris-pizarra-borde));
-  --color-border-strong: light-dark(var(--color-azul-claro-borde-fuerte), var(--color-gris-pizarra-borde-fuerte));
+  --color-bg: light-dark(var(--color-azul-claro), var(--color-mono-bg));
+  --color-sidebar: light-dark(var(--color-neutral-50), var(--color-mono-bg));
+  --color-surface: light-dark(var(--color-neutral-50), var(--color-mono-bg));
+  --color-surface-hover: light-dark(var(--color-azul-claro-hover), var(--color-mono-hover));
+  --color-surface-active: light-dark(var(--color-azul-claro-hover), var(--color-mono-hover));
+  --color-border: light-dark(var(--color-azul-claro-borde), var(--color-mono-borde));
+  --color-divider: light-dark(var(--color-azul-claro-borde), var(--color-mono-borde));
+  --color-border-strong: light-dark(var(--color-azul-claro-borde-fuerte), var(--color-mono-borde-fuerte));
   /* Borde de controles (inputs, composer, radios) y pista del switch apagado: >= 3:1 sobre la superficie. */
   --color-border-control: light-dark(var(--color-borde-control-claro), var(--color-borde-control-oscuro));
   --color-control-off: light-dark(var(--color-borde-control-claro), var(--color-borde-control-oscuro));
-  --color-text: light-dark(var(--color-neutral-950), var(--color-texto-oscuro));
-  --color-text-2: light-dark(var(--color-texto-claro), var(--color-texto-oscuro-2));
-  --color-muted: light-dark(var(--color-azul-oscuro), var(--color-cian));
-  --color-faint: light-dark(var(--color-azul-oscuro), var(--color-lavanda));
-  --color-accent: light-dark(var(--color-azul-oscuro), var(--color-lavanda));
-  --color-accent-hover: light-dark(var(--color-azul-hover), var(--color-rosa));
-  --color-accent-ink: light-dark(var(--color-neutral-50), var(--color-ink-sobre-pastel));
-  --color-highlight: light-dark(var(--color-azul-oscuro), var(--color-rosa));
-  --color-highlight-ink: light-dark(var(--color-neutral-50), var(--color-ink-sobre-pastel));
-  --color-highlight-muted: light-dark(var(--color-azul-claro-hover), var(--color-rosa-oscuro));
-  --color-chart-1: light-dark(var(--color-azul-chart-5), var(--color-rosa));
-  --color-chart-2: light-dark(var(--color-azul-chart-4), var(--color-cian));
-  --color-chart-3: light-dark(var(--color-azul-oscuro), var(--color-lavanda));
-  --color-chart-4: light-dark(var(--color-azul-chart-2), var(--color-cian-oscuro));
-  --color-chart-5: light-dark(var(--color-azul-brillante), var(--color-lavanda-oscuro));
-  --color-ok: light-dark(var(--color-azul-oscuro), var(--color-cian));
+  --color-text: light-dark(var(--color-neutral-950), var(--color-mono-texto));
+  --color-text-2: light-dark(var(--color-texto-claro), var(--color-mono-texto-2));
+  --color-muted: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-faint: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-accent: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-accent-hover: light-dark(var(--color-azul-hover), var(--color-mono-acento-hover));
+  --color-accent-ink: light-dark(var(--color-neutral-50), var(--color-mono-ink));
+  --color-highlight: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-highlight-ink: light-dark(var(--color-neutral-50), var(--color-mono-ink));
+  --color-highlight-muted: light-dark(var(--color-azul-claro-hover), var(--color-mono-muted-sobre-acento));
+  --color-chart-1: light-dark(var(--color-azul-chart-5), var(--color-mono-chart-1));
+  --color-chart-2: light-dark(var(--color-azul-chart-4), var(--color-mono-chart-2));
+  --color-chart-3: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
+  --color-chart-4: light-dark(var(--color-azul-chart-2), var(--color-mono-chart-4));
+  --color-chart-5: light-dark(var(--color-azul-brillante), var(--color-mono-chart-5));
+  --color-ok: light-dark(var(--color-azul-oscuro), var(--color-mono-acento));
   --color-warn: light-dark(var(--color-neutral-600), var(--color-neutral-400));
   --color-danger: light-dark(var(--color-neutral-900), var(--color-neutral-300));
 

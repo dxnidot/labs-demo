@@ -44,37 +44,37 @@ Desde la vuelta de colores, **claro y oscuro ya no son la misma paleta invertida
 | `azul-hover`         | `#007A9E` | Fondo de accent-hover (con tinta blanca)       |
 | `azul-chart-2/4/5`   | `#0086B0` / `#004F66` / `#003347` | Serie de gráficas |
 
-**Oscuro** — gris pizarra (fondo) + cian/rosa/lavanda (acentos):
+**Oscuro** — negro carbón + grises, provisional mientras se decide un color definitivo (sustituyó a cian/rosa/lavanda):
 
-| Token               | Hex       | Uso                                       |
-| ------------------- | --------- | ------------------------------------------ |
-| `gris-pizarra`       | `#2C2C2C` | Fondo, barra lateral y superficies         |
-| `gris-pizarra-hover` | `#3A3A3A` | Hover/activo                               |
-| `gris-pizarra-borde` | `#454545` | Bordes y divisores                         |
-| `gris-pizarra-borde-fuerte` | `#5A5A5A` | Bordes marcados                     |
-| `cian`               | `#A8DADC` | Texto: muted, estado ok, gráfico           |
-| `rosa`               | `#FFC1CC` | Fondo de accent-hover y highlight (con tinta oscura) |
-| `rosa-oscuro`        | `#4A3A5C` | Texto muted sobre highlight (rosa)         |
-| `lavanda`            | `#B39CD0` | Accent, faint, botón/CTA principal         |
-| `lavanda-oscuro`     | `#8268A0` | Gráfico                                    |
-| `cian-oscuro`        | `#6FA8AB` | Gráfico                                    |
-| `ink-sobre-pastel`   | `#1C1C1C` | Texto sobre accent/highlight/cian/rosa/lavanda |
+| Token                   | Hex       | Uso                                       |
+| ----------------------- | --------- | ------------------------------------------ |
+| `mono-bg`                | `#121212` | Fondo, barra lateral y superficies         |
+| `mono-hover`             | `#1E1E1E` | Hover/activo                               |
+| `mono-borde`             | `#444444` | Bordes y divisores                         |
+| `mono-borde-fuerte`      | `#5A5A5A` | Bordes marcados                            |
+| `mono-texto`             | `#E0E0E0` | Texto principal                            |
+| `mono-texto-2`           | `#B0B0B0` | Texto secundario                           |
+| `mono-acento`            | `#888888` | Accent, muted, faint, ok, highlight, botón/CTA |
+| `mono-acento-hover`      | `#A0A0A0` | Fondo de accent-hover (con tinta negra)    |
+| `mono-ink`               | `#121212` | Texto sobre accent/highlight                |
+| `mono-muted-sobre-acento`| `#1A1A1A` | Texto muted sobre highlight                 |
+| `mono-chart-1/2/4/5`     | `#D0D0D0` / `#B0B0B0` / `#707070` / `#505050` | Serie de gráficas |
 
 #### Series de gráficas
 
 | Token      | Claro     | Oscuro    |
 | ---------- | --------- | --------- |
-| `chart-1`  | `#003347` | `#FFC1CC` |
-| `chart-2`  | `#004F66` | `#A8DADC` |
-| `chart-3`  | `#006786` | `#B39CD0` |
-| `chart-4`  | `#0086B0` | `#6FA8AB` |
-| `chart-5`  | `#00ABE4` | `#8268A0` |
+| `chart-1`  | `#003347` | `#D0D0D0` |
+| `chart-2`  | `#004F66` | `#B0B0B0` |
+| `chart-3`  | `#006786` | `#888888` |
+| `chart-4`  | `#0086B0` | `#707070` |
+| `chart-5`  | `#00ABE4` | `#505050` |
 
 #### Estados
 
 | Token      | Hex (claro / oscuro)   | Uso                                      |
 | ---------- | ------------------------ | ----------------------------------------- |
-| `ok`       | `#006786` / `#A8DADC`    | Correcto, arriba, permitido              |
+| `ok`       | `#006786` / `#888888`    | Correcto, arriba, permitido              |
 | `warn`     | `#575757` / `#A5A5A5`    | Pendiente, parcial, solo lectura         |
 | `danger`   | `#131416` / `#D6D6D6`    | Error, bloqueado, rechazado              |
 
@@ -86,27 +86,27 @@ En `index.css` cada token semántico se define una sola vez con `light-dark(clar
 
 | Token | Claro | Oscuro |
 | ----- | ----- | ------ |
-| `bg` | #E9F1FA | #2C2C2C |
-| `sidebar` | #FAFAFA | #2C2C2C |
-| `surface` | #FAFAFA | #2C2C2C |
-| `surface-hover` | #D3E6F5 | #3A3A3A |
-| `surface-active` | #D3E6F5 | #3A3A3A |
-| `border` | #C7DCEC | #454545 |
-| `divider` | #C7DCEC | #454545 |
+| `bg` | #E9F1FA | #121212 |
+| `sidebar` | #FAFAFA | #121212 |
+| `surface` | #FAFAFA | #121212 |
+| `surface-hover` | #D3E6F5 | #1E1E1E |
+| `surface-active` | #D3E6F5 | #1E1E1E |
+| `border` | #C7DCEC | #444444 |
+| `divider` | #C7DCEC | #444444 |
 | `border-strong` | #9FBFD9 | #5A5A5A |
-| `border-control` | #6B6B6B | #8F8F8F |
-| `control-off` | #6B6B6B | #8F8F8F |
-| `text` | #0A0C0E | #E4E4E4 |
-| `text-2` | #2B3A44 | #B8B8B8 |
-| `muted` | #006786 | #A8DADC |
-| `faint` | #006786 | #B39CD0 |
-| `accent` | #006786 | #B39CD0 |
-| `accent-hover` | #007A9E | #FFC1CC |
-| `accent-ink` | #FAFAFA | #1C1C1C |
-| `highlight` | #006786 | #FFC1CC |
-| `highlight-ink` | #FAFAFA | #1C1C1C |
-| `highlight-muted` | #D3E6F5 | #4A3A5C |
-| `ok` | #006786 | #A8DADC |
+| `border-control` | #6B6B6B | #888888 |
+| `control-off` | #6B6B6B | #888888 |
+| `text` | #0A0C0E | #E0E0E0 |
+| `text-2` | #2B3A44 | #B0B0B0 |
+| `muted` | #006786 | #888888 |
+| `faint` | #006786 | #888888 |
+| `accent` | #006786 | #888888 |
+| `accent-hover` | #007A9E | #A0A0A0 |
+| `accent-ink` | #FAFAFA | #121212 |
+| `highlight` | #006786 | #888888 |
+| `highlight-ink` | #FAFAFA | #121212 |
+| `highlight-muted` | #D3E6F5 | #1A1A1A |
+| `ok` | #006786 | #888888 |
 | `warn` | #575757 | #A5A5A5 |
 | `danger` | #131416 | #D6D6D6 |
 
@@ -151,9 +151,8 @@ Los componentes no usan valores arbitrarios (`text-[13px]`, `rounded-[10px]`…)
 App
 ├── Sidebar
 │   ├── Logo + contraer
-│   ├── Nuevo chat (botón principal) · Buscar chats · Estado del lab
-│   ├── AGENTES: Agentes · Base de datos · Memoria vectorizada · Herramientas MCP
-│   ├── IDENTIDAD: Menú por rol · Usuarios y roles · Sincronización BPM
+│   ├── Nuevo chat (botón principal) · Estado del lab
+│   ├── LABORATORIO (colapsable): Agentes · Base de datos · Memoria vectorizada · Herramientas MCP · Menú por rol · Usuarios y roles
 │   ├── PERSONAL · SOLO LOCAL: Finanzas · Gastos fijos
 │   ├── RECIENTES: lista de chats
 │   └── Usuario (username, rol, entorno) · Configuración · Cerrar sesión
@@ -176,7 +175,6 @@ El item activo usa `aria-current="page"`. Cerrar sesión llama a `logout` de Key
 | 08  | `png/08-herramientas.png`       | Herramientas MCP    | B.6                | Lista de tools y permisos                             |
 | 09  | `png/09-menu-por-rol.png`       | Menú por rol        | kc-front           | kc-demo `GET /api/menu`                               |
 | 10  | `png/10-usuarios-roles.png`     | Usuarios y roles    | Keycloak           | Admin REST API, solo lectura                          |
-| 11  | `png/11-sincronizacion-bpm.png` | Sincronización BPM  | bpm-sync           | Resultado del dry-run                                 |
 | 12  | `png/12-finanzas.png`           | Finanzas            | FIN                | servicio finanzas (`:8083`)                           |
 | 13  | `png/13-gastos-fijos.png`       | Gastos fijos        | FIN                | servicio finanzas (`:8083`)                           |
 | 14  | `png/14-finanzas-tarjetas.png`  | Tarjetas y pagos    | FIN                | servicio finanzas (`:8083`)                           |
@@ -254,13 +252,6 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 - Tabla de usuarios, grupo y roles del client. Inspector de token con los claims decodificados.
 - El token solo se decodifica en pantalla; nunca se guarda ni se manda a otro lado.
 
-### 11 · Sincronización BPM
-
-![Sincronización BPM](png/11-sincronizacion-bpm.png)
-
-- Pill **Dry-run** y botón para ejecutarlo. Contadores: crear, actualizar, sin cambios, huérfanas.
-- Tabla con la acción por usuario. Las huérfanas no se borran solas.
-
 ### 12 · Finanzas
 
 ![Finanzas](png/12-finanzas.png)
@@ -298,7 +289,7 @@ Nota: algunas capturas aún muestran aclaraciones y kc-front; ambos se retiraron
 - Arquitectura hexagonal ligera: `AuthPort`, `AgentePort` y un puerto por fuente de datos de cada vista.
 - Tokens solo en memoria. Nada en `localStorage`, con dos excepciones: la clave `lara.fuente` (fuente elegida en "Apariencia") y la clave `lara.tema` (`sistema` | `claro` | `oscuro`, por defecto `sistema`). Son preferencias visuales, no sensibles, y se usan siempre con `try/catch` y valor por defecto. Ningún otro dato puede ir a `localStorage`.
 - Datos de relleno: un único composition root (`src/infrastructure/composition.ts`) elige los adaptadores. Con `VITE_USE_MOCKS=true` usa los mock de `src/infrastructure/mocks/` (ficticios, solo en memoria, marcados `// MOCK`) para `AuthPort`, `AgentePort`, `ModeloPort`, `EstadoLabPort`, `MenuPort` y `FinanzasPort`, y Lara abre sin Keycloak ni backend con una pill "MOCK" junto al logo. Sin la variable (o con `false`) usa los servicios reales. Para activarlo copia `apps/lara-web/.env.example` a `.env.local` (ignorado por Git) o, en PowerShell, `$env:VITE_USE_MOCKS = "true"; npm run dev`.
-- Vistas de administración (BD, usuarios, BPM, herramientas) **solo lectura** desde Lara.
+- Vistas de administración (BD, usuarios, herramientas) **solo lectura** desde Lara.
 - Finanzas: datos en el servicio finanzas (Postgres local); al LLM solo le llegan resultados calculados.
 - Botones reales (`<button>`, `<a>`), `aria-label` en botones de solo ícono, contraste AA.
 - Estados comunes de las vistas que cargan datos: carga con esqueletos (`animate-pulse`, quieto con `prefers-reduced-motion`) y un aviso `role="status"` para lectores de pantalla; vacío con una frase en lenguaje claro (nunca claves del backlog ni "Pendiente:"); error con `role="alert"` y botón **Reintentar**.
