@@ -4,16 +4,15 @@ Este directorio guarda la parte publicable del proyecto y del laboratorio.
 
 ## Estructura
 
-- `backlog/`: historias y pendientes del lab.
-- `bugs/`: incidencias con causa, síntoma y fix propuesto.
-- `decisions/`: ADRs cortos con contexto y decisión.
-- `plans/`: planes del trabajo activo.
-- `archive/`: contenido ya cerrado o movido fuera de la ruta activa.
-- `private/`: notas personales y borradores que no deben subirse.
+- `snapshot-<fecha>.md`: estado vivo y resumido del proyecto (se reemplaza, no se acumula). Punto de partida de la memoria vectorizada.
+- `design/`: guía visual activa de Lara (tokens, mockups PNG/HTML). Manda sobre cualquier skill de diseño.
+- `archive/`: historial completo movido fuera de la ruta activa — `backlog/` (historias), `decisions/` (ADRs), `plans/` (planes cerrados), `bugs/` (incidencias corregidas).
+
+El detalle histórico (por qué se tomó cada decisión, el estado exacto de cada historia) vive en `archive/`; para trabajar día a día basta con el snapshot y, pronto, la búsqueda semántica sobre `archive/` + este directorio.
 
 ## Reglas
 
 - Mantener un archivo por tema.
 - Mantener los documentos en español cuando se trate del flujo del lab.
 - No guardar secretos, tokens, credenciales, nombres internos ni datos del banco.
-- Cuando algo esté listo, moverlo a `archive/`.
+- Cuando algo esté cerrado, moverlo a `archive/` en vez de borrarlo.
