@@ -1,0 +1,25 @@
+# AG-09 · Memoria vectorizada con RAG
+
+- Estado: Pendiente
+- Prioridad: Alta
+- Parte del lab: fuera de los módulos originales (iniciativa nueva)
+- Depende de: AG-01
+- Fecha: 2026-10-10
+- Contexto: Herramienta de búsqueda semántica sobre los documentos del propio proyecto (`docs/archive/**`, `docs/snapshot-<fecha>.md`), pensada primero para usarse durante las sesiones de trabajo (ahorrar tokens evitando releer archivos completos) y, si funciona bien, como backend real de `MemoriaPort` en Lara (hoy mockeado, pantalla 07).
+- Criterio de aceptación:
+  - `docker compose` levanta un Postgres propio con la extensión `pgvector` (`CREATE EXTENSION vector` ya aplicado), separado de los Postgres de Keycloak y kc-finanzas.
+  - Un script de ingesta trocea `docs/archive/**` + el snapshot vigente, genera embeddings y los inserta con índice HNSW; correrlo dos veces no duplica filas.
+  - Un script de consulta por CLI devuelve los fragmentos más relevantes para una pregunta en español en menos de un par de segundos.
+  - (Solo si se decide dar el paso siguiente) `MemoriaPort` tiene un adaptador HTTP real y `MockMemoriaAdapter` deja de usarse en `crearReales()`.
+- Archivos relevantes:
+  - infra/ (nuevo servicio Docker Compose)
+  - agents/ o scripts/ (ingesta y consulta)
+  - apps/lara-web/src/application/ports/MemoriaPort.ts
+  - apps/lara-web/src/infrastructure/composition.ts
+  - docs/decisions/ (ADR nuevo)
+- Notas:
+  - Confirmado: motor Postgres + `pgvector` en vez de Supabase — el stack self-hosted de Supabase son 8-11 servicios y ≥4 GB RAM solo para tener algo que una extensión resuelve en cualquier Postgres.
+  - Confirmado: índice HNSW (mejor relación velocidad/recall que IVFFlat, sin paso de entrenamiento; adecuado para el volumen pequeño de este lab) — README de pgvector.
+  - Confirmado: embeddings con `gemini/gemini-embedding-001` vía LiteLLM, reutilizando `GEMINI_API_KEY` de `agents/orquestador/.env`; verificado en el paquete instalado (`agents/.venv/Lib/site-packages/litellm/model_prices_and_context_window_backup.json:26915`), no solo en documentación web. 2048 tokens máx. de entrada, salida truncable a 768 dimensiones.
+  - Pendiente: tamaño de chunk exacto para trocear los `.md` (orientativo: 300–500 tokens).
+  - Pendiente: si se conecta como backend de `MemoriaPort`, revisar ADR-0007 (qué fragmentos son seguros de reenviar al proveedor del modelo) antes de usarlos como tool del orquestador — fuera de alcance de esta iteración.
