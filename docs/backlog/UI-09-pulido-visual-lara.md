@@ -53,6 +53,7 @@
   - Confirmado: se corrigieron dos defectos previos: la columna "monto" de "Últimos movimientos" ya no se corta con el panel del asistente abierto (tabla de 3 columnas con el origen bajo el concepto) y el estado vacío del chat arranca arriba, con el saludo visible a 320 px.
   - Confirmado: el test intermitente de foco al contraer la barra lateral era una carrera del componente (un efecto con estado anterior consumía el destino de foco); se corrigió con `focoAplicable`.
   - Pendiente: Lato y NTR, que la guía visual citaba como fuentes alternativas, no están instaladas; requieren decidir y autorizar sus paquetes `@fontsource`.
-  - Pendiente: fase C (resto): pulir las vistas 05–11 y 13 contra su PNG con datos de relleno (Agentes, Base de datos ampliada, Memoria, Herramientas, Menú por rol, Usuarios, BPM y Gastos fijos) y el chat con A2A, pasos y adjuntar; faltan sus puertos y mocks.
+  - Confirmado: fase C (resto) hecha — vistas 05–11 y 13 pulidas contra su PNG con datos de relleno (Agentes, Base de datos ampliada, Memoria, Herramientas, Menú por rol, Usuarios y roles, Sincronización BPM y Gastos fijos), cada una con su puerto y mock, y el chat con A2A, pasos y adjuntar.
+  - Confirmado: la vista "Sincronización BPM" se quitó de Lara (no se implementará); se borraron su página, puerto, mock, dominio y rama del sidebar. El servicio `bpm-sync` en sí (BPM-01) sigue como una decisión de backend aparte, sin tocar.
   - Pendiente: fase D (motion en CSS).
   - Pendiente: el `Estado` de UI-09 pasará a "Hecho" solo al cerrar las fases C y D.

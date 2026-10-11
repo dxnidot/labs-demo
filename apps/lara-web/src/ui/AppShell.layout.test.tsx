@@ -68,7 +68,6 @@ const rutas = [
   { ruta: "/herramientas", titulo: "Herramientas MCP" },
   { ruta: "/menu-por-rol", titulo: "Menú por rol" },
   { ruta: "/usuarios", titulo: "Usuarios y roles" },
-  { ruta: "/sincronizacion-bpm", titulo: "Sincronización BPM" },
   { ruta: "/gastos-fijos", titulo: "Gastos fijos" },
   { ruta: "/finanzas/resumen", titulo: "Finanzas" },
   { ruta: "/finanzas/gastos", titulo: "Finanzas" },
@@ -142,7 +141,7 @@ describe("landmarks de la barra lateral", () => {
     expect(lateral.contains(principal)).toBe(false);
     expect(principal.contains(lateral)).toBe(false);
     const nav = within(lateral).getByRole("navigation", { name: "Principal" });
-    for (const enlace of ["Estado del lab", "Agentes", "Menú por rol", "Finanzas"]) {
+    for (const enlace of ["Estado del lab", "Finanzas"]) {
       expect(within(nav).getByRole("link", { name: enlace })).toBeTruthy();
     }
     expect(within(lateral).queryAllByRole("region")).toHaveLength(0);
@@ -193,7 +192,7 @@ describe("navegación como drawer bajo 980px", () => {
     expect(dialogo.getAttribute("aria-modal")).toBe("true");
     expect(abrir.getAttribute("aria-expanded")).toBe("true");
     expect(dialogo.contains(document.activeElement)).toBe(true);
-    expect(within(dialogo).getByRole("link", { name: "Agentes" })).toBeTruthy();
+    expect(within(dialogo).getByRole("link", { name: "Finanzas" })).toBeTruthy();
     expect(screen.getByTestId("fondo-navegacion")).toBeTruthy();
   });
 
@@ -254,9 +253,9 @@ describe("navegación como drawer bajo 980px", () => {
     montar("/estado");
     fireEvent.click(await screen.findByRole("button", { name: "Abrir navegación" }));
 
-    fireEvent.click(within(screen.getByRole("dialog")).getByRole("link", { name: "Agentes" }));
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("link", { name: "Finanzas" }));
 
-    expect(await screen.findByRole("heading", { name: "Agentes", level: 1 })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Finanzas", level: 1 })).toBeTruthy();
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(
       screen.getByRole("button", { name: "Abrir navegación" }).getAttribute("aria-expanded"),

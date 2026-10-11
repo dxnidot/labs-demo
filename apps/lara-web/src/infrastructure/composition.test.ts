@@ -31,7 +31,6 @@ describe("composition root", () => {
       "MockMemoriaAdapter",
       "MockMenuPorRolAdapter",
       "MockUsuariosRealmAdapter",
-      "MockBpmSyncAdapter",
       "MockGastosFijosAdapter",
     ]);
   });
@@ -44,20 +43,18 @@ describe("composition root", () => {
     expect(usarMocks).toBe(false);
     expect(adaptadores.agente.constructor.name).toBe("AdkAgenteAdapter");
     expect(adaptadores.finanzas.constructor.name).toBe("HttpFinanzasAdapter");
-    // Sin backend real todavía: estos seis puertos siguen en mock aunque VITE_USE_MOCKS sea falso.
+    // Sin backend real todavía: estos puertos siguen en mock aunque VITE_USE_MOCKS sea falso.
     expect([
       adaptadores.baseDatos.constructor.name,
       adaptadores.memoria.constructor.name,
       adaptadores.menuPorRol.constructor.name,
       adaptadores.usuariosRealm.constructor.name,
-      adaptadores.bpm.constructor.name,
       adaptadores.gastosFijos.constructor.name,
     ]).toEqual([
       "MockBaseDatosAdapter",
       "MockMemoriaAdapter",
       "MockMenuPorRolAdapter",
       "MockUsuariosRealmAdapter",
-      "MockBpmSyncAdapter",
       "MockGastosFijosAdapter",
     ]);
   });

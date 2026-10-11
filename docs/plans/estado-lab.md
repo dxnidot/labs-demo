@@ -42,13 +42,13 @@ Los commits hasta `53edffd` salen con el autor `Claude`; desde `0716d42`, con `d
 
 ### Qué está pendiente
 
-- **UI-09, fase C (resto):** pulir contra su PNG las vistas 05–11 y 13 (Agentes, Base de datos ampliada, Memoria, Herramientas, Menú por rol, Usuarios y roles, Sincronización BPM, Gastos fijos) con sus puertos y mocks, y el chat con eventos A2A, pasos y adjuntar. Fase D: motion solo con CSS.
+- **UI-09, fase C (resto):** hecho — vistas 05–11 y 13 pulidas contra su PNG (Agentes, Base de datos ampliada, Memoria, Herramientas, Menú por rol, Usuarios y roles, Gastos fijos) con sus puertos y mocks, y el chat con eventos A2A, pasos y adjuntar. La vista "Sincronización BPM" se quitó de Lara (no se implementará). Pendiente: fase D, motion solo con CSS.
 - **Fuentes Lato y NTR:** la guía las citaba; no están instaladas porque requieren autorizar sus paquetes `@fontsource`.
 - **Keycloak (KC-03):** falta probar el import en Docker; no se pudo en el entorno donde se escribió. KC-01 (subir a 26.7.5) sigue pendiente.
 - **Ajustes de ADR-0006 que quedan:** el client `finanzas-agent` (no sigue la regla de nombrarlo como el servicio) y los roles de realm en `snake_case` (`llm_basic`, `llm_advanced`, `ver_agentes`, `ver_identidad`).
 - **ADR-0006 y ADR-0007 están en estado "Propuesta":** falta aceptarlos o ajustarlos.
 - **ADR-0007:** revisar los términos de retención de cada proveedor y plan (retención, entrenamiento, ubicación) y registrar el resultado con fecha.
-- **Backends que alimentan las vistas:** FIN-17 (totales mensuales, serie de 6 meses, calendario con `ultimos4` y `diasRestantes`; hoy la UI solo resta fechas y no calcula totales), FIN-03 (gastos fijos), FIN-04 (inversiones), AG-02 a AG-06, el servicio de memoria y `bpm-sync`.
+- **Backends que alimentan las vistas:** FIN-17 (totales mensuales, serie de 6 meses, calendario con `ultimos4` y `diasRestantes`; hoy la UI solo resta fechas y no calcula totales), FIN-03 (gastos fijos), FIN-04 (inversiones), AG-02 a AG-06 y el servicio de memoria. (`bpm-sync` ya no alimenta ninguna vista de Lara: su vista se quitó.)
 - **Capturas:** las de `.capturas/` se generaron en el entorno remoto y no están en el repo (carpeta ignorada). El arnés que las produjo (Keycloak y backend simulados con Playwright) vivía fuera del repo; QA-01 es la historia para formalizarlo.
 
 ### Decisiones y sus razones
@@ -88,7 +88,7 @@ Los commits hasta `53edffd` salen con el autor `Claude`; desde `0716d42`, con `d
 
 ### Siguientes pasos
 
-1. **Fase C de UI-09:** vista por vista (orden sugerido: Agentes y Herramientas, Base de datos, Menú por rol y Usuarios, Memoria, Sincronización BPM, Gastos fijos), cada una con su puerto y mock y comparada contra su PNG; después el chat con A2A, pasos y adjuntar. Luego la fase D (motion en CSS).
+1. **Fase D de UI-09 (motion en CSS):** la fase C ya cerró (vista por vista, con puerto, mock y comparación contra su PNG; "Sincronización BPM" se quitó de Lara y no se implementará).
 2. **Probar y cerrar Keycloak como código:** validar el import en Docker (KC-03), los logins y el audience de `lara-web`, y decidir si se aceptan ADR-0006 y ADR-0007.
 3. **Backends:** FIN-17 primero (totales, serie, `ultimos4` y `diasRestantes`: desbloquea KPIs, gráfica y "en N días" reales), luego FIN-03, FIN-04, la persistencia de sesión (AG-05) y los agentes AG-02 a AG-04. Cada vista pasa de mock a real cambiando solo el adaptador del composition root.
 4. **Auditoría de privacidad del historial:** el historial de conversaciones vive en el servidor ADK y se reenvía al proveedor del modelo en cada turno. Revisar qué se guarda y por cuánto tiempo (sesiones en `agents/data/` o en el servidor ADK), qué contienen los mensajes y las vistas previas (comercio, alias, últimos cuatro dígitos), si conviene limitar o purgar el historial, y registrar el resultado junto con la revisión de retención de los proveedores de ADR-0007. Hasta entonces, el aviso de Lara es la mitigación visible.

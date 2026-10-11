@@ -1,7 +1,6 @@
 import type { AgentePort } from "../application/ports/AgentePort";
 import type { AuthPort } from "../application/ports/AuthPort";
 import type { BaseDatosPort } from "../application/ports/BaseDatosPort";
-import type { BpmSyncPort } from "../application/ports/BpmSyncPort";
 import type { EstadoLabPort } from "../application/ports/EstadoLabPort";
 import type { FinanzasPort } from "../application/ports/FinanzasPort";
 import type { GastosFijosPort } from "../application/ports/GastosFijosPort";
@@ -20,7 +19,6 @@ import { keycloakAuthAdapter } from "./adapters/KeycloakAuthAdapter";
 import { MockAgenteAdapter } from "./mocks/MockAgenteAdapter";
 import { MockAuthAdapter } from "./mocks/MockAuthAdapter";
 import { MockBaseDatosAdapter } from "./mocks/MockBaseDatosAdapter";
-import { MockBpmSyncAdapter } from "./mocks/MockBpmSyncAdapter";
 import { MockEstadoLabAdapter } from "./mocks/MockEstadoLabAdapter";
 import { MockFinanzasAdapter } from "./mocks/MockFinanzasAdapter";
 import { MockGastosFijosAdapter } from "./mocks/MockGastosFijosAdapter";
@@ -32,9 +30,9 @@ import { MockUsuariosRealmAdapter } from "./mocks/MockUsuariosRealmAdapter";
 
 /**
  * Adaptadores que usa la UI, uno por puerto.
- * Los seis puertos de la fase C restante (06,07,09,10,11,13) todavía no tienen
- * backend real, así que `baseDatos`, `memoria`, `menuPorRol`, `usuariosRealm`,
- * `bpm` y `gastosFijos` son siempre el adaptador mock, tanto en `crearReales()`
+ * Los puertos de la fase C restante (06,07,09,10,13) todavía no tienen
+ * backend real, así que `baseDatos`, `memoria`, `menuPorRol`, `usuariosRealm`
+ * y `gastosFijos` son siempre el adaptador mock, tanto en `crearReales()`
  * como en `crearMocks()`, hasta que exista el adaptador HTTP correspondiente.
  */
 export interface Adaptadores {
@@ -48,7 +46,6 @@ export interface Adaptadores {
   memoria: MemoriaPort;
   menuPorRol: MenuPorRolPort;
   usuariosRealm: UsuariosRealmPort;
-  bpm: BpmSyncPort;
   gastosFijos: GastosFijosPort;
 }
 
@@ -64,12 +61,11 @@ function crearReales(): Adaptadores {
     estadoLab: new HttpEstadoLabAdapter(),
     menu: new HttpMenuAdapter(http),
     finanzas: new HttpFinanzasAdapter(http),
-    // MOCK: sin backend real todavía para estos seis puertos (fase C restante).
+    // MOCK: sin backend real todavía para estos puertos (fase C restante).
     baseDatos: new MockBaseDatosAdapter(),
     memoria: new MockMemoriaAdapter(),
     menuPorRol: new MockMenuPorRolAdapter(),
     usuariosRealm: new MockUsuariosRealmAdapter(),
-    bpm: new MockBpmSyncAdapter(),
     gastosFijos: new MockGastosFijosAdapter(),
   };
 }
@@ -87,7 +83,6 @@ function crearMocks(): Adaptadores {
     memoria: new MockMemoriaAdapter(),
     menuPorRol: new MockMenuPorRolAdapter(),
     usuariosRealm: new MockUsuariosRealmAdapter(),
-    bpm: new MockBpmSyncAdapter(),
     gastosFijos: new MockGastosFijosAdapter(),
   };
 }

@@ -1,8 +1,8 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
+  ArrowLeft,
   Calendar,
   ChartNoAxesColumn,
-  ChevronRight,
   Database,
   LayoutDashboard,
   LogOut,
@@ -11,7 +11,6 @@ import {
   PanelLeft,
   PanelLeftOpen,
   Plus,
-  RefreshCw,
   SunMoon,
   TextAlignStart,
   Users,
@@ -59,9 +58,6 @@ const HerramientasPage = lazy(() =>
 const MemoriaPage = lazy(() => import("./MemoriaPage").then((m) => ({ default: m.MemoriaPage })));
 const MenuPorRolPage = lazy(() =>
   import("./MenuPorRolPage").then((m) => ({ default: m.MenuPorRolPage })),
-);
-const SincronizacionBpmPage = lazy(() =>
-  import("./SincronizacionBpmPage").then((m) => ({ default: m.SincronizacionBpmPage })),
 );
 const UsuariosRolesPage = lazy(() =>
   import("./UsuariosRolesPage").then((m) => ({ default: m.UsuariosRolesPage })),
@@ -161,40 +157,6 @@ interface EntradaNav {
   ruta: string;
 }
 
-function GrupoColapsable({
-  children,
-  idContenido,
-  titulo,
-}: {
-  children: ReactNode;
-  idContenido: string;
-  titulo: string;
-}) {
-  const [abierto, setAbierto] = useState(true);
-  return (
-    <div className="flex flex-col gap-0.5">
-      <button
-        aria-controls={idContenido}
-        aria-expanded={abierto}
-        className={`flex min-h-9 w-full items-center gap-1.5 rounded-button px-3 text-left font-mono text-label font-normal tracking-label text-faint hover:text-text-2 ${claseFocoInterno}`}
-        onClick={() => setAbierto((actual) => !actual)}
-        type="button"
-      >
-        <ChevronRight
-          aria-hidden="true"
-          className={`size-3 shrink-0 transition-transform ${abierto ? "rotate-90" : ""}`}
-        />
-        {titulo}
-      </button>
-      {abierto && (
-        <div className="flex flex-col gap-0.5" id={idContenido}>
-          {children}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function RielItem({ activo, etiqueta, icono, to }: { activo: boolean; etiqueta: string; icono: ReactNode; to: string }) {
   return (
     <Link
@@ -241,6 +203,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   const [barraVisible, setBarraVisible] = useState(true);
   const [rutaDrawer, setRutaDrawer] = useState<string | null>(null);
   const [aparienciaAbierta, setAparienciaAbierta] = useState(false);
+  const [menuUsuarioAbierto, setMenuUsuarioAbierto] = useState(false);
   useTituloDocumento(tituloDeRuta(pathname));
   const puedeVerAgentes = useHasRole(usuario, ["ver_agentes", "admin"]);
   const puedeVerIdentidad = useHasRole(usuario, ["ver_identidad", "admin"]);
@@ -301,20 +264,18 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
             icono: <Users aria-hidden="true" className={iconoNav} />,
             ruta: "/usuarios",
           },
-          {
-            etiqueta: "Sincronización BPM",
-            icono: <RefreshCw aria-hidden="true" className={iconoNav} />,
-            ruta: "/sincronizacion-bpm",
-          },
         ]
       : []),
   ];
+
+  const enLaboratorio = itemsLaboratorio.some((item) => pathname === item.ruta);
 
   const panelNav = useRef<HTMLElement | null>(null);
   const botonMenu = useRef<HTMLButtonElement | null>(null);
   const botonContraer = useRef<HTMLButtonElement | null>(null);
   const botonMostrar = useRef<HTMLButtonElement | null>(null);
   const botonApariencia = useRef<HTMLButtonElement | null>(null);
+  const botonUsuario = useRef<HTMLButtonElement | null>(null);
   const contenidoPrincipal = useRef<HTMLElement | null>(null);
   const aparienciaEstabaAbierta = useRef(false);
   const navEstabaAbierta = useRef(false);
@@ -342,8 +303,10 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   }, [drawerActivo]);
 
   useEffect(() => {
+    // El botón "Configuración" vive dentro del menú de usuario, que se cierra al abrir el diálogo:
+    // el foco vuelve al botón de usuario (su trigger), no al ítem del menú ya desmontado.
     if (aparienciaEstabaAbierta.current && !aparienciaAbierta) {
-      botonApariencia.current?.focus();
+      botonUsuario.current?.focus();
     }
     aparienciaEstabaAbierta.current = aparienciaAbierta;
   }, [aparienciaAbierta]);
@@ -360,6 +323,28 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   function alternarBarra(visible: boolean) {
     focoPendiente.current = visible ? "contraer" : "mostrar";
     setBarraVisible(visible);
+  }
+
+  useEffect(() => {
+    if (!menuUsuarioAbierto) {
+      return;
+    }
+    function alPulsarTecla(evento: KeyboardEvent) {
+      if (evento.key === "Escape") {
+        setMenuUsuarioAbierto(false);
+        botonUsuario.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", alPulsarTecla);
+    return () => document.removeEventListener("keydown", alPulsarTecla);
+  }, [menuUsuarioAbierto]);
+
+  function irALaboratorio() {
+    setMenuUsuarioAbierto(false);
+    setRutaDrawer(null);
+    if (itemsLaboratorio[0]) {
+      navigate(itemsLaboratorio[0].ruta);
+    }
   }
 
   function iniciarChatNuevo() {
@@ -453,123 +438,135 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
               )}
             </div>
 
-            <button
-              className={`flex min-h-11 w-full shrink-0 items-center gap-2.5 rounded-button bg-accent px-3.5 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent-hover ${claseFoco}`}
-              onClick={iniciarChatNuevo}
-              type="button"
-            >
-              <Plus aria-hidden="true" className={iconoNav} />
-              Nuevo chat
-            </button>
+            {enLaboratorio ? (
+              <button
+                className={`flex min-h-11 w-full shrink-0 items-center gap-2.5 rounded-button px-3.5 text-sm font-semibold text-text-2 transition-colors hover:bg-surface-hover hover:text-text ${claseFoco}`}
+                onClick={() => navigate("/chat")}
+                type="button"
+              >
+                <ArrowLeft aria-hidden="true" className={iconoNav} />
+                Volver al chat
+              </button>
+            ) : (
+              <button
+                className={`flex min-h-11 w-full shrink-0 items-center gap-2.5 rounded-button bg-accent px-3.5 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent-hover ${claseFoco}`}
+                onClick={iniciarChatNuevo}
+                type="button"
+              >
+                <Plus aria-hidden="true" className={iconoNav} />
+                Nuevo chat
+              </button>
+            )}
 
-            <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto">
-              <nav aria-label="Principal" className="flex shrink-0 flex-col gap-3.5">
-                <SidebarItem
-                  active={enRuta("/estado")}
-                  icono={<LayoutDashboard aria-hidden="true" className={iconoNav} />}
-                  to="/estado"
-                >
-                  Estado del lab
-                </SidebarItem>
-
-                {itemsLaboratorio.length > 0 && (
-                  <GrupoColapsable idContenido="grupo-laboratorio" titulo="LABORATORIO">
-                    {itemsLaboratorio.map((item) => (
-                      <SidebarItem
-                        active={enRuta(item.ruta)}
-                        icono={item.icono}
-                        key={item.ruta}
-                        to={item.ruta}
-                      >
-                        {item.etiqueta}
-                      </SidebarItem>
-                    ))}
-                  </GrupoColapsable>
-                )}
-
-                {itemsPersonal.length > 0 && (
-                  <SeccionNav titulo="PERSONAL · SOLO LOCAL">
-                    {itemsPersonal.map((item) => (
-                      <SidebarItem
-                        active={item.activo ?? enRuta(item.ruta)}
-                        icono={item.icono}
-                        key={item.ruta}
-                        to={item.ruta}
-                      >
-                        {item.etiqueta}
-                      </SidebarItem>
-                    ))}
-                  </SeccionNav>
-                )}
-              </nav>
-
-              <div className="flex shrink-0 flex-col gap-0.5">
-                <div className="flex items-center justify-between px-3 pb-1.5">
-                  <h2 className="m-0 font-mono text-label font-normal tracking-label text-faint">
-                    RECIENTES
-                  </h2>
-                  {isLoadingHistory && <AvisoCarga texto="Cargando conversaciones…" />}
-                </div>
-                <nav aria-label="Historial de chats" className="flex flex-col gap-0.5">
-                  {sessions.map((session) => (
+            {enLaboratorio ? (
+              <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto">
+                <SeccionNav titulo="LABORATORIO">
+                  {itemsLaboratorio.map((item) => (
                     <SidebarItem
-                      active={pathname === "/chat" && session.id === activeSessionId}
-                      key={session.id}
-                      onClick={() => selectSession(session.id)}
-                      reciente
-                      to="/chat"
+                      active={enRuta(item.ruta)}
+                      icono={item.icono}
+                      key={item.ruta}
+                      to={item.ruta}
                     >
-                      {session.titulo}
+                      {item.etiqueta}
                     </SidebarItem>
                   ))}
-                  {!isLoadingHistory && sessions.length === 0 && (
-                    <p className="m-0 px-3 py-2 text-xs text-faint">Aún no hay conversaciones.</p>
-                  )}
-                  {historyError && (
-                    <div className="flex flex-col items-start gap-1 px-3 py-2">
-                      <p className="m-0 text-xs text-danger" role="alert">{historyError}</p>
-                      <button
-                        className="inline-flex min-h-11 items-center text-xs text-accent underline hover:text-accent-hover shell:min-h-0"
-                        onClick={() => void refreshSessions().catch(() => undefined)}
-                        type="button"
-                      >
-                        Reintentar
-                      </button>
-                    </div>
-                  )}
-                  {isLoadingHistory && sessions.length === 0 && (
-                    <div aria-hidden="true" className="flex flex-col gap-2 px-3 py-2">
-                      <Esqueleto className="h-3.5 w-4/5" />
-                      <Esqueleto className="h-3.5 w-3/5" />
-                    </div>
+                </SeccionNav>
+              </div>
+            ) : (
+              <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto">
+                <nav aria-label="Principal" className="flex shrink-0 flex-col gap-3.5">
+                  <SidebarItem
+                    active={enRuta("/estado")}
+                    icono={<LayoutDashboard aria-hidden="true" className={iconoNav} />}
+                    to="/estado"
+                  >
+                    Estado del lab
+                  </SidebarItem>
+
+                  {itemsPersonal.length > 0 && (
+                    <SeccionNav titulo="PERSONAL · SOLO LOCAL">
+                      {itemsPersonal.map((item) => (
+                        <SidebarItem
+                          active={item.activo ?? enRuta(item.ruta)}
+                          icono={item.icono}
+                          key={item.ruta}
+                          to={item.ruta}
+                        >
+                          {item.etiqueta}
+                        </SidebarItem>
+                      ))}
+                    </SeccionNav>
                   )}
                 </nav>
-              </div>
-            </div>
 
-            <footer className="flex shrink-0 items-center gap-2.5 border-t border-border px-2 pb-1 pt-3">
-              <span
-                aria-hidden="true"
-                className="flex size-8.5 shrink-0 items-center justify-center rounded-full bg-surface-active text-sm font-semibold text-accent"
-              >
-                {usuario.username.slice(0, 1).toUpperCase()}
-              </span>
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm">{usuario.username}</span>
-                <span className="truncate text-xs text-muted">
-                  {`${usuario.kcMenuRoles.length > 0 ? usuario.kcMenuRoles.join(", ") : "sin rol"} · LOCAL`}
-                </span>
+                <div className="flex shrink-0 flex-col gap-0.5">
+                  <div className="flex items-center justify-between px-3 pb-1.5">
+                    <h2 className="m-0 font-mono text-label font-normal tracking-label text-faint">
+                      RECIENTES
+                    </h2>
+                    {isLoadingHistory && <AvisoCarga texto="Cargando conversaciones…" />}
+                  </div>
+                  <nav aria-label="Historial de chats" className="flex flex-col gap-0.5">
+                    {sessions.map((session) => (
+                      <SidebarItem
+                        active={pathname === "/chat" && session.id === activeSessionId}
+                        key={session.id}
+                        onClick={() => selectSession(session.id)}
+                        reciente
+                        to="/chat"
+                      >
+                        {session.titulo}
+                      </SidebarItem>
+                    ))}
+                    {!isLoadingHistory && sessions.length === 0 && (
+                      <p className="m-0 px-3 py-2 text-xs text-faint">Aún no hay conversaciones.</p>
+                    )}
+                    {historyError && (
+                      <div className="flex flex-col items-start gap-1 px-3 py-2">
+                        <p className="m-0 text-xs text-danger" role="alert">{historyError}</p>
+                        <button
+                          className="inline-flex min-h-11 items-center text-xs text-accent underline hover:text-accent-hover shell:min-h-0"
+                          onClick={() => void refreshSessions().catch(() => undefined)}
+                          type="button"
+                        >
+                          Reintentar
+                        </button>
+                      </div>
+                    )}
+                    {isLoadingHistory && sessions.length === 0 && (
+                      <div aria-hidden="true" className="flex flex-col gap-2 px-3 py-2">
+                        <Esqueleto className="h-3.5 w-4/5" />
+                        <Esqueleto className="h-3.5 w-3/5" />
+                      </div>
+                    )}
+                  </nav>
+                </div>
               </div>
-              <IconButton
-                aria-haspopup="dialog"
-                aria-label="Apariencia"
-                onClick={() => setAparienciaAbierta(true)}
-                ref={botonApariencia}
-                tamano="compacto"
-                tono="atenuado"
+            )}
+
+            <footer className="relative flex shrink-0 items-center gap-1 border-t border-border px-2 pb-1 pt-3">
+              <button
+                aria-expanded={menuUsuarioAbierto}
+                aria-haspopup="menu"
+                className={`flex min-w-0 flex-1 items-center gap-2.5 rounded-button py-1 pl-1 pr-2 text-left transition-colors hover:bg-surface-hover ${claseFocoInterno}`}
+                onClick={() => setMenuUsuarioAbierto((abierto) => !abierto)}
+                ref={botonUsuario}
+                type="button"
               >
-                <SunMoon aria-hidden="true" className="size-4.5" />
-              </IconButton>
+                <span
+                  aria-hidden="true"
+                  className="flex size-8.5 shrink-0 items-center justify-center rounded-full bg-surface-active text-sm font-semibold text-accent"
+                >
+                  {usuario.username.slice(0, 1).toUpperCase()}
+                </span>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate text-sm">{usuario.username}</span>
+                  <span className="truncate text-xs text-muted">
+                    {`${usuario.kcMenuRoles.length > 0 ? usuario.kcMenuRoles.join(", ") : "sin rol"} · LOCAL`}
+                  </span>
+                </div>
+              </button>
               <IconButton
                 aria-label="Cerrar sesión"
                 onClick={() => void cerrarSesion()}
@@ -578,6 +575,46 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
               >
                 <LogOut aria-hidden="true" className="size-4.5" />
               </IconButton>
+
+              {menuUsuarioAbierto && (
+                <>
+                  <div
+                    aria-hidden="true"
+                    className="fixed inset-0 z-30"
+                    onClick={() => setMenuUsuarioAbierto(false)}
+                  />
+                  <div
+                    aria-label="Usuario"
+                    className="absolute bottom-full left-2 z-40 mb-2 w-52 rounded-card border border-border bg-surface p-1"
+                    role="menu"
+                  >
+                    <button
+                      className={`flex min-h-11 w-full items-center gap-2.5 rounded-button px-3 text-left text-sm text-text-2 transition-colors hover:bg-surface-hover hover:text-text ${claseFocoInterno}`}
+                      onClick={() => {
+                        setMenuUsuarioAbierto(false);
+                        setAparienciaAbierta(true);
+                      }}
+                      ref={botonApariencia}
+                      role="menuitem"
+                      type="button"
+                    >
+                      <SunMoon aria-hidden="true" className={iconoNav} />
+                      Configuración
+                    </button>
+                    {itemsLaboratorio.length > 0 && (
+                      <button
+                        className={`flex min-h-11 w-full items-center gap-2.5 rounded-button px-3 text-left text-sm text-text-2 transition-colors hover:bg-surface-hover hover:text-text ${claseFocoInterno}`}
+                        onClick={irALaboratorio}
+                        role="menuitem"
+                        type="button"
+                      >
+                        <Network aria-hidden="true" className={iconoNav} />
+                        Laboratorio
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
             </footer>
           </Sidebar>
         ) : (
@@ -593,21 +630,27 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
               <PanelLeftOpen aria-hidden="true" className="size-4.5" />
             </IconButton>
             <div aria-hidden="true" className="my-1 h-px w-6 shrink-0 bg-divider" />
-            <nav aria-label="Principal" className="flex flex-col items-center gap-1">
-              <RielItem activo={enRuta("/estado")} etiqueta="Estado del lab" icono={<LayoutDashboard aria-hidden="true" className={iconoNav} />} to="/estado" />
-              {itemsLaboratorio.map((item) => (
-                <RielItem activo={enRuta(item.ruta)} etiqueta={item.etiqueta} icono={item.icono} key={item.ruta} to={item.ruta} />
-              ))}
-              {itemsPersonal.map((item) => (
-                <RielItem
-                  activo={item.activo ?? enRuta(item.ruta)}
-                  etiqueta={item.etiqueta}
-                  icono={item.icono}
-                  key={item.ruta}
-                  to={item.ruta}
-                />
-              ))}
-            </nav>
+            {enLaboratorio ? (
+              <nav aria-label="Laboratorio" className="flex flex-col items-center gap-1">
+                <RielItem activo={false} etiqueta="Volver al chat" icono={<ArrowLeft aria-hidden="true" className={iconoNav} />} to="/chat" />
+                {itemsLaboratorio.map((item) => (
+                  <RielItem activo={enRuta(item.ruta)} etiqueta={item.etiqueta} icono={item.icono} key={item.ruta} to={item.ruta} />
+                ))}
+              </nav>
+            ) : (
+              <nav aria-label="Principal" className="flex flex-col items-center gap-1">
+                <RielItem activo={enRuta("/estado")} etiqueta="Estado del lab" icono={<LayoutDashboard aria-hidden="true" className={iconoNav} />} to="/estado" />
+                {itemsPersonal.map((item) => (
+                  <RielItem
+                    activo={item.activo ?? enRuta(item.ruta)}
+                    etiqueta={item.etiqueta}
+                    icono={item.icono}
+                    key={item.ruta}
+                    to={item.ruta}
+                  />
+                ))}
+              </nav>
+            )}
           </div>
         )}
 
@@ -653,10 +696,6 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
                   puedeVerIdentidad,
                   <UsuariosRolesPage usuariosRealm={adaptadores.usuariosRealm} />,
                 )}
-              />
-              <Route
-                path="/sincronizacion-bpm"
-                element={protegido(puedeVerIdentidad, <SincronizacionBpmPage bpm={adaptadores.bpm} />)}
               />
               <Route
                 path="/gastos-fijos"

@@ -72,14 +72,17 @@ function montar(ruta: string) {
 
 const vistas = [
   { ruta: "/estado", enlace: "Estado del lab", titulo: "Estado del lab" },
+  { ruta: "/gastos-fijos", enlace: "Gastos fijos", titulo: "Gastos fijos" },
+];
+
+// Vistas de LABORATORIO: ya no están en el sidebar del chat, solo se llega vía el menú de usuario.
+const vistasLaboratorio = [
   { ruta: "/agentes", enlace: "Agentes", titulo: "Agentes" },
   { ruta: "/base-de-datos", enlace: "Base de datos", titulo: "Base de datos" },
   { ruta: "/memoria", enlace: "Memoria vectorizada", titulo: "Memoria vectorizada" },
   { ruta: "/herramientas", enlace: "Herramientas MCP", titulo: "Herramientas MCP" },
   { ruta: "/menu-por-rol", enlace: "Menú por rol", titulo: "Menú por rol" },
   { ruta: "/usuarios", enlace: "Usuarios y roles", titulo: "Usuarios y roles" },
-  { ruta: "/sincronizacion-bpm", enlace: "Sincronización BPM", titulo: "Sincronización BPM" },
-  { ruta: "/gastos-fijos", enlace: "Gastos fijos", titulo: "Gastos fijos" },
 ];
 
 describe("login", () => {
@@ -124,19 +127,20 @@ describe("login", () => {
     expect(auth.logout).toHaveBeenCalledTimes(1);
   });
 
-  it("el botón Apariencia abre el diálogo y al cerrarlo devuelve el foco al botón", async () => {
+  it("Configuración (menú de usuario) abre el diálogo y al cerrarlo devuelve el foco al botón de usuario", async () => {
     prepararFetch();
 
     montar("/chat");
 
-    const boton = await screen.findByRole("button", { name: "Apariencia" });
-    fireEvent.click(boton);
+    const botonUsuario = await screen.findByRole("button", { name: /^ana/ });
+    fireEvent.click(botonUsuario);
+    fireEvent.click(screen.getByRole("menuitem", { name: "Configuración" }));
     expect(screen.getByRole("dialog", { name: "Apariencia" })).toBeTruthy();
 
     fireEvent.keyDown(document, { key: "Escape" });
 
     await waitFor(() => expect(screen.queryByRole("dialog", { name: "Apariencia" })).toBeNull());
-    expect(document.activeElement).toBe(boton);
+    expect(document.activeElement).toBe(botonUsuario);
   });
 });
 
@@ -334,6 +338,34 @@ describe("sidebar y rutas", () => {
     expect(screen.getByRole("link", { name: vista.enlace }).getAttribute("aria-current")).toBe("page");
   });
 
+  it.each(vistasLaboratorio)(
+    "Laboratorio: la entrada $enlace abre su vista y marca aria-current",
+    async (vista) => {
+      prepararFetch();
+
+      montar(vista.ruta);
+
+      expect(await screen.findByRole("heading", { name: vista.titulo, level: 1 })).toBeTruthy();
+      expect(screen.getByRole("link", { name: vista.enlace }).getAttribute("aria-current")).toBe("page");
+      expect(screen.getByRole("button", { name: "Volver al chat" })).toBeTruthy();
+    },
+  );
+
+  it("el menú de usuario abre Configuración y lleva a Laboratorio", async () => {
+    prepararFetch();
+
+    montar("/chat");
+    fireEvent.click(await screen.findByRole("button", { name: /^ana/ }));
+
+    const menu = screen.getByRole("menu", { name: "Usuario" });
+    expect(within(menu).getByRole("menuitem", { name: "Configuración" })).toBeTruthy();
+
+    fireEvent.click(within(menu).getByRole("menuitem", { name: "Laboratorio" }));
+
+    expect(await screen.findByRole("heading", { name: "Agentes", level: 1 })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "LABORATORIO", level: 2 })).toBeTruthy();
+  });
+
   it("no ofrece MENÚ, Buscar chats, Configuración ni la entrada Chat suelta", async () => {
     prepararFetch([], menu);
 
@@ -342,10 +374,11 @@ describe("sidebar y rutas", () => {
 
     expect(screen.queryByText("MENÚ")).toBeNull();
     expect(screen.queryByText("Buscar chats")).toBeNull();
-    expect(screen.queryByLabelText("Configuración")).toBeNull();
+    expect(screen.queryByText("Configuración")).toBeNull();
     expect(screen.queryByRole("link", { name: "Chat" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Reportes" })).toBeNull();
-    for (const titulo of ["PERSONAL · SOLO LOCAL", "LABORATORIO", "RECIENTES"]) {
+    expect(screen.queryByText("LABORATORIO")).toBeNull();
+    for (const titulo of ["PERSONAL · SOLO LOCAL", "RECIENTES"]) {
       expect(screen.getByText(titulo)).toBeTruthy();
     }
     expect(screen.getByText("ver-menu · LOCAL")).toBeTruthy();
@@ -358,20 +391,29 @@ describe("sidebar y rutas", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Contraer barra lateral" }));
 
     // Contraída: el riel sigue ofreciendo el enlace como ícono (con título), pero ya no muestra RECIENTES.
-    expect(screen.getByRole("link", { name: "Agentes" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Estado del lab" })).toBeTruthy();
     expect(screen.queryByText("RECIENTES")).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Mostrar barra lateral" }));
 
-    expect(screen.getByRole("link", { name: "Agentes" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Estado del lab" })).toBeTruthy();
     expect(screen.getByText("RECIENTES")).toBeTruthy();
   });
 
   it("Nuevo chat lleva a /chat desde otra vista", async () => {
     prepararFetch();
 
-    montar("/agentes");
+    montar("/gastos-fijos");
     fireEvent.click(await screen.findByRole("button", { name: "Nuevo chat" }));
+
+    expect(await screen.findByRole("heading", { name: /Hola, ana/ })).toBeTruthy();
+  });
+
+  it("Volver al chat lleva a /chat desde una vista de Laboratorio", async () => {
+    prepararFetch();
+
+    montar("/agentes");
+    fireEvent.click(await screen.findByRole("button", { name: "Volver al chat" }));
 
     expect(await screen.findByRole("heading", { name: /Hola, ana/ })).toBeTruthy();
   });
@@ -458,7 +500,6 @@ describe("sidebar y rutas", () => {
       "Herramientas MCP",
       "Menú por rol",
       "Usuarios y roles",
-      "Sincronización BPM",
       "Finanzas",
       "Gastos fijos",
     ]) {
@@ -518,7 +559,6 @@ describe("pantallas con datos", () => {
     "/herramientas",
     "/menu-por-rol",
     "/usuarios",
-    "/sincronizacion-bpm",
     "/gastos-fijos",
     "/finanzas/resumen",
   ])("%s no muestra claves del backlog ni 'Pendiente:' al usuario", async (ruta) => {

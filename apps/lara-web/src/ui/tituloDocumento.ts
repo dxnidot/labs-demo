@@ -10,7 +10,6 @@ const titulosPorRuta: Record<string, string> = {
   "/herramientas": "Herramientas MCP",
   "/menu-por-rol": "Menú por rol",
   "/usuarios": "Usuarios y roles",
-  "/sincronizacion-bpm": "Sincronización BPM",
   "/gastos-fijos": "Gastos fijos",
 };
 
