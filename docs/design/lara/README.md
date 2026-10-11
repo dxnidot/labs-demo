@@ -42,11 +42,11 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 | `hoki-800`         | `#384754` | Hoki oscuro                              |
 | `hoki-900`         | `#323D48` | Hoki oscuro                              |
 | `hoki-950`         | `#212830` | Tinta sobre accent/highlight             |
-| `sage-200`         | `#CDDBC6` | Accent hover, highlight (solo oscuro)    |
-| `sage-300`         | `#A8C29C` | Muted, accent (solo oscuro)              |
-| `sage-400`         | `#85A378` | Faint, estado ok (solo oscuro)           |
-| `sage-500`–`700`   | `#6C8761`–`#475A40` | Gráficas y highlight-muted (solo oscuro) |
-| `sage-950`         | `#1B2318` | Tinta sobre accent/highlight (solo oscuro) |
+| `cielo-200`        | `#C9E2F5` | Accent hover, highlight (solo oscuro)    |
+| `cielo-300`        | `#A3CDEF` | Muted, accent (solo oscuro)              |
+| `cielo-400`        | `#7EB6E6` | Faint, estado ok (solo oscuro)           |
+| `cielo-500`–`700`  | `#5F9FD6`–`#2F5879` | Gráficas y highlight-muted (solo oscuro) |
+| `cielo-950`        | `#1C2D3D` | Tinta sobre accent/highlight (solo oscuro) |
 | `bg`               | `#14171B` | Fondo                                   |
 | `sidebar`, `surface` | `#1A1A1A` | Barra lateral, tarjetas y composer       |
 | `surface-hover`, `surface-active`, `border`, `divider` | `#292929` | Estados y separadores |
@@ -98,24 +98,24 @@ En `index.css` cada token semántico se define una sola vez con `light-dark(clar
 | `control-off` | #767676 | #767676 |
 | `text` | #14171B | #FAFAFA |
 | `text-2` | #292929 | #E6E6E6 |
-| `muted` | #384754 | #A8C29C |
-| `faint` | #415363 | #85A378 |
-| `accent` | #415363 | #A8C29C |
-| `accent-hover` | #384754 | #CDDBC6 |
-| `accent-ink` | #FAFAFA | #1B2318 |
-| `highlight` | #384754 | #CDDBC6 |
-| `highlight-ink` | #F6F7F9 | #1B2318 |
-| `highlight-muted` | #D4DCE3 | #475A40 |
-| `chart-1` | #323D48 | #CDDBC6 |
-| `chart-2` | #384754 | #A8C29C |
-| `chart-3` | #415363 | #85A378 |
-| `chart-4` | #4F667A | #6C8761 |
-| `chart-5` | #678398 | #566D4C |
-| `ok` | #415363 | #85A378 |
+| `muted` | #384754 | #A3CDEF |
+| `faint` | #415363 | #7EB6E6 |
+| `accent` | #415363 | #A3CDEF |
+| `accent-hover` | #384754 | #C9E2F5 |
+| `accent-ink` | #FAFAFA | #1C2D3D |
+| `highlight` | #384754 | #C9E2F5 |
+| `highlight-ink` | #F6F7F9 | #1C2D3D |
+| `highlight-muted` | #D4DCE3 | #2F5879 |
+| `chart-1` | #323D48 | #C9E2F5 |
+| `chart-2` | #384754 | #A3CDEF |
+| `chart-3` | #415363 | #7EB6E6 |
+| `chart-4` | #4F667A | #5F9FD6 |
+| `chart-5` | #678398 | #4A84B8 |
+| `ok` | #415363 | #7EB6E6 |
 | `warn` | #575757 | #A5A5A5 |
 | `danger` | #1A1A1A | #D6D6D6 |
 
-**Acento oscuro `sage`:** el modo oscuro usa una escala verde-salvia aparte (`--color-sage-*` en `index.css`, 50–950) en vez de `hoki` para `accent`, `muted`, `faint`, `highlight*`, `chart-*` y `ok`; el claro no cambió y sigue en `hoki`. El fondo oscuro (`bg`/`sidebar`/`surface`) también se oscureció (`neutral-950`/`neutral-900` más negros, estilo "OLED"). Todo verificado en `src/contraste.test.ts` (texto >= 4.5:1, controles >= 3:1).
+**Acento oscuro `cielo`:** el modo oscuro usa una escala azul pastel aparte (`--color-cielo-*` en `index.css`, 50–950) en vez de `hoki` para `accent`, `muted`, `faint`, `highlight*`, `chart-*` y `ok`; el claro no cambió y sigue en `hoki`. El fondo oscuro (`bg`/`sidebar`/`surface`) también se oscureció (`neutral-950`/`neutral-900` más negros, estilo "OLED"). Todo verificado en `src/contraste.test.ts` (texto >= 4.5:1, controles >= 3:1).
 
 Contraste calculado desde estos tokens y verificado en `src/contraste.test.ts`: texto >= 4.5:1 y controles y estados >= 3:1 en ambos temas. La única excepción es `chart-5`, que siempre va con etiqueta y valor en texto. `ok` y `danger` se distinguen además por forma y por texto.
 

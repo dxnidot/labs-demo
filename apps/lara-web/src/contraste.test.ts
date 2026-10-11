@@ -5,7 +5,7 @@ const css = readFileSync(new URL("./index.css", import.meta.url), "utf8");
 
 function paleta(): Map<string, string> {
   const mapa = new Map<string, string>();
-  for (const [, nombre, hex] of css.matchAll(/--color-((?:neutral|hoki|sage)-\d+):\s*(#[0-9a-fA-F]{6});/g)) {
+  for (const [, nombre, hex] of css.matchAll(/--color-((?:neutral|hoki|cielo)-\d+):\s*(#[0-9a-fA-F]{6});/g)) {
     mapa.set(nombre, hex.toLowerCase());
   }
   return mapa;
@@ -92,14 +92,14 @@ describe("contraste de los tokens en ambos temas", () => {
       border: "#292929",
       text: "#fafafa",
       "text-2": "#e6e6e6",
-      muted: "#a8c29c",
-      faint: "#85a378",
-      accent: "#a8c29c",
-      "accent-hover": "#cddbc6",
-      "accent-ink": "#1b2318",
-      highlight: "#cddbc6",
-      "highlight-ink": "#1b2318",
-      ok: "#85a378",
+      muted: "#a3cdef",
+      faint: "#7eb6e6",
+      accent: "#a3cdef",
+      "accent-hover": "#c9e2f5",
+      "accent-ink": "#1c2d3d",
+      highlight: "#c9e2f5",
+      "highlight-ink": "#1c2d3d",
+      ok: "#7eb6e6",
       warn: "#a5a5a5",
       danger: "#d6d6d6",
     };
