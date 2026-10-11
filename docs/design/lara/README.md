@@ -42,6 +42,11 @@ Las capturas están en `png/`. Si una captura y este texto no coinciden, **manda
 | `hoki-800`         | `#384754` | Hoki oscuro                              |
 | `hoki-900`         | `#323D48` | Hoki oscuro                              |
 | `hoki-950`         | `#212830` | Tinta sobre accent/highlight             |
+| `sage-200`         | `#CDDBC6` | Accent hover, highlight (solo oscuro)    |
+| `sage-300`         | `#A8C29C` | Muted, accent (solo oscuro)              |
+| `sage-400`         | `#85A378` | Faint, estado ok (solo oscuro)           |
+| `sage-500`–`700`   | `#6C8761`–`#475A40` | Gráficas y highlight-muted (solo oscuro) |
+| `sage-950`         | `#1B2318` | Tinta sobre accent/highlight (solo oscuro) |
 | `bg`               | `#14171B` | Fondo                                   |
 | `sidebar`, `surface` | `#1A1A1A` | Barra lateral, tarjetas y composer       |
 | `surface-hover`, `surface-active`, `border`, `divider` | `#292929` | Estados y separadores |
@@ -81,9 +86,9 @@ En `index.css` cada token semántico se define una sola vez con `light-dark(clar
 
 | Token | Claro | Oscuro |
 | ----- | ----- | ------ |
-| `bg` | #ECEFF2 | #14171B |
-| `sidebar` | #FAFAFA | #1A1A1A |
-| `surface` | #FAFAFA | #1A1A1A |
+| `bg` | #ECEFF2 | #0A0C0E |
+| `sidebar` | #FAFAFA | #131416 |
+| `surface` | #FAFAFA | #131416 |
 | `surface-hover` | #D4DCE3 | #292929 |
 | `surface-active` | #D4DCE3 | #292929 |
 | `border` | #D6D6D6 | #292929 |
@@ -93,22 +98,24 @@ En `index.css` cada token semántico se define una sola vez con `light-dark(clar
 | `control-off` | #767676 | #767676 |
 | `text` | #14171B | #FAFAFA |
 | `text-2` | #292929 | #E6E6E6 |
-| `muted` | #384754 | #AFBECA |
-| `faint` | #415363 | #839BAD |
-| `accent` | #415363 | #AFBECA |
-| `accent-hover` | #384754 | #D4DCE3 |
-| `accent-ink` | #FAFAFA | #212830 |
-| `highlight` | #384754 | #D4DCE3 |
-| `highlight-ink` | #F6F7F9 | #212830 |
-| `highlight-muted` | #D4DCE3 | #415363 |
-| `chart-1` | #323D48 | #D4DCE3 |
-| `chart-2` | #384754 | #AFBECA |
-| `chart-3` | #415363 | #839BAD |
-| `chart-4` | #4F667A | #678398 |
-| `chart-5` | #678398 | #4F667A |
-| `ok` | #415363 | #839BAD |
+| `muted` | #384754 | #A8C29C |
+| `faint` | #415363 | #85A378 |
+| `accent` | #415363 | #A8C29C |
+| `accent-hover` | #384754 | #CDDBC6 |
+| `accent-ink` | #FAFAFA | #1B2318 |
+| `highlight` | #384754 | #CDDBC6 |
+| `highlight-ink` | #F6F7F9 | #1B2318 |
+| `highlight-muted` | #D4DCE3 | #475A40 |
+| `chart-1` | #323D48 | #CDDBC6 |
+| `chart-2` | #384754 | #A8C29C |
+| `chart-3` | #415363 | #85A378 |
+| `chart-4` | #4F667A | #6C8761 |
+| `chart-5` | #678398 | #566D4C |
+| `ok` | #415363 | #85A378 |
 | `warn` | #575757 | #A5A5A5 |
 | `danger` | #1A1A1A | #D6D6D6 |
+
+**Acento oscuro `sage`:** el modo oscuro usa una escala verde-salvia aparte (`--color-sage-*` en `index.css`, 50–950) en vez de `hoki` para `accent`, `muted`, `faint`, `highlight*`, `chart-*` y `ok`; el claro no cambió y sigue en `hoki`. El fondo oscuro (`bg`/`sidebar`/`surface`) también se oscureció (`neutral-950`/`neutral-900` más negros, estilo "OLED"). Todo verificado en `src/contraste.test.ts` (texto >= 4.5:1, controles >= 3:1).
 
 Contraste calculado desde estos tokens y verificado en `src/contraste.test.ts`: texto >= 4.5:1 y controles y estados >= 3:1 en ambos temas. La única excepción es `chart-5`, que siempre va con etiqueta y valor en texto. `ok` y `danger` se distinguen además por forma y por texto.
 

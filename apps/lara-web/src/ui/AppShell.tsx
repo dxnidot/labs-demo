@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNod
 import {
   Calendar,
   ChartNoAxesColumn,
+  ChevronRight,
   Database,
   LayoutDashboard,
   LogOut,
@@ -18,14 +19,14 @@ import {
   Wrench,
   X,
 } from "lucide-react";
-import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router";
+import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router";
 import type { Usuario } from "../domain/Usuario";
 import { IniciarSesion } from "../application/use-cases/IniciarSesion";
 import { adaptadores, usarMocks } from "../infrastructure/composition";
 import { DialogoApariencia } from "./apariencia/DialogoApariencia";
 import { AvisoCarga, Esqueleto, EsqueletoTabla } from "./components/Esqueleto";
 import { AccesoDenegado } from "./components/AccesoDenegado";
-import { claseFoco } from "./components/foco";
+import { claseFoco, claseFocoInterno } from "./components/foco";
 import { IconButton } from "./components/IconButton";
 import { IndicadorMock } from "./components/IndicadorMock";
 import { LaraLogo } from "./components/LaraLogo";
@@ -153,6 +154,63 @@ function SeccionNav({ titulo, children }: { titulo: string; children: ReactNode 
   );
 }
 
+interface EntradaNav {
+  activo?: boolean;
+  etiqueta: string;
+  icono: ReactNode;
+  ruta: string;
+}
+
+function GrupoColapsable({
+  children,
+  idContenido,
+  titulo,
+}: {
+  children: ReactNode;
+  idContenido: string;
+  titulo: string;
+}) {
+  const [abierto, setAbierto] = useState(true);
+  return (
+    <div className="flex flex-col gap-0.5">
+      <button
+        aria-controls={idContenido}
+        aria-expanded={abierto}
+        className={`flex min-h-9 w-full items-center gap-1.5 rounded-button px-3 text-left font-mono text-label font-normal tracking-label text-faint hover:text-text-2 ${claseFocoInterno}`}
+        onClick={() => setAbierto((actual) => !actual)}
+        type="button"
+      >
+        <ChevronRight
+          aria-hidden="true"
+          className={`size-3 shrink-0 transition-transform ${abierto ? "rotate-90" : ""}`}
+        />
+        {titulo}
+      </button>
+      {abierto && (
+        <div className="flex flex-col gap-0.5" id={idContenido}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RielItem({ activo, etiqueta, icono, to }: { activo: boolean; etiqueta: string; icono: ReactNode; to: string }) {
+  return (
+    <Link
+      aria-current={activo ? "page" : undefined}
+      aria-label={etiqueta}
+      className={`flex size-11 shrink-0 items-center justify-center rounded-button transition-colors shell:size-9.5 ${claseFocoInterno} ${
+        activo ? "bg-surface-active text-text" : "text-text-2 hover:bg-surface-hover hover:text-text"
+      }`}
+      title={etiqueta}
+      to={to}
+    >
+      {icono}
+    </Link>
+  );
+}
+
 function CargandoVista() {
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-8">
@@ -187,6 +245,70 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
   const puedeVerAgentes = useHasRole(usuario, ["ver_agentes", "admin"]);
   const puedeVerIdentidad = useHasRole(usuario, ["ver_identidad", "admin"]);
   const puedeVerPersonal = useHasRole(usuario, ["ver-finanzas", "admin"]);
+
+  const enFinanzas = pathname === "/finanzas" || pathname.startsWith("/finanzas/");
+
+  const itemsPersonal: EntradaNav[] = puedeVerPersonal
+    ? [
+        {
+          activo: enFinanzas,
+          etiqueta: "Finanzas",
+          icono: <ChartNoAxesColumn aria-hidden="true" className={iconoNav} />,
+          ruta: "/finanzas",
+        },
+        {
+          etiqueta: "Gastos fijos",
+          icono: <Calendar aria-hidden="true" className={iconoNav} />,
+          ruta: "/gastos-fijos",
+        },
+      ]
+    : [];
+
+  const itemsLaboratorio: EntradaNav[] = [
+    ...(puedeVerAgentes
+      ? [
+          {
+            etiqueta: "Agentes",
+            icono: <Network aria-hidden="true" className={iconoNav} />,
+            ruta: "/agentes",
+          },
+          {
+            etiqueta: "Base de datos",
+            icono: <Database aria-hidden="true" className={iconoNav} />,
+            ruta: "/base-de-datos",
+          },
+          {
+            etiqueta: "Memoria vectorizada",
+            icono: <Waypoints aria-hidden="true" className={iconoNav} />,
+            ruta: "/memoria",
+          },
+          {
+            etiqueta: "Herramientas MCP",
+            icono: <Wrench aria-hidden="true" className={iconoNav} />,
+            ruta: "/herramientas",
+          },
+        ]
+      : []),
+    ...(puedeVerIdentidad
+      ? [
+          {
+            etiqueta: "Menú por rol",
+            icono: <TextAlignStart aria-hidden="true" className={iconoNav} />,
+            ruta: "/menu-por-rol",
+          },
+          {
+            etiqueta: "Usuarios y roles",
+            icono: <Users aria-hidden="true" className={iconoNav} />,
+            ruta: "/usuarios",
+          },
+          {
+            etiqueta: "Sincronización BPM",
+            icono: <RefreshCw aria-hidden="true" className={iconoNav} />,
+            ruta: "/sincronizacion-bpm",
+          },
+        ]
+      : []),
+  ];
 
   const panelNav = useRef<HTMLElement | null>(null);
   const botonMenu = useRef<HTMLButtonElement | null>(null);
@@ -259,7 +381,6 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
     permitido ? elemento : <AccesoDenegado />;
 
   const enRuta = (ruta: string) => pathname === ruta;
-  const enFinanzas = pathname === "/finanzas" || pathname.startsWith("/finanzas/");
   const barraCompleta = estrecha || barraVisible;
 
   const barraSuperior = estrecha && (
@@ -351,82 +472,34 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
                   Estado del lab
                 </SidebarItem>
 
-                {puedeVerAgentes && (
-                  <SeccionNav titulo="AGENTES">
-                    <SidebarItem
-                      active={enRuta("/agentes")}
-                      icono={<Network aria-hidden="true" className={iconoNav} />}
-                      to="/agentes"
-                    >
-                      Agentes
-                    </SidebarItem>
-                    <SidebarItem
-                      active={enRuta("/base-de-datos")}
-                      icono={<Database aria-hidden="true" className={iconoNav} />}
-                      to="/base-de-datos"
-                    >
-                      Base de datos
-                    </SidebarItem>
-                    <SidebarItem
-                      active={enRuta("/memoria")}
-                      icono={<Waypoints aria-hidden="true" className={iconoNav} />}
-                      to="/memoria"
-                    >
-                      Memoria vectorizada
-                    </SidebarItem>
-                    <SidebarItem
-                      active={enRuta("/herramientas")}
-                      icono={<Wrench aria-hidden="true" className={iconoNav} />}
-                      to="/herramientas"
-                    >
-                      Herramientas MCP
-                    </SidebarItem>
-                  </SeccionNav>
-                )}
-
-                {puedeVerIdentidad && (
-                  <SeccionNav titulo="IDENTIDAD">
-                    <SidebarItem
-                      active={enRuta("/menu-por-rol")}
-                      icono={<TextAlignStart aria-hidden="true" className={iconoNav} />}
-                      to="/menu-por-rol"
-                    >
-                      Menú por rol
-                    </SidebarItem>
-                    <SidebarItem
-                      active={enRuta("/usuarios")}
-                      icono={<Users aria-hidden="true" className={iconoNav} />}
-                      to="/usuarios"
-                    >
-                      Usuarios y roles
-                    </SidebarItem>
-                    <SidebarItem
-                      active={enRuta("/sincronizacion-bpm")}
-                      icono={<RefreshCw aria-hidden="true" className={iconoNav} />}
-                      to="/sincronizacion-bpm"
-                    >
-                      Sincronización BPM
-                    </SidebarItem>
-                  </SeccionNav>
-                )}
-
-                {puedeVerPersonal && (
+                {itemsPersonal.length > 0 && (
                   <SeccionNav titulo="PERSONAL · SOLO LOCAL">
-                    <SidebarItem
-                      active={enFinanzas}
-                      icono={<ChartNoAxesColumn aria-hidden="true" className={iconoNav} />}
-                      to="/finanzas"
-                    >
-                      Finanzas
-                    </SidebarItem>
-                    <SidebarItem
-                      active={enRuta("/gastos-fijos")}
-                      icono={<Calendar aria-hidden="true" className={iconoNav} />}
-                      to="/gastos-fijos"
-                    >
-                      Gastos fijos
-                    </SidebarItem>
+                    {itemsPersonal.map((item) => (
+                      <SidebarItem
+                        active={item.activo ?? enRuta(item.ruta)}
+                        icono={item.icono}
+                        key={item.ruta}
+                        to={item.ruta}
+                      >
+                        {item.etiqueta}
+                      </SidebarItem>
+                    ))}
                   </SeccionNav>
+                )}
+
+                {itemsLaboratorio.length > 0 && (
+                  <GrupoColapsable idContenido="grupo-laboratorio" titulo="LABORATORIO">
+                    {itemsLaboratorio.map((item) => (
+                      <SidebarItem
+                        active={enRuta(item.ruta)}
+                        icono={item.icono}
+                        key={item.ruta}
+                        to={item.ruta}
+                      >
+                        {item.etiqueta}
+                      </SidebarItem>
+                    ))}
+                  </GrupoColapsable>
                 )}
               </nav>
 
@@ -508,7 +581,7 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
             </footer>
           </Sidebar>
         ) : (
-          <div className="flex w-14 shrink-0 flex-col items-center border-r border-border bg-sidebar pt-4">
+          <div className="flex w-14 shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-border bg-sidebar px-1.5 py-3">
             <IconButton
               aria-expanded={false}
               aria-label="Mostrar barra lateral"
@@ -519,6 +592,22 @@ function AppShellLayout({ usuario }: AppShellLayoutProps) {
             >
               <PanelLeftOpen aria-hidden="true" className="size-4.5" />
             </IconButton>
+            <div aria-hidden="true" className="my-1 h-px w-6 shrink-0 bg-divider" />
+            <nav aria-label="Principal" className="flex flex-col items-center gap-1">
+              <RielItem activo={enRuta("/estado")} etiqueta="Estado del lab" icono={<LayoutDashboard aria-hidden="true" className={iconoNav} />} to="/estado" />
+              {itemsPersonal.map((item) => (
+                <RielItem
+                  activo={item.activo ?? enRuta(item.ruta)}
+                  etiqueta={item.etiqueta}
+                  icono={item.icono}
+                  key={item.ruta}
+                  to={item.ruta}
+                />
+              ))}
+              {itemsLaboratorio.map((item) => (
+                <RielItem activo={enRuta(item.ruta)} etiqueta={item.etiqueta} icono={item.icono} key={item.ruta} to={item.ruta} />
+              ))}
+            </nav>
           </div>
         )}
 

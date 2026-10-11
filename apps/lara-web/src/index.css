@@ -15,8 +15,8 @@
   --color-neutral-600: #575757;
   --color-neutral-700: #434343;
   --color-neutral-800: #292929;
-  --color-neutral-900: #1a1a1a;
-  --color-neutral-950: #14171b;
+  --color-neutral-900: #131416;
+  --color-neutral-950: #0a0c0e;
   --color-hoki-50: #f6f7f9;
   --color-hoki-100: #eceff2;
   --color-hoki-200: #d4dce3;
@@ -28,6 +28,18 @@
   --color-hoki-800: #384754;
   --color-hoki-900: #323d48;
   --color-hoki-950: #212830;
+  /* Acento oscuro alterno (sage): solo se usa en el lado oscuro de los tokens semánticos de abajo. */
+  --color-sage-50: #f5f7f4;
+  --color-sage-100: #e9efe6;
+  --color-sage-200: #cddbc6;
+  --color-sage-300: #a8c29c;
+  --color-sage-400: #85a378;
+  --color-sage-500: #6c8761;
+  --color-sage-600: #566d4c;
+  --color-sage-700: #475a40;
+  --color-sage-800: #3c4a37;
+  --color-sage-900: #343f30;
+  --color-sage-950: #1b2318;
   /*
    * Tokens semánticos: light-dark(claro, oscuro). El oscuro es el de la guía y los PNG; el claro sale
    * de la misma paleta (neutral + hoki) con los papeles invertidos. Requiere color-scheme (ver :root).
@@ -45,20 +57,20 @@
   --color-control-off: var(--color-neutral-500);
   --color-text: light-dark(var(--color-neutral-950), var(--color-neutral-50));
   --color-text-2: light-dark(var(--color-neutral-800), var(--color-neutral-200));
-  --color-muted: light-dark(var(--color-hoki-800), var(--color-hoki-300));
-  --color-faint: light-dark(var(--color-hoki-700), var(--color-hoki-400));
-  --color-accent: light-dark(var(--color-hoki-700), var(--color-hoki-300));
-  --color-accent-hover: light-dark(var(--color-hoki-800), var(--color-hoki-200));
-  --color-accent-ink: light-dark(var(--color-neutral-50), var(--color-hoki-950));
-  --color-highlight: light-dark(var(--color-hoki-800), var(--color-hoki-200));
-  --color-highlight-ink: light-dark(var(--color-hoki-50), var(--color-hoki-950));
-  --color-highlight-muted: light-dark(var(--color-hoki-200), var(--color-hoki-700));
-  --color-chart-1: light-dark(var(--color-hoki-900), var(--color-hoki-200));
-  --color-chart-2: light-dark(var(--color-hoki-800), var(--color-hoki-300));
-  --color-chart-3: light-dark(var(--color-hoki-700), var(--color-hoki-400));
-  --color-chart-4: light-dark(var(--color-hoki-600), var(--color-hoki-500));
-  --color-chart-5: light-dark(var(--color-hoki-500), var(--color-hoki-600));
-  --color-ok: light-dark(var(--color-hoki-700), var(--color-hoki-400));
+  --color-muted: light-dark(var(--color-hoki-800), var(--color-sage-300));
+  --color-faint: light-dark(var(--color-hoki-700), var(--color-sage-400));
+  --color-accent: light-dark(var(--color-hoki-700), var(--color-sage-300));
+  --color-accent-hover: light-dark(var(--color-hoki-800), var(--color-sage-200));
+  --color-accent-ink: light-dark(var(--color-neutral-50), var(--color-sage-950));
+  --color-highlight: light-dark(var(--color-hoki-800), var(--color-sage-200));
+  --color-highlight-ink: light-dark(var(--color-hoki-50), var(--color-sage-950));
+  --color-highlight-muted: light-dark(var(--color-hoki-200), var(--color-sage-700));
+  --color-chart-1: light-dark(var(--color-hoki-900), var(--color-sage-200));
+  --color-chart-2: light-dark(var(--color-hoki-800), var(--color-sage-300));
+  --color-chart-3: light-dark(var(--color-hoki-700), var(--color-sage-400));
+  --color-chart-4: light-dark(var(--color-hoki-600), var(--color-sage-500));
+  --color-chart-5: light-dark(var(--color-hoki-500), var(--color-sage-600));
+  --color-ok: light-dark(var(--color-hoki-700), var(--color-sage-400));
   --color-warn: light-dark(var(--color-neutral-600), var(--color-neutral-400));
   --color-danger: light-dark(var(--color-neutral-900), var(--color-neutral-300));
 

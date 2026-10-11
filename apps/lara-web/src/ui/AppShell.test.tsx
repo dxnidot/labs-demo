@@ -345,23 +345,26 @@ describe("sidebar y rutas", () => {
     expect(screen.queryByLabelText("Configuración")).toBeNull();
     expect(screen.queryByRole("link", { name: "Chat" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Reportes" })).toBeNull();
-    for (const titulo of ["AGENTES", "IDENTIDAD", "PERSONAL · SOLO LOCAL", "RECIENTES"]) {
+    for (const titulo of ["PERSONAL · SOLO LOCAL", "LABORATORIO", "RECIENTES"]) {
       expect(screen.getByText(titulo)).toBeTruthy();
     }
     expect(screen.getByText("ver-menu · LOCAL")).toBeTruthy();
   });
 
-  it("contrae y vuelve a mostrar la barra lateral", async () => {
+  it("contrae a un riel de iconos y vuelve a mostrar la barra lateral completa", async () => {
     prepararFetch();
 
     montar("/chat");
     fireEvent.click(await screen.findByRole("button", { name: "Contraer barra lateral" }));
 
-    expect(screen.queryByRole("link", { name: "Agentes" })).toBeNull();
+    // Contraída: el riel sigue ofreciendo el enlace como ícono (con título), pero ya no muestra RECIENTES.
+    expect(screen.getByRole("link", { name: "Agentes" })).toBeTruthy();
+    expect(screen.queryByText("RECIENTES")).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Mostrar barra lateral" }));
 
     expect(screen.getByRole("link", { name: "Agentes" })).toBeTruthy();
+    expect(screen.getByText("RECIENTES")).toBeTruthy();
   });
 
   it("Nuevo chat lleva a /chat desde otra vista", async () => {
@@ -445,7 +448,7 @@ describe("sidebar y rutas", () => {
 
     expect(await screen.findByRole("heading", { name: /Hola, beto/ })).toBeTruthy();
     expect(screen.getByText("Estado del lab")).toBeTruthy();
-    for (const titulo of ["AGENTES", "IDENTIDAD", "PERSONAL · SOLO LOCAL"]) {
+    for (const titulo of ["PERSONAL · SOLO LOCAL", "LABORATORIO"]) {
       expect(screen.queryByText(titulo)).toBeNull();
     }
     for (const enlace of [

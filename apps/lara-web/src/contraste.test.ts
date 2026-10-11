@@ -5,7 +5,7 @@ const css = readFileSync(new URL("./index.css", import.meta.url), "utf8");
 
 function paleta(): Map<string, string> {
   const mapa = new Map<string, string>();
-  for (const [, nombre, hex] of css.matchAll(/--color-((?:neutral|hoki)-\d+):\s*(#[0-9a-fA-F]{6});/g)) {
+  for (const [, nombre, hex] of css.matchAll(/--color-((?:neutral|hoki|sage)-\d+):\s*(#[0-9a-fA-F]{6});/g)) {
     mapa.set(nombre, hex.toLowerCase());
   }
   return mapa;
@@ -86,20 +86,20 @@ describe("contraste de los tokens en ambos temas", () => {
 
   it("el tema oscuro conserva los valores de la guía (README > Tokens)", () => {
     const guia: Record<string, string> = {
-      bg: "#14171b",
-      surface: "#1a1a1a",
+      bg: "#0a0c0e",
+      surface: "#131416",
       "surface-active": "#292929",
       border: "#292929",
       text: "#fafafa",
       "text-2": "#e6e6e6",
-      muted: "#afbeca",
-      faint: "#839bad",
-      accent: "#afbeca",
-      "accent-hover": "#d4dce3",
-      "accent-ink": "#212830",
-      highlight: "#d4dce3",
-      "highlight-ink": "#212830",
-      ok: "#839bad",
+      muted: "#a8c29c",
+      faint: "#85a378",
+      accent: "#a8c29c",
+      "accent-hover": "#cddbc6",
+      "accent-ink": "#1b2318",
+      highlight: "#cddbc6",
+      "highlight-ink": "#1b2318",
+      ok: "#85a378",
       warn: "#a5a5a5",
       danger: "#d6d6d6",
     };

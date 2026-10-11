@@ -28,7 +28,7 @@ export function SidebarItem({
 }: SidebarItemProps) {
   const base = reciente
     ? "min-h-11 py-2 text-compact text-muted shell:min-h-9"
-    : "min-h-11 gap-3 text-sm text-text-2";
+    : "min-h-11 gap-3 text-sm text-text-2 shell:min-h-9.5";
   return (
     <Link
       aria-current={active ? "page" : undefined}
