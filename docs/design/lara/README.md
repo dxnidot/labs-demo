@@ -166,7 +166,7 @@ El item activo usa `aria-current="page"`. Cerrar sesión llama a `logout` de Key
 | #   | Captura                         | Vista               | Parte del lab      | Fuente de datos                                       |
 | --- | ------------------------------- | ------------------- | ------------------ | ----------------------------------------------------- |
 | 01  | `png/01-login.png`              | Login               | C.1                | Keycloak (redirect PKCE)                              |
-| 02  | `png/02-estado-lab.png`         | Estado del lab      | todas              | Health checks de puertos + `docs/plans/estado-lab.md` |
+| 02  | `png/02-estado-lab.png`         | Estado del lab      | todas              | Health checks de puertos + `docs/archive/plans/estado-lab.md` |
 | 03  | `png/03-nuevo-chat.png`         | Nuevo chat          | C                  | —                                                     |
 | 04  | `png/04-chat.png`               | Chat                | C, B.4             | ADK API server `:8010` (SSE)                          |
 | 05  | `png/05-agentes.png`            | Agentes             | B                  | `/.well-known/agent-card.json` de cada agente         |
