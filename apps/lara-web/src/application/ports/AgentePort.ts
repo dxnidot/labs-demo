@@ -17,13 +17,14 @@ export type ActualizacionStreaming =
  * @modified Daniel Tovar 2026-09-30 Permite marcar el origen de la sesión (chat o finanzas).
  * @modified Daniel Tovar 2026-10-01 Agrega modeloId para elegir el LLM que atiende el mensaje.
  * @modified Daniel Tovar 2026-10-10 ActualizacionStreaming admite eventos A2A y pasos del flujo determinista.
+ * @modified Daniel Tovar 2026-11-19 enviarMensaje acepta un AbortSignal para cancelar el streaming.
  */
 export interface AgentePort {
   crearSesion(userId: string, titulo: string, origen?: OrigenSesion): Promise<string>;
   listarSesiones(userId: string): Promise<SesionChat[]>;
   obtenerSesion(userId: string, sessionId: string): Promise<Mensaje[]>;
   enviarMensaje(
-    input: { userId: string; sessionId: string; texto: string; modeloId: string },
+    input: { userId: string; sessionId: string; texto: string; modeloId: string; signal?: AbortSignal },
     onUpdate: (update: ActualizacionStreaming) => void,
   ): Promise<void>;
 }

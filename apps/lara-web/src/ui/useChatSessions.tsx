@@ -33,6 +33,7 @@ interface ChatSessionsValue {
     onUpdate: (update: ActualizacionStreaming) => void,
     modeloId: string,
     origen?: OrigenSesion,
+    signal?: AbortSignal,
   ) => Promise<string>;
 }
 
@@ -51,6 +52,7 @@ const ChatSessionsContext = createContext<ChatSessionsValue | null>(null);
  * @modified Daniel Tovar 2026-09-30 Separa la sesión del panel de finanzas y la oculta de Recientes.
  * @modified Daniel Tovar 2026-10-01 enviarMensaje exige el modeloId elegido en el chat.
  * @modified Daniel Tovar 2026-10-10 Adaptadores desde el composition root (VITE_USE_MOCKS).
+ * @modified Daniel Tovar 2026-11-19 enviarMensaje acepta un AbortSignal opcional.
  */
 export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderProps) {
   const [todasLasSesiones, setTodasLasSesiones] = useState<SesionChat[]>([]);
@@ -91,7 +93,8 @@ export function ChatSessionsProvider({ children, userId }: ChatSessionsProviderP
       onUpdate: (update: ActualizacionStreaming) => void,
       modeloId: string,
       origen?: OrigenSesion,
-    ) => casoEnviarMensaje.ejecutar(texto, sessionId, onUpdate, modeloId, origen),
+      signal?: AbortSignal,
+    ) => casoEnviarMensaje.ejecutar(texto, sessionId, onUpdate, modeloId, origen, signal),
     [],
   );
   const sessions = useMemo(

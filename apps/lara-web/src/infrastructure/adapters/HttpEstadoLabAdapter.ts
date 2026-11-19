@@ -17,23 +17,20 @@ const rutasSalud: Record<ClaveServicio, string> = {
  * Comprueba la salud de los servicios locales con un timeout corto.
  * @author Daniel Tovar
  * @since 2026-09-30
+ * @modified Daniel Tovar 2026-11-19 El timeout usa AbortSignal.timeout en vez de AbortController con setTimeout.
  */
 export class HttpEstadoLabAdapter implements EstadoLabPort {
   constructor(private readonly timeoutMs = 3000) {}
 
   async comprobar(clave: ClaveServicio): Promise<Disponibilidad> {
-    const controlador = new AbortController();
-    const temporizador = setTimeout(() => controlador.abort(), this.timeoutMs);
     try {
       const respuesta = await fetch(rutasSalud[clave], {
         cache: "no-store",
-        signal: controlador.signal,
+        signal: AbortSignal.timeout(this.timeoutMs),
       });
       return respuesta.status < 500 ? "arriba" : "sin-respuesta";
     } catch {
       return "sin-respuesta";
-    } finally {
-      clearTimeout(temporizador);
     }
   }
 }

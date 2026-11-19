@@ -28,6 +28,7 @@ const separadorAclaraciones = "orquestador → aclaraciones · A2A · transfiere
  * @author Daniel Tovar
  * @since 2026-10-10
  * @modified Daniel Tovar 2026-10-10 Simula una delegación A2A con pasos cuando el mensaje menciona "aclarac...".
+ * @modified Daniel Tovar 2026-11-19 Respeta el AbortSignal entre fragmentos de la respuesta de ejemplo.
  */
 export class MockAgenteAdapter implements AgentePort {
   private readonly sesiones = new Map<string, SesionEnMemoria>();
@@ -61,7 +62,7 @@ export class MockAgenteAdapter implements AgentePort {
   }
 
   async enviarMensaje(
-    input: { userId: string; sessionId: string; texto: string; modeloId: string },
+    input: { userId: string; sessionId: string; texto: string; modeloId: string; signal?: AbortSignal },
     onUpdate: (update: ActualizacionStreaming) => void,
   ): Promise<void> {
     const sesion = this.sesiones.get(input.sessionId);
@@ -80,6 +81,7 @@ export class MockAgenteAdapter implements AgentePort {
     let acumulado = "";
     for (const fragmento of respuesta) {
       await this.esperar();
+      input.signal?.throwIfAborted();
       acumulado += fragmento;
       onUpdate({ tipo: "texto", operacion: "agregar", texto: fragmento });
     }

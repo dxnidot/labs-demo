@@ -2,10 +2,11 @@ import Keycloak from "keycloak-js";
 import type { AuthPort } from "../../application/ports/AuthPort";
 import type { Usuario } from "../../domain/Usuario";
 
+// Valores por defecto del lab local; se pueden cambiar con VITE_KEYCLOAK_* en .env.local.
 const keycloak = new Keycloak({
-  url: "http://localhost:8080",
-  realm: "lab",
-  clientId: "lara-web",
+  url: import.meta.env.VITE_KEYCLOAK_URL ?? "http://localhost:8080",
+  realm: import.meta.env.VITE_KEYCLOAK_REALM ?? "lab",
+  clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? "lara-web",
 });
 let initPromise: Promise<Usuario | null> | undefined;
 
@@ -15,6 +16,7 @@ let initPromise: Promise<Usuario | null> | undefined;
  * @since 2026-09-30
  * @modified Daniel Tovar 2026-09-30 Usa check-sso con SSO silencioso, añade login y claims del token.
  * @modified Daniel Tovar 2026-10-10 Renombra identificadores de Keycloak según ADR-0006.
+ * @modified Daniel Tovar 2026-11-19 URL, realm y client salen de VITE_KEYCLOAK_* con los valores del lab como defecto.
  */
 export class KeycloakAuthAdapter implements AuthPort {
   init(): Promise<Usuario | null> {

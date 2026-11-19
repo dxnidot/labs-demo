@@ -1,14 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-  type KeyboardEvent,
-  type RefObject,
-} from "react";
-import { ArrowUp, Check, Paperclip, X } from "lucide-react";
-import ReactMarkdown, { type Components } from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { ListarModelos } from "../application/use-cases/ListarModelos";
 import type { Mensaje } from "../domain/Mensaje";
 import type { Modelo } from "../domain/Modelo";
@@ -16,17 +6,16 @@ import type { Usuario } from "../domain/Usuario";
 import { adaptadores } from "../infrastructure/composition";
 import { agregarOActualizarPaso, agregarOActualizarTexto } from "./chatEventos";
 import { Button } from "./components/Button";
-import { IconButton } from "./components/IconButton";
-import { Tag } from "./components/Tag";
-import { claseFoco, claseFocoContenedor } from "./components/foco";
+import { claseFoco } from "./components/foco";
 import { AvisoProveedorModelo } from "./components/AvisoProveedorModelo";
 import { Esqueleto, AvisoCarga } from "./components/Esqueleto";
 import { EstadoError } from "./components/EstadoError";
 import { LaraLogo } from "./components/LaraLogo";
 import { PageLayout } from "./components/PageLayout";
-import { PuntoEstado } from "./components/PuntoEstado";
 import { SelectorModelo } from "./components/SelectorModelo";
 import { modeloOrquestador } from "../domain/catalogoLab";
+import { ComposerChat } from "./ComposerChat";
+import { MensajeConversacion, MensajeEvento } from "./MensajeChat";
 import { comportamientoDeScroll } from "./movimientoReducido";
 import { useChatSessions } from "./useChatSessions";
 
@@ -35,157 +24,12 @@ const modelosDeRespaldo: Modelo[] = [
   { id: modeloOrquestador, nombre: modeloOrquestador.split("/")[1], tier: "basic" },
 ];
 
-const componentesMarkdown: Components = {
-  h1: ({ children }) => <h1 className="mb-3 mt-5 text-2xl font-semibold">{children}</h1>,
-  h2: ({ children }) => <h2 className="mb-2 mt-4 text-xl font-semibold">{children}</h2>,
-  ul: ({ children }) => <ul className="my-3 list-disc space-y-1 pl-6">{children}</ul>,
-  ol: ({ children }) => <ol className="my-3 list-decimal space-y-1 pl-6">{children}</ol>,
-  li: ({ children }) => <li className="pl-1">{children}</li>,
-  pre: ({ children }) => (
-    <pre className="my-3 overflow-x-auto rounded-card border border-border bg-bg p-4">
-      {children}
-    </pre>
-  ),
-  code: ({ children, className }) => (
-    <code
-      className={
-        className
-          ? "font-mono text-sm text-text-2"
-          : "rounded bg-bg px-1 font-mono text-sm text-accent"
-      }
-    >
-      {children}
-    </code>
-  ),
-  table: ({ children }) => (
-    <div className="my-3 overflow-x-auto">
-      <table className="w-full border-collapse text-left text-sm">{children}</table>
-    </div>
-  ),
-  th: ({ children }) => (
-    <th className="border border-border bg-surface px-3 py-2">{children}</th>
-  ),
-  td: ({ children }) => <td className="border border-border px-3 py-2">{children}</td>,
-  blockquote: ({ children }) => (
-    <blockquote className="my-3 border-l-2 border-accent pl-4 text-muted">
-      {children}
-    </blockquote>
-  ),
-};
-
 const sugerencias = [
   "¿Cuánto llevo en gastos este mes?",
   "¿Cuáles son mis próximos pagos de tarjeta?",
   "Muéstrame el resumen financiero del mes",
   "¿Me conviene pagar el total o el mínimo de mi tarjeta?",
 ];
-
-function ChipAgente() {
-  return (
-    <span className="inline-flex min-h-8 items-center gap-2 rounded-pill border border-border px-3 text-compact text-text-2">
-      <PuntoEstado estado="ok" />
-      Agente: orquestador
-    </span>
-  );
-}
-
-function ChipMemoria() {
-  return (
-    <span className="inline-flex min-h-8 items-center gap-2 rounded-pill border border-border px-3 text-compact text-text-2">
-      <PuntoEstado estado="ok" />
-      Memoria: activa
-    </span>
-  );
-}
-
-/** Separador A2A centrado en mono, con los pasos del flujo determinista cuando los hay (mockup 04). */
-function MensajeEvento({ mensaje }: { mensaje: Mensaje }) {
-  return (
-    <div className="flex flex-col gap-3">
-      <div aria-hidden="true" className="flex items-center gap-3 text-xs text-faint">
-        <span className="h-px flex-1 bg-divider" />
-        <span className="font-mono">{mensaje.texto}</span>
-        <span className="h-px flex-1 bg-divider" />
-      </div>
-      {mensaje.pasos && mensaje.pasos.length > 0 && (
-        <ul className="m-0 flex list-none flex-col gap-2 rounded-card border border-border bg-surface p-3.5 text-sm">
-          {mensaje.pasos.map((paso) => (
-            <li className="flex items-center justify-between gap-3" key={paso.clave}>
-              <span className="flex items-center gap-2">
-                <Check
-                  aria-hidden="true"
-                  className={`size-4 shrink-0 ${paso.completado ? "text-ok" : "text-faint opacity-0"}`}
-                />
-                {paso.nombre}
-              </span>
-              <span className="font-mono text-xs text-faint">{paso.clave}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-interface AdjuntarArchivoProps {
-  archivo: File | null;
-  entradaRef: RefObject<HTMLInputElement | null>;
-  onElegir: (archivo: File | null) => void;
-}
-
-/**
- * Control "adjuntar" del composer: solo previsualiza el nombre del archivo elegido (sin backend de
- * carga en el chat general todavía), para que el usuario vea que se seleccionó antes de poder quitarlo.
- */
-function AdjuntarArchivo({ archivo, entradaRef, onElegir }: AdjuntarArchivoProps) {
-  return (
-    <>
-      <input
-        aria-label="Elegir archivo para adjuntar"
-        className="hidden"
-        onChange={(event) => onElegir(event.target.files?.[0] ?? null)}
-        ref={entradaRef}
-        type="file"
-      />
-      <IconButton
-        aria-label="Adjuntar archivo"
-        onClick={() => entradaRef.current?.click()}
-        tamano="compacto"
-        type="button"
-      >
-        <Paperclip aria-hidden="true" className="size-4.5" />
-      </IconButton>
-      {archivo && (
-        <Tag>
-          <span className="flex items-center gap-1.5">
-            {archivo.name}
-            <button
-              aria-label={`Quitar ${archivo.name}`}
-              className="inline-flex size-4 items-center justify-center"
-              onClick={() => onElegir(null)}
-              type="button"
-            >
-              <X aria-hidden="true" className="size-3.5" />
-            </button>
-          </span>
-        </Tag>
-      )}
-    </>
-  );
-}
-
-function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
-  return (
-    <button
-      aria-label="Enviar"
-      className={`inline-flex size-11 shrink-0 items-center justify-center rounded-button bg-accent text-accent-ink transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 shell:size-10 ${claseFoco}`}
-      disabled={deshabilitado}
-      type="submit"
-    >
-      <ArrowUp aria-hidden="true" className="size-4.5" />
-    </button>
-  );
-}
 
 /**
  * Presenta la conversación de Lara y su respuesta en streaming.
@@ -204,6 +48,7 @@ function BotonEnviar({ deshabilitado }: { deshabilitado: boolean }) {
  * @modified Daniel Tovar 2026-10-10 El estado inicial arranca arriba (antes bajaba el scroll al final y ocultaba el saludo a 320px).
  * @modified Daniel Tovar 2026-10-10 Catálogo de domain/catalogoLab y catálogo de modelos desde el composition root.
  * @modified Daniel Tovar 2026-10-10 Eventos A2A y pasos del flujo determinista como mensajes "evento" (mockup 04).
+ * @modified Daniel Tovar 2026-11-19 Composer y mensajes en componentes propios (mensajes memoizados), adjuntar deshabilitado, cancelación del streaming al salir y aviso accesible al terminar.
  */
 export function ChatPage({ usuario }: { usuario: Usuario }) {
   const {
@@ -217,6 +62,7 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
   const [mensajes, setMensajes] = useState<Mensaje[]>([]);
   const [texto, setTexto] = useState("");
   const [estado, setEstado] = useState("");
+  const [anuncio, setAnuncio] = useState("");
   const [cargando, setCargando] = useState(false);
   const [cargandoSesion, setCargandoSesion] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -229,8 +75,12 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
   const composicionActiva = useRef(false);
   const listaMensajesRef = useRef<HTMLDivElement>(null);
   const seguirAlFinal = useRef(true);
-  const entradaArchivo = useRef<HTMLInputElement>(null);
-  const [archivoAdjunto, setArchivoAdjunto] = useState<File | null>(null);
+  const envioEnCurso = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    // Al salir del chat se corta el streaming en curso: no se sigue leyendo ni actualizando estado.
+    return () => envioEnCurso.current?.abort();
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -312,12 +162,14 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
   }
 
   async function enviarTexto(mensaje: string) {
+    const controlador = new AbortController();
+    envioEnCurso.current = controlador;
     ultimoEnvio.current = mensaje;
     setError(null);
     setOrigenError(null);
+    setAnuncio("");
     setCargando(true);
     setTexto("");
-    setArchivoAdjunto(null);
     seguirAlFinal.current = true;
     setMensajes((actuales) => [...actuales, { rol: "usuario", texto: mensaje, fecha: new Date() }]);
 
@@ -355,13 +207,19 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
           setMensajes((actuales) => agregarOActualizarTexto(actuales, update));
         },
         modeloId,
+        undefined,
+        controlador.signal,
       );
       setActiveSessionId(sentSessionId);
       if (!receivedText) {
         throw new Error("El agente terminó el flujo sin una respuesta de texto.");
       }
+      setAnuncio("Lara respondió.");
       await refreshSessions();
     } catch (reason: unknown) {
+      if (controlador.signal.aborted) {
+        return;
+      }
       setMensajes((actuales) => {
         const ultimo = actuales.at(-1);
         return ultimo?.rol === "agente" && ultimo.texto.length === 0 ? actuales.slice(0, -1) : actuales;
@@ -369,8 +227,10 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
       setError(reason instanceof Error ? reason.message : "No se pudo completar el mensaje.");
       setOrigenError("envio");
     } finally {
-      setEstado("");
-      setCargando(false);
+      if (!controlador.signal.aborted) {
+        setEstado("");
+        setCargando(false);
+      }
     }
   }
 
@@ -406,6 +266,10 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
     }
   }
 
+  function alCambiarComposicion(activa: boolean) {
+    composicionActiva.current = activa;
+  }
+
   return (
     <PageLayout
       cabecera={
@@ -433,7 +297,8 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
       contenidoClassName="px-4 py-6 sm:px-6 sm:py-8"
       contenidoProps={{
         "aria-label": "Conversación",
-        "aria-live": "polite",
+        // Durante el streaming no se anuncia cada fragmento; al terminar avisa la región de estado.
+        "aria-live": cargando ? "off" : "polite",
         onScroll: (event) => {
           const element = event.currentTarget;
           const alFinal = element.scrollHeight - element.scrollTop - element.clientHeight < 48;
@@ -458,43 +323,20 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
         mensajes.length > 0 || cargandoSesion ? (
           <footer className="px-4 pb-4 sm:px-6 sm:pb-5">
             <div className="mx-auto flex w-full max-w-190 flex-col gap-2.5">
-              <form
-                className={`flex flex-col gap-3 rounded-composer border border-border bg-surface py-3.5 pl-4 pr-3.5 ${claseFocoContenedor}`}
-                onSubmit={enviar}
-              >
-                <label className="sr-only" htmlFor="mensaje-chat">
-                  Mensaje para Lara
-                </label>
-                <textarea
-                  className="w-full resize-none bg-transparent text-body text-text outline-none placeholder:text-faint"
-                  disabled={cargando || cargandoSesion}
-                  aria-describedby="aviso-proveedor-chat"
-                  id="mensaje-chat"
-                  onChange={(event) => setTexto(event.target.value)}
-                  onCompositionEnd={() => {
-                    composicionActiva.current = false;
-                  }}
-                  onCompositionStart={() => {
-                    composicionActiva.current = true;
-                  }}
-                  onKeyDown={alPulsarTecla}
-                  placeholder="Escribe a Lara…"
-                  rows={2}
-                  value={texto}
-                />
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <AdjuntarArchivo
-                      archivo={archivoAdjunto}
-                      entradaRef={entradaArchivo}
-                      onElegir={setArchivoAdjunto}
-                    />
-                    <ChipAgente />
-                    <ChipMemoria />
-                  </div>
-                  <BotonEnviar deshabilitado={cargando || cargandoSesion || !texto.trim()} />
-                </div>
-              </form>
+              <ComposerChat
+                campoDeshabilitado={cargando || cargandoSesion}
+                className="flex flex-col gap-3 rounded-composer border border-border bg-surface py-3.5 pl-4 pr-3.5"
+                envioDeshabilitado={cargando || cargandoSesion || !texto.trim()}
+                idAviso="aviso-proveedor-chat"
+                idCampo="mensaje-chat"
+                onCambiar={setTexto}
+                onComposicion={alCambiarComposicion}
+                onEnviar={enviar}
+                onKeyDown={alPulsarTecla}
+                placeholder="Escribe a Lara…"
+                rows={2}
+                texto={texto}
+              />
               <AvisoProveedorModelo id="aviso-proveedor-chat" />
               <p className="m-0 text-center text-xs text-faint">
                 Lara puede equivocarse. Verifica los datos importantes.
@@ -513,43 +355,20 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
                 Hola, {usuario.username}. ¿En qué te ayudo?
               </h1>
             </div>
-            <form
-              className={`flex flex-col gap-3 rounded-composer border border-border bg-surface p-4 ${claseFocoContenedor}`}
-              onSubmit={enviar}
-            >
-              <label className="sr-only" htmlFor="mensaje">
-                Mensaje para Lara
-              </label>
-              <textarea
-                className="w-full resize-none bg-transparent text-body text-text outline-none placeholder:text-faint"
-                disabled={cargando}
-                aria-describedby="aviso-proveedor-inicio"
-                id="mensaje"
-                onChange={(event) => setTexto(event.target.value)}
-                onCompositionEnd={() => {
-                  composicionActiva.current = false;
-                }}
-                onCompositionStart={() => {
-                  composicionActiva.current = true;
-                }}
-                onKeyDown={alPulsarTecla}
-                placeholder="Pregunta por tus gastos, tus tarjetas o tu calendario de pagos…"
-                rows={3}
-                value={texto}
-              />
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
-                  <AdjuntarArchivo
-                    archivo={archivoAdjunto}
-                    entradaRef={entradaArchivo}
-                    onElegir={setArchivoAdjunto}
-                  />
-                  <ChipAgente />
-                  <ChipMemoria />
-                </div>
-                <BotonEnviar deshabilitado={cargando || !texto.trim()} />
-              </div>
-            </form>
+            <ComposerChat
+              campoDeshabilitado={cargando}
+              className="flex flex-col gap-3 rounded-composer border border-border bg-surface p-4"
+              envioDeshabilitado={cargando || !texto.trim()}
+              idAviso="aviso-proveedor-inicio"
+              idCampo="mensaje"
+              onCambiar={setTexto}
+              onComposicion={alCambiarComposicion}
+              onEnviar={enviar}
+              onKeyDown={alPulsarTecla}
+              placeholder="Pregunta por tus gastos, tus tarjetas o tu calendario de pagos…"
+              rows={3}
+              texto={texto}
+            />
             <AvisoProveedorModelo className="-mt-3" id="aviso-proveedor-inicio" />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 wide:grid-cols-4">
               {sugerencias.map((sugerencia) => (
@@ -584,43 +403,22 @@ export function ChatPage({ usuario }: { usuario: Usuario }) {
         )}
 
         {mensajes.map((mensaje, index) => {
-          if (mensaje.rol === "evento") {
-            return <MensajeEvento key={`${mensaje.fecha.getTime()}-${index}`} mensaje={mensaje} />;
-          }
-          return (
-          <article
-            className={
-              mensaje.rol === "usuario"
-                ? "max-w-4/5 self-end rounded-card bg-surface-active px-4 py-3 text-body"
-                : "flex w-full gap-3.5 text-body leading-body"
-            }
-            key={`${mensaje.fecha.getTime()}-${index}`}
-          >
-            {mensaje.rol === "agente" && (
-              <span className="inline-flex size-7.5 shrink-0 items-center justify-center rounded-button border border-border bg-surface">
-                <LaraLogo soloL tamano={18} />
-              </span>
-            )}
-            <div className="min-w-0 break-words">
-              {mensaje.rol === "usuario" ? (
-                <p className="m-0 whitespace-pre-wrap">{mensaje.texto}</p>
-              ) : (
-                <div className="text-text">
-                  {mensaje.texto ? (
-                    <ReactMarkdown components={componentesMarkdown} remarkPlugins={[remarkGfm]}>
-                      {mensaje.texto}
-                    </ReactMarkdown>
-                  ) : (
-                    cargando && <span className="text-muted">…</span>
-                  )}
-                </div>
-              )}
-            </div>
-          </article>
+          const clave = `${mensaje.fecha.getTime()}-${index}`;
+          return mensaje.rol === "evento" ? (
+            <MensajeEvento key={clave} mensaje={mensaje} />
+          ) : (
+            <MensajeConversacion
+              key={clave}
+              mensaje={mensaje}
+              pendiente={cargando && index === mensajes.length - 1}
+            />
           );
         })}
 
         {estado && <p className="mx-auto font-mono text-xs text-muted">{estado}</p>}
+        <p aria-live="polite" className="sr-only">
+          {anuncio}
+        </p>
         {error && <EstadoError mensaje={error} onReintentar={reintentar} />}
       </div>
     </PageLayout>
