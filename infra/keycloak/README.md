@@ -16,7 +16,7 @@ docker compose up -d
 
 ## Qué trae el realm
 
-Clients, roles de realm y de client, grupos, los usuarios de prueba y el mapper de audiencia de Lara. Detalle y nombres: skill `keycloak-lab` y [ADR-0006](../../docs/decisions/0006-convencion-de-nombres.md). No incluye (pendiente): la configuración de Authorization Services (RPT) de la prueba original.
+Clients, roles de realm y de client, grupos, los usuarios de prueba y el mapper de audiencia de Lara. Detalle y nombres: skill `keycloak-lab` y [ADR-0006](../../docs/archive/decisions/0006-convencion-de-nombres.md). No incluye (pendiente): la configuración de Authorization Services (RPT) de la prueba original.
 
 ## Reglas del import
 
