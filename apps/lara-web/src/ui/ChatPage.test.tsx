@@ -20,6 +20,7 @@ const chatFake = vi.hoisted(() => ({
       _sesion: string | null,
       _onUpdate: (update: unknown) => void,
       _modeloId: string,
+      ..._resto: unknown[]
     ): Promise<string> => "sesion-1",
   ),
 }));
@@ -153,7 +154,7 @@ describe("ChatPage · posición del scroll", () => {
     montar();
 
     await screen.findByText("Respuesta");
-    expect((screen.getByRole("log") as HTMLElement).scrollTop).toBe(900);
+    await waitFor(() => expect((screen.getByRole("log") as HTMLElement).scrollTop).toBe(900));
     altura.mockRestore();
   });
 });
@@ -199,41 +200,48 @@ describe("ChatPage · eventos A2A y pasos", () => {
 });
 
 describe("ChatPage · composer: adjuntar y memoria activa", () => {
-  it("muestra el chip de memoria activa y el botón adjuntar", async () => {
+  it("muestra el chip de memoria activa y el botón adjuntar deshabilitado", async () => {
     montar();
 
     expect(await screen.findByText("Memoria: activa")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Adjuntar archivo" })).toBeTruthy();
+    const adjuntar = screen.getByRole("button", { name: "Adjuntar archivo (aún no disponible)" });
+    expect((adjuntar as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.queryByLabelText("Elegir archivo para adjuntar")).toBeNull();
   });
+});
 
-  it("elegir un archivo lo muestra como chip removible, y desaparece al pulsar quitar", async () => {
-    montar();
-    const entrada = (await screen.findByLabelText("Elegir archivo para adjuntar")) as HTMLInputElement;
-    const archivo = new File(["contenido"], "estado-de-cuenta.pdf", { type: "application/pdf" });
-
-    fireEvent.change(entrada, { target: { files: [archivo] } });
-
-    expect(await screen.findByText("estado-de-cuenta.pdf")).toBeTruthy();
-
-    fireEvent.click(screen.getByRole("button", { name: "Quitar estado-de-cuenta.pdf" }));
-
-    await waitFor(() => expect(screen.queryByText("estado-de-cuenta.pdf")).toBeNull());
-  });
-
-  it("al enviar un mensaje se limpia el archivo adjunto (no se sube a ningún lado)", async () => {
-    chatFake.enviarMensaje.mockResolvedValueOnce("sesion-1");
-    montar();
-    const entrada = (await screen.findByLabelText("Elegir archivo para adjuntar")) as HTMLInputElement;
-    fireEvent.change(entrada, {
-      target: { files: [new File(["x"], "ejemplo.csv", { type: "text/csv" })] },
+describe("ChatPage · accesibilidad y cancelación del envío", () => {
+  it("al terminar la respuesta avisa en una región aria-live sin anunciar cada fragmento", async () => {
+    chatFake.enviarMensaje.mockImplementationOnce(async (_t, _s, onUpdate) => {
+      onUpdate({ tipo: "texto", operacion: "agregar", texto: "Listo" });
+      return "sesion-1";
     });
-    await screen.findByText("ejemplo.csv");
-
-    fireEvent.change(screen.getByRole("textbox", { name: "Mensaje para Lara" }), {
+    montar();
+    fireEvent.change(await screen.findByRole("textbox", { name: "Mensaje para Lara" }), {
       target: { value: "Hola" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
 
-    await waitFor(() => expect(screen.queryByText("ejemplo.csv")).toBeNull());
+    const aviso = await screen.findByText("Lara respondió.");
+    expect(aviso.getAttribute("aria-live")).toBe("polite");
+  });
+
+  it("pasa un AbortSignal al envío y lo aborta al salir del chat", async () => {
+    let senal: AbortSignal | undefined;
+    chatFake.enviarMensaje.mockImplementationOnce(async (...args: unknown[]) => {
+      senal = args[5] as AbortSignal;
+      return new Promise<string>(() => {});
+    });
+    const { unmount } = montar();
+    fireEvent.change(await screen.findByRole("textbox", { name: "Mensaje para Lara" }), {
+      target: { value: "Hola" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+    await waitFor(() => expect(senal).toBeDefined());
+    expect(senal?.aborted).toBe(false);
+
+    unmount();
+
+    expect(senal?.aborted).toBe(true);
   });
 });

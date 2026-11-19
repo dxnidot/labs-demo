@@ -91,5 +91,33 @@ describe("AdkAgenteAdapter", () => {
 
     const headers = new Headers(fetchMock.mock.calls[0]?.[1]?.headers);
     expect(headers.get("X-LLM-Model")).toBe("deepseek/deepseek-v4-pro");
+    expect(headers.get("Accept")).toBe("text/event-stream");
+    expect(headers.get("Authorization")).toBe("Bearer test-token");
+  });
+
+  it("reenvía el AbortSignal al fetch del stream y falla con el mensaje HTTP si el servidor rechaza", async () => {
+    const auth: AuthPort = {
+      init: async () => null,
+      usuarioActual: () => null,
+      token: () => null,
+      updateToken: async () => "test-token",
+      logout: async () => {},
+      login: async () => {},
+      claimsToken: () => null,
+    };
+    const fetchMock = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) => new Response("", { status: 403 }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const controlador = new AbortController();
+
+    await expect(
+      new AdkAgenteAdapter(auth).enviarMensaje(
+        { userId: "u", sessionId: "s", texto: "hola", modeloId: "m", signal: controlador.signal },
+        () => {},
+      ),
+    ).rejects.toThrow("No se pudo enviar el mensaje al agente (HTTP 403).");
+
+    expect(fetchMock.mock.calls[0]?.[1]?.signal).toBe(controlador.signal);
   });
 });

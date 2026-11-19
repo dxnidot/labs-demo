@@ -9,6 +9,7 @@ import type { AgentePort, ActualizacionStreaming } from "../ports/AgentePort";
  * @modified Daniel 2026-09-30 Guarda el primer mensaje como título de sesión.
  * @modified Daniel Tovar 2026-09-30 Acepta el origen opcional de la sesión nueva.
  * @modified Daniel Tovar 2026-10-01 Recibe el modeloId elegido y lo reenvía al agente.
+ * @modified Daniel Tovar 2026-11-19 Reenvía un AbortSignal opcional para cancelar el envío.
  */
 export class EnviarMensaje {
   constructor(
@@ -22,6 +23,7 @@ export class EnviarMensaje {
     onUpdate: (update: ActualizacionStreaming) => void,
     modeloId: string,
     origen?: OrigenSesion,
+    signal?: AbortSignal,
   ): Promise<string> {
     const usuario = this.auth.usuarioActual();
     if (!usuario) {
@@ -31,7 +33,7 @@ export class EnviarMensaje {
     const activeSessionId =
       sessionId ?? await this.agente.crearSesion(usuario.id, texto.trim().slice(0, 60), origen);
     await this.agente.enviarMensaje(
-      { userId: usuario.id, sessionId: activeSessionId, texto, modeloId },
+      { userId: usuario.id, sessionId: activeSessionId, texto, modeloId, signal },
       onUpdate,
     );
     return activeSessionId;

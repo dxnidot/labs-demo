@@ -134,12 +134,34 @@ describe("login", () => {
 
     const botonUsuario = await screen.findByRole("button", { name: /^ana/ });
     fireEvent.click(botonUsuario);
-    fireEvent.click(screen.getByRole("menuitem", { name: "Configuración" }));
+    fireEvent.click(screen.getByRole("button", { name: "Configuración" }));
     expect(screen.getByRole("dialog", { name: "Apariencia" })).toBeTruthy();
 
     fireEvent.keyDown(document, { key: "Escape" });
 
     await waitFor(() => expect(screen.queryByRole("dialog", { name: "Apariencia" })).toBeNull());
+    expect(document.activeElement).toBe(botonUsuario);
+  });
+});
+
+describe("opciones de usuario", () => {
+  it("el botón anuncia aria-expanded, no declara aria-haspopup, y Escape cierra y devuelve el foco", async () => {
+    prepararFetch();
+
+    montar("/chat");
+
+    const botonUsuario = await screen.findByRole("button", { name: /^ana/ });
+    expect(botonUsuario.getAttribute("aria-expanded")).toBe("false");
+    expect(botonUsuario.getAttribute("aria-haspopup")).toBeNull();
+
+    fireEvent.click(botonUsuario);
+    expect(botonUsuario.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("group", { name: "Opciones de usuario" })).toBeTruthy();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    await waitFor(() => expect(screen.queryByRole("group", { name: "Opciones de usuario" })).toBeNull());
+    expect(botonUsuario.getAttribute("aria-expanded")).toBe("false");
     expect(document.activeElement).toBe(botonUsuario);
   });
 });
@@ -351,16 +373,18 @@ describe("sidebar y rutas", () => {
     },
   );
 
-  it("el menú de usuario abre Configuración y lleva a Laboratorio", async () => {
+  it("las opciones de usuario (disclosure, sin roles de menú) abren Configuración y llevan a Laboratorio", async () => {
     prepararFetch();
 
     montar("/chat");
     fireEvent.click(await screen.findByRole("button", { name: /^ana/ }));
 
-    const menu = screen.getByRole("menu", { name: "Usuario" });
-    expect(within(menu).getByRole("menuitem", { name: "Configuración" })).toBeTruthy();
+    const opciones = screen.getByRole("group", { name: "Opciones de usuario" });
+    expect(within(opciones).getByRole("button", { name: "Configuración" })).toBeTruthy();
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(screen.queryByRole("menuitem")).toBeNull();
 
-    fireEvent.click(within(menu).getByRole("menuitem", { name: "Laboratorio" }));
+    fireEvent.click(within(opciones).getByRole("button", { name: "Laboratorio" }));
 
     expect(await screen.findByRole("heading", { name: "Agentes", level: 1 })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "LABORATORIO", level: 2 })).toBeTruthy();

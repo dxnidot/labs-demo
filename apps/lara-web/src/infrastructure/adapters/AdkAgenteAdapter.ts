@@ -2,6 +2,7 @@ import type { AuthPort } from "../../application/ports/AuthPort";
 import type { AgentePort, ActualizacionStreaming } from "../../application/ports/AgentePort";
 import type { Mensaje } from "../../domain/Mensaje";
 import type { OrigenSesion, SesionChat } from "../../domain/SesionChat";
+import { ApiHttpClient } from "./ApiHttpClient";
 import { mapearEventosSesion, mapearSesiones } from "./sesiones";
 import { procesarStreamSse } from "./sse";
 
@@ -30,9 +31,13 @@ async function* decodificarChunks(
  * @modified Daniel Tovar 2026-09-30 Marca con origen las sesiones creadas desde el panel de finanzas.
  * @modified Daniel Tovar 2026-10-01 Envía el modelo elegido en la cabecera X-LLM-Model.
  * @modified Daniel Tovar 2026-10-02 Logs de consola del modelo enviado/aceptado/rechazado.
+ * @modified Daniel Tovar 2026-11-19 Reutiliza ApiHttpClient (token y errores HTTP) y cancela el stream con AbortSignal.
  */
 export class AdkAgenteAdapter implements AgentePort {
-  constructor(private readonly auth: AuthPort) {}
+  constructor(
+    auth: AuthPort,
+    private readonly http: ApiHttpClient = new ApiHttpClient(auth),
+  ) {}
 
   async listarSesiones(userId: string): Promise<SesionChat[]> {
     const response = await this.solicitar(
@@ -56,24 +61,16 @@ export class AdkAgenteAdapter implements AgentePort {
   }
 
   async crearSesion(userId: string, titulo: string, origen?: OrigenSesion): Promise<string> {
-    const token = await this.auth.updateToken();
-    const response = await fetch(
+    const response = await this.http.solicitarRespuesta(
       `/adk/apps/orquestador/users/${encodeURIComponent(userId)}/sessions`,
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
         body: JSON.stringify({
           state: origen === "finanzas" ? { titulo, origen } : { titulo },
         }),
       },
+      (status) => `No se pudo crear la sesión del agente (HTTP ${status}).`,
     );
-    if (!response.ok) {
-      throw new Error(`No se pudo crear la sesión del agente (HTTP ${response.status}).`);
-    }
 
     const session: unknown = await response.json();
     if (
@@ -87,51 +84,43 @@ export class AdkAgenteAdapter implements AgentePort {
     return session.id;
   }
 
-  private async solicitar(url: string): Promise<Response> {
-    const token = await this.auth.updateToken();
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-    });
-    if (!response.ok) {
-      throw new Error(`No se pudo consultar el historial del agente (HTTP ${response.status}).`);
-    }
-    return response;
+  private solicitar(url: string): Promise<Response> {
+    return this.http.solicitarRespuesta(
+      url,
+      {},
+      (status) => `No se pudo consultar el historial del agente (HTTP ${status}).`,
+    );
   }
 
   async enviarMensaje(
-    input: { userId: string; sessionId: string; texto: string; modeloId: string },
+    input: { userId: string; sessionId: string; texto: string; modeloId: string; signal?: AbortSignal },
     onUpdate: (update: ActualizacionStreaming) => void,
   ): Promise<void> {
-    const token = await this.auth.updateToken();
     console.info(`[modelo] POST /adk/run_sse con X-LLM-Model=${input.modeloId}`);
-    const response = await fetch("/adk/run_sse", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        Accept: "text/event-stream",
-        "X-LLM-Model": input.modeloId,
+    const response = await this.http.solicitarRespuesta(
+      "/adk/run_sse",
+      {
+        method: "POST",
+        headers: { Accept: "text/event-stream", "X-LLM-Model": input.modeloId },
+        signal: input.signal,
+        body: JSON.stringify({
+          appName: "orquestador",
+          userId: input.userId,
+          sessionId: input.sessionId,
+          streaming: true,
+          newMessage: {
+            role: "user",
+            parts: [{ text: input.texto }],
+          },
+        }),
       },
-      body: JSON.stringify({
-        appName: "orquestador",
-        userId: input.userId,
-        sessionId: input.sessionId,
-        streaming: true,
-        newMessage: {
-          role: "user",
-          parts: [{ text: input.texto }],
-        },
-      }),
-    });
-    if (!response.ok) {
-      if (response.status === 403) {
-        console.warn(`[modelo] rechazado por el backend (model=${input.modeloId}, HTTP 403)`);
-      }
-      throw new Error(`No se pudo enviar el mensaje al agente (HTTP ${response.status}).`);
-    }
+      (status) => {
+        if (status === 403) {
+          console.warn(`[modelo] rechazado por el backend (model=${input.modeloId}, HTTP 403)`);
+        }
+        return `No se pudo enviar el mensaje al agente (HTTP ${status}).`;
+      },
+    );
     console.info(`[modelo] aceptado por el backend (model=${input.modeloId})`);
     if (!response.body) {
       throw new Error("El servidor ADK no devolvió el flujo de eventos.");
